@@ -20,9 +20,10 @@ jobs:
         run: |
           version=$(node -p "require('./crates/arc-tauri/tauri.conf.json').version")
           test "v$version" = "$GITHUB_REF_NAME"
-      - run: cargo test --workspace
-      - run: npm ci
+      - name: Build the UI
         working-directory: ui
+        run: npm ci && npm run build
+      - run: cargo test --workspace
       - name: Build the installer
         working-directory: crates/arc-tauri
         env:
