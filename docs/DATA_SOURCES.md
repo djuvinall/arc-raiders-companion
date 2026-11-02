@@ -30,7 +30,7 @@ Of the 155 recipes both sources have, 151 match exactly. The 4 that differ (Anvi
 
 - **Nodes:** names, descriptions, ranks and choice groups come from the wiki's Skills article (CC BY-SA 4.0), saved in `tests/fixtures/wiki_skills/`. The count is 48, 16 per branch. RaidTheory's `skillNodes.json` is the removed pre-2.0 tree and is not used.
 - **Gates:** first choice at 10 branch points (one of two); end choices at 30 and 40 (two of three). Wiki, allthings.how and Neonsect agree.
-- **Max ranks:** the wiki leaves six Mobility ranks blank. Effortless Roll is 5 per allthings.how; the other five are null, capped at 5 by the planner with a warning. In the reference screenshot, Mobility 41 has all six of those nodes solid, and solid means maxed, so the six add up to 26 if the four lower nodes are 5 each. So they can't all be 5, but the screenshot doesn't say which are lower. Hovering them in game settles it.
+- **Max ranks:** the wiki leaves six Mobility ranks blank. Effortless Roll is 5 per allthings.how. The other five come from in-game tooltips: Slip And Slide, Off The Wall, Marathon Runner and Swift Start show V, and Right Back At It shows no numeral, so it's a single point. Together they match the 21 points the reference screenshot's Mobility total needs.
 - **Wiring and layout:** hand-entered from an in-game screenshot of tree 2.0 into `crates/arc-ingest/skills_overlay.json`, in the screenshot's 2000-wide coordinates. Nodes were named by matching in-game icons to the wiki's per-skill icons, which are identical. `real_tree_reproduces_the_screenshot_build` checks the screenshot's 41/10/9 build and its locks.
 - **Icons:** the wiki's per-skill files, referenced by URL and fetched at runtime like other art.
 - **Do not use the wiki's `Widget:SkillTree` SVG.** Its header reads "Can not be used for other purposes without given permission." Ingest does not fetch it. Using it would need permission from its author, wiki user Dread.
@@ -42,7 +42,7 @@ Of the 155 recipes both sources have, 151 match exactly. The 4 that differ (Anvi
 - Weapons are separate items per tier (`rattler-i` to `rattler-iv`), not one `rattler` item.
 - Trader prices are not all coins. Currency and daily limits come from RaidTheory, so they are as of August.
 - `game-map-data` carries markers only; map images are separate tile pyramids (see Access).
-- Stella Montis has one tile layer (`b1`) but markers from several levels, so some markers sit outside the drawn floor.
+- Spaceport, Blue Gate and Stella Montis have two floors each, as separate tile paths. A marker's `zlayers` is a bitmask of the floors it's on: bit 1 is the lower floor and bit 2 the upper, and 2147483647 means every floor.
 
 ## Field precedence
 

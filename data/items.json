@@ -1024,6 +1024,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 18.75
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1085,6 +1095,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 18.75
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1144,6 +1164,16 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 18.75
         }
       ],
       "measured": {
@@ -1211,6 +1241,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1276,6 +1307,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1341,6 +1373,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1406,6 +1439,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1471,6 +1505,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1536,6 +1571,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1601,6 +1637,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1666,6 +1703,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1731,6 +1769,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1796,6 +1835,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1861,6 +1901,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1926,6 +1967,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -1993,6 +2035,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
         }
       ],
       "measured": {
@@ -2064,6 +2116,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2131,6 +2193,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
         }
       ],
       "measured": {
@@ -2202,6 +2274,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2265,6 +2347,12 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -2332,6 +2420,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2395,6 +2489,12 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -2462,6 +2562,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2525,6 +2631,12 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -2592,6 +2704,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2655,6 +2773,12 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -2722,6 +2846,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2778,6 +2908,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2834,6 +2974,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2890,6 +3040,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -2946,6 +3106,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3002,6 +3172,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3058,6 +3238,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3114,6 +3304,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3170,6 +3361,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3226,6 +3418,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3282,6 +3475,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3338,6 +3532,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3394,6 +3589,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3488,6 +3684,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3547,6 +3753,16 @@
         {
           "slot": "light-mag",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -3610,6 +3826,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3671,6 +3897,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3730,6 +3966,16 @@
         {
           "slot": "light-mag",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -3797,6 +4043,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 53.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3860,6 +4112,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 53.0
         }
       ],
       "measured": {
@@ -3927,6 +4185,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 53.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -3990,6 +4254,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 53.0
         }
       ],
       "measured": {
@@ -4065,6 +4335,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4136,6 +4412,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -4211,6 +4493,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4284,6 +4572,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4340,6 +4634,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4396,6 +4691,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4452,6 +4748,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4508,6 +4805,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4564,6 +4862,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4620,6 +4919,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4676,6 +4976,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4732,6 +5033,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4803,6 +5105,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -4878,6 +5190,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -4949,6 +5271,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -5024,6 +5356,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5097,6 +5439,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5164,6 +5516,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
         }
       ],
       "measured": {
@@ -5235,6 +5597,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5302,6 +5674,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
         }
       ],
       "measured": {
@@ -5373,6 +5755,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5440,6 +5832,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
         }
       ],
       "measured": {
@@ -5511,6 +5913,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5567,6 +5979,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5623,6 +6041,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5679,6 +6103,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5735,6 +6165,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5791,6 +6227,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5847,6 +6289,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5903,6 +6351,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -5959,6 +6413,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6028,6 +6488,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6097,6 +6558,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6166,6 +6628,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6235,6 +6698,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6304,6 +6768,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6373,6 +6838,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6440,6 +6906,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -6511,6 +6987,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6580,6 +7066,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 50.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -6647,6 +7143,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -7296,6 +7802,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -7363,6 +7870,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 25.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 6.25
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -7426,6 +7943,16 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 12.5
         }
       ],
       "measured": {
@@ -7493,6 +8020,16 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 18.75
         }
       ],
       "measured": {
@@ -7631,6 +8168,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -8434,6 +8972,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -8521,6 +9060,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 20.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 12.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -8597,6 +9146,20 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 40.0
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 46.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 25.0
         }
       ],
       "measured": {
@@ -8677,6 +9240,20 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 70.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -9490,6 +10067,7 @@
       "firing_mode": "Double-Action",
       "arc_armor_penetration": "strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -9557,6 +10135,20 @@
       "firing_mode": "Double-Action",
       "arc_armor_penetration": "strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Dispersion Recovery Time",
+          "pct": 6.25
+        },
+        {
+          "label": "Reduced Per Shot Dispersion",
+          "pct": 8.1
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 14.7
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -9615,6 +10207,20 @@
       "firing_mode": "Double-Action",
       "arc_armor_penetration": "strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Dispersion Recovery Time",
+          "pct": 12.5
+        },
+        {
+          "label": "Reduced Per Shot Dispersion",
+          "pct": 16.2
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 29.4
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -9675,6 +10281,20 @@
       "firing_mode": "Double-Action",
       "arc_armor_penetration": "strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Dispersion Recovery Time",
+          "pct": 18.75
+        },
+        {
+          "label": "Reduced Per Shot Dispersion",
+          "pct": 24.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 44.1
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -11227,6 +11847,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -11299,6 +11920,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 5.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 11.1
         }
       ],
       "measured": {
@@ -11375,6 +12006,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 10.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 22.2
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -11447,6 +12088,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
         }
       ],
       "measured": {
@@ -12576,6 +13227,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -12656,6 +13308,20 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -12734,6 +13400,20 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -12810,6 +13490,20 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -14265,6 +14959,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -14344,6 +15039,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 16.6
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -14414,6 +15115,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -14482,6 +15189,12 @@
         {
           "slot": "muzzle",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -15159,6 +15872,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -15220,6 +15934,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 15.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 14.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -15280,6 +16004,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 29.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -15340,6 +16074,16 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "moderate",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Max Shot Dispersion",
+          "pct": 45.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 43.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -20061,6 +20805,7 @@
       "firing_mode": "Semi-Automatic",
       "arc_armor_penetration": "strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -21466,6 +22211,7 @@
       "firing_mode": "Fully-Automatic",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -23877,6 +24623,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -23960,6 +24707,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -24034,6 +24787,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 51.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -24106,6 +24869,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 39.0
         }
       ],
       "measured": {
@@ -27819,6 +28588,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -27887,6 +28657,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 10.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -27953,6 +28733,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 20.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -28017,6 +28807,16 @@
         {
           "slot": "light-mag",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -29505,6 +30305,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -29573,6 +30374,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 18.0
         }
       ],
       "measured": {
@@ -29645,6 +30452,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 35.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -29713,6 +30526,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 53.0
         }
       ],
       "measured": {
@@ -30239,6 +31058,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -30326,6 +31146,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 17.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -30404,6 +31230,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 35.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -30480,6 +31312,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -31139,6 +31977,7 @@
       "firing_mode": "Bolt-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -31312,6 +32151,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -31399,6 +32239,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 25.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -31477,6 +32327,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -31553,6 +32413,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Bullet Velocity",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -36663,6 +37533,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -36746,6 +37617,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 20.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 12.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -36820,6 +37701,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 40.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 25.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -36892,6 +37783,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Bolt Action Time",
+          "pct": 60.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 37.5
         }
       ],
       "measured": {
@@ -40608,6 +41509,7 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -40709,6 +41611,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 7.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -40770,6 +41678,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -40831,6 +41745,12 @@
       "firing_mode": "Break-Action",
       "arc_armor_penetration": "very strong",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Reduced Reload Time",
+          "pct": 20.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -40905,6 +41825,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -40981,6 +41902,12 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 23.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -41055,6 +41982,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -41127,6 +42055,12 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 70.0
         }
       ],
       "measured": {
@@ -41823,6 +42757,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -41906,6 +42841,20 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 25.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 16.6
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 23.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -41980,6 +42929,20 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 33.3
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 46.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -42052,6 +43015,20 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 75.0
+        },
+        {
+          "label": "Reduced Dispersion Recovery Time",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 70.0
         }
       ],
       "measured": {
@@ -48858,6 +49835,7 @@
       "firing_mode": "Semi-Automatic",
       "arc_armor_penetration": "weak",
       "mod_slots": [],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -48918,6 +49896,16 @@
       "firing_mode": "Semi-Automatic",
       "arc_armor_penetration": "weak",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 8.6
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 10.5
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -48978,6 +49966,16 @@
       "firing_mode": "Semi-Automatic",
       "arc_armor_penetration": "weak",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 17.5
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 21.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -49038,6 +50036,16 @@
       "firing_mode": "Semi-Automatic",
       "arc_armor_penetration": "weak",
       "mod_slots": [],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 25.7
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 31.6
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -49115,6 +50123,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -49202,6 +50211,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 16.6
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 16.6
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -49280,6 +50299,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 33.3
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.3
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -49356,6 +50385,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -51923,6 +52962,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -52003,6 +53043,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 16.6
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -52081,6 +53131,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 33.3
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -52157,6 +53217,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Horizontal Recoil",
+          "pct": 50.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {
@@ -52936,6 +54006,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -53019,6 +54090,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 23.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 15.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -53093,6 +54174,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 46.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 30.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -53165,6 +54256,16 @@
         {
           "slot": "stock",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 70.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 45.0
         }
       ],
       "measured": {
@@ -54590,6 +55691,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -54664,6 +55766,20 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 13.0
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 23.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 16.0
         }
       ],
       "measured": {
@@ -54742,6 +55858,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 26.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 33.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -54814,6 +55940,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 40.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 50.0
         }
       ],
       "measured": {
@@ -55702,6 +56838,7 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -55780,6 +56917,20 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 10.0
+        },
+        {
+          "label": "Reduced Durability Burn Rate",
+          "pct": 46.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 13.0
         }
       ],
       "measured": {
@@ -55862,6 +57013,16 @@
           "tier_max": 3
         }
       ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 20.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 26.0
+        }
+      ],
       "measured": {
         "rounds_per_minute": null,
         "bullet_velocity_ms": null,
@@ -55938,6 +57099,16 @@
         {
           "slot": "underbarrel",
           "tier_max": 3
+        }
+      ],
+      "upgrades": [
+        {
+          "label": "Increased Fire Rate",
+          "pct": 30.0
+        },
+        {
+          "label": "Reduced Reload Time",
+          "pct": 40.0
         }
       ],
       "measured": {

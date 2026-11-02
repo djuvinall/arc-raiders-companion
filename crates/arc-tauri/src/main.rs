@@ -13,7 +13,7 @@ use arc_core::model::{ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTre
 use arc_core::patches::{self, PatchNote};
 use arc_core::routing::{self, MapCover, Needed};
 use arc_core::skills::{self, PlanState};
-use arc_core::tracking::{self, Collection, ProjectView, QuestRow};
+use arc_core::tracking::{self, Collection, PartyPlan, ProjectView, QuestRow};
 use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Overview};
 use arc_core::weapons::{self, CompareTable, Sheet, SlotOptions};
 use arc_core::Dataset;
@@ -227,6 +227,39 @@ fn set_quest_state(state: State<AppState>, quest_id: String, tracked: bool, done
     })
 }
 
+/// Saves the name so the next code uses it too.
+#[tauri::command]
+fn quest_share_code(state: State<AppState>, name: String) -> CommandResult<String> {
+    with_profile(&state, |p| {
+        p.player_name = Some(name.trim().to_string());
+        tracking::encode_progress(&state.dataset, p, &name)
+    })
+}
+
+/// Pasting a newer code from the same friend replaces their progress.
+#[tauri::command]
+fn add_friend(state: State<AppState>, code: String) -> CommandResult<String> {
+    let friend = tracking::decode_progress(&state.dataset, &code)?;
+    let name = friend.name.clone();
+    with_profile(&state, |p| {
+        p.friends.retain(|f| f.name != friend.name);
+        p.friends.push(friend);
+    })?;
+    Ok(name)
+}
+
+#[tauri::command]
+fn remove_friend(state: State<AppState>, name: String) -> CommandResult<()> {
+    with_profile(&state, |p| p.friends.retain(|f| f.name != name))
+}
+
+#[tauri::command]
+fn party_plan(state: State<AppState>, name: String) -> CommandResult<PartyPlan> {
+    let profile = state.profile.lock().expect("profile lock");
+    let friend = profile.friends.iter().find(|f| f.name == name).ok_or_else(|| missing("friend", &name))?;
+    Ok(tracking::party_plan(&state.dataset, &profile, friend))
+}
+
 #[tauri::command]
 fn project_list(state: State<AppState>) -> Vec<ProjectView> {
     tracking::project_views(&state.dataset, &state.profile.lock().expect("profile lock"))
@@ -428,7 +461,7 @@ fn main() {
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,
-            restart_app, stencil_shots, save_stencil_shot, delete_stencil_shot,
+            restart_app, quest_share_code, add_friend, remove_friend, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
             updates::check_app_update, updates::install_app_update
         ])
         .run(tauri::generate_context!())

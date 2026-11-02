@@ -43,6 +43,8 @@ struct MapTiles {
     max_native_zoom: u8,
     world_extent: [f64; 4],
     tile_extent: [f64; 4],
+    #[serde(default)]
+    layers: Vec<m::MapLayer>,
 }
 
 fn apply_map_tiles(maps: &mut [m::GameMap]) -> Result<()> {
@@ -54,6 +56,7 @@ fn apply_map_tiles(maps: &mut [m::GameMap]) -> Result<()> {
         map.image.max_native_zoom = Some(tiles.max_native_zoom);
         map.image.world_extent = Some(tiles.world_extent);
         map.image.tile_extent = Some(tiles.tile_extent);
+        map.image.layers = tiles.layers.clone();
     }
     Ok(())
 }

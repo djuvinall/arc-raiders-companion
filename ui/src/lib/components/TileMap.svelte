@@ -3,13 +3,15 @@
 
   interface Props {
     map: GameMap;
+    /** Tile template of the floor on show. */
+    url: string | null;
     pois: Poi[];
     /** POI ids on the active route, drawn large and numbered. */
     route: string[];
     selected: Poi | null;
     onselect: (poi: Poi | null) => void;
   }
-  let { map, pois, route, selected, onselect }: Props = $props();
+  let { map, url, pois, route, selected, onselect }: Props = $props();
 
   const COLORS: Record<string, string> = { cache: "#2ab0c6", extract: "#3fcf6b", landmark: "#9aa0a6" };
 
@@ -54,7 +56,7 @@
   });
 
   const tiles = $derived.by(() => {
-    const { url, tile_size: size, max_native_zoom: maxZ } = map.image;
+    const { tile_size: size, max_native_zoom: maxZ } = map.image;
     if (!url || !size || !width) return [];
     const z = Math.max(1, Math.min(maxZ ?? 5, Math.round(zoom)));
     const span = size * 2 ** (zoom - z);

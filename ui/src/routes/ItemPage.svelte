@@ -78,7 +78,11 @@
     if (typeof value !== "number" || typeof before !== "number") return 0;
     return Math.round((value - before) * 10) / 10;
   };
-  const anyDelta = $derived(stats.some(([key, value]) => delta(key, value) !== 0));
+  const upgrades = $derived((detail?.item.stats?.upgrades ?? []) as { label: string; pct: number }[]);
+  const anyDelta = $derived(
+    stats.some(([key, value]) => delta(key, value) !== 0) ||
+      JSON.stringify(upgrades) !== JSON.stringify(baseline?.item.stats?.upgrades ?? []),
+  );
 
   const usedIn = $derived.by((): Link[] => {
     if (!detail) return [];
@@ -136,6 +140,12 @@
           <dt>Stencil Parts</dt><dd>{item.stencil.parts} per weapon</dd>
         {/if}
       </dl>
+      {#if upgrades.length}
+        <p class="heading">Upgrade modifiers</p>
+        <ul class="upgrades">
+          {#each upgrades as upgrade}<li>{upgrade.pct}% {upgrade.label}</li>{/each}
+        </ul>
+      {/if}
       {#if baseline}
         <p class="compared">
           {anyDelta ? `Changes compared with ${baseline.item.name}.` : `Same stats as ${baseline.item.name} in the source data.`}
@@ -345,6 +355,18 @@
   }
   .delta.down {
     color: #c0392b;
+  }
+  .heading {
+    margin: 0 0 2px;
+    color: var(--on-cream-dim);
+    font-family: var(--font-head);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .upgrades {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
   }
   .compared {
     margin: -8px 0 12px;

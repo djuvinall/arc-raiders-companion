@@ -179,6 +179,7 @@ fn project_stats(cat: Category, block: &Value, shield_type: Option<String>, slot
             firing_mode: stat_text(block, "firingMode"),
             arc_armor_penetration: stat_text(block, "arcArmorPenetration").map(|s| s.to_lowercase()),
             mod_slots: slots,
+            upgrades: weapon_upgrades(block),
             measured: MeasuredStats::default(),
         })),
         Category::Shield => Some(Stats::Shield(ShieldStats {
@@ -366,6 +367,27 @@ fn parse_modifier(entry: &str) -> Option<(Option<Modifier>, i32)> {
 pub struct Output {
     pub files: DatasetFiles,
     pub unresolved: Vec<String>,
+}
+
+/// MetaForge lists each level's modifiers as `increasedFireRate` style fields, mostly zero.
+fn weapon_upgrades(block: &Value) -> Vec<WeaponUpgrade> {
+    let mut rows: Vec<WeaponUpgrade> = block.as_object().into_iter().flatten()
+        .filter(|(key, _)| key.starts_with("increased") || key.starts_with("reduced"))
+        .filter_map(|(key, value)| {
+            let pct = value.as_f64().filter(|p| *p != 0.0)?;
+            let (verb, rest) = key.split_at(if key.starts_with("reduced") { 7 } else { 9 });
+            let words = rest.chars().fold(String::new(), |mut text, c| {
+                if c.is_uppercase() && !text.is_empty() && !text.ends_with(|p: char| p.is_uppercase()) {
+                    text.push(' ');
+                }
+                text.push(c);
+                text
+            });
+            Some(WeaponUpgrade { label: format!("{} {words}", title_case(verb)), pct })
+        })
+        .collect();
+    rows.sort_by(|a, b| a.label.cmp(&b.label));
+    rows
 }
 
 pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Overlay) -> Result<Output> {
@@ -817,6 +839,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
                 y,
                 loot_areas,
                 notes: None,
+                zlayers: m["zlayers"].as_u64().and_then(|z| u32::try_from(z).ok()),
             });
         }
         let bounds = (!xs.is_empty()).then(|| Bounds {
@@ -837,6 +860,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
             image: MapImage {
                 url: None, width_px: None, height_px: None, tile_size: None,
                 max_native_zoom: None, world_extent: None, tile_extent: None,
+                layers: Vec::new(),
             },
             bounds,
             poi_ids,

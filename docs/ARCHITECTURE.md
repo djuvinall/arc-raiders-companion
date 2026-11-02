@@ -15,7 +15,7 @@ The budget is `76 + expedition_bonus`, capped at 5 as the plan specifies. The wi
 
 ## Weapon calculators
 
-`arc-core/src/weapons.rs`. Only `fire_rate` and flat magazine size change a UI stat; every other mod stat has no UI counterpart and is listed as an effect. Percent modifiers on one stat multiply in sequence, which is a guess: the game's rule isn't published. Stat DPS is damage × fire rate stat. Time to kill and falloff stay hidden until `measured` values exist.
+`arc-core/src/weapons.rs`. Only `fire_rate` and flat magazine size change a UI stat; every other mod stat has no UI counterpart and is listed as an effect. Percent modifiers on one stat multiply in sequence, which is a guess: the game's rule isn't published. Stat DPS is damage × fire rate stat, with the level's fire rate upgrade applied, because the listed stat is the same at every level. Time to kill and falloff stay hidden until `measured` values exist.
 
 ## Tracking and routing
 

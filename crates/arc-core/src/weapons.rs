@@ -45,6 +45,7 @@ pub struct Sheet {
     pub arc_armor_penetration: Option<String>,
     pub ammo_type: Option<String>,
     pub rows: Vec<StatRow>,
+    pub upgrades: Vec<WeaponUpgrade>,
     pub effects: Vec<Effect>,
     pub measured: Vec<StatRow>,
     /// Null until `measured.rounds_per_minute` exists.
@@ -226,14 +227,17 @@ pub fn apply_mods(ds: &Dataset, item_id: &str, mod_ids: &[String], target_hp: f6
         }
     }
 
-    let fire_rate = stats.fire_rate.map(|f| f * multiplier(&mods, ModStat::FireRate));
+    // A level's fire rate bonus isn't in the listed stat, which is the same at every level.
+    let bonus = stats.upgrades.iter().find(|u| u.label == "Increased Fire Rate").map_or(0.0, |u| u.pct);
+    let base_rate = stats.fire_rate.map(|f| f * (1.0 + bonus / 100.0));
+    let fire_rate = base_rate.map(|f| f * multiplier(&mods, ModStat::FireRate));
     let magazine_flat: i32 = mods.iter().map(|m| m.flat.magazine_size).sum();
     let base_mag = stats.magazine_size.map(f64::from);
     let dps = |rate: Option<f64>| stats.damage.zip(rate).map(|(d, r)| d * r);
     let rows = vec![
         row("damage", "Damage", stats.damage, stats.damage),
-        row("fire_rate", "Fire rate", stats.fire_rate, fire_rate),
-        row("stat_dps", "Stat DPS", dps(stats.fire_rate), dps(fire_rate)),
+        row("fire_rate", "Fire rate", base_rate, fire_rate),
+        row("stat_dps", "Stat DPS", dps(base_rate), dps(fire_rate)),
         row("range", "Range", stats.range, stats.range),
         row("stability", "Stability", stats.stability, stats.stability),
         row("agility", "Agility", stats.agility, stats.agility),
@@ -262,6 +266,7 @@ pub fn apply_mods(ds: &Dataset, item_id: &str, mod_ids: &[String], target_hp: f6
         arc_armor_penetration: stats.arc_armor_penetration.clone(),
         ammo_type: item.ammo_type.clone(),
         rows,
+        upgrades: stats.upgrades.clone(),
         effects,
         measured,
         ttk: stats.damage.zip(rpm).and_then(|(d, r)| ttk_flat(target_hp, d, r)),

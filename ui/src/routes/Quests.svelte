@@ -1,15 +1,16 @@
 <script lang="ts">
+  import QuestParty from "../lib/components/QuestParty.svelte";
   import { linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
   const COLORS: Record<string, string> = {
-    done: "#2ab0c6", active: "#f5c400", available: "#ece6d6", locked: "#6b7080",
+    done: "#2ab0c6", active: "#f5c400", needed: "#ff8a3d", available: "#ece6d6", locked: "#6b7080",
   };
 
   let quests = $state<QuestRow[]>([]);
   let maps = $state<GameMap[]>([]);
-  let view = $state<"list" | "graph">("list");
+  let view = $state<"list" | "graph" | "friends">("list");
   let selectedId = $state<string | null>(null);
   let map = $state("");
   let trader = $state("");
@@ -71,6 +72,7 @@
       <div class="switch">
         <button class:on={view === "list"} onclick={() => (view = "list")}>List</button>
         <button class:on={view === "graph"} onclick={() => (view = "graph")}>Graph</button>
+        <button class:on={view === "friends"} onclick={() => (view = "friends")}>Friends</button>
       </div>
       <input class="field" placeholder="Search quests" bind:value={search} />
       <select class="field" aria-label="Map" bind:value={map}>
@@ -88,7 +90,9 @@
       <span class="dim">{visible.length} of {quests.length}</span>
     </div>
 
-    {#if view === "list"}
+    {#if view === "friends"}
+      <QuestParty {maps} {selectedId} onselect={(id) => (selectedId = id)} />
+    {:else if view === "list"}
       <div class="list">
         {#each visible as q (q.quest.id)}
           <button class="row" class:active={selectedId === q.quest.id} onclick={() => (selectedId = q.quest.id)}>
@@ -144,6 +148,14 @@
       {:else}
         <p class="dim small">{map ? "Nothing left to do on this map." : "No objectives listed."}</p>
       {/each}
+
+      {#if selected.needed_for.length}
+        <h3 class="section-title">Needed for</h3>
+        {#each selected.needed_for as link}
+          <button class="line plain" onclick={() => (selectedId = link.id)}>{link.name}</button>
+        {/each}
+        {#if !selected.open}<p class="dim small">An earlier quest has to come first.</p>{/if}
+      {/if}
 
       {#if selected.required.length}
         <h3 class="section-title">Needs</h3>

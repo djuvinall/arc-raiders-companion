@@ -40,6 +40,15 @@
             "string",
             "null"
           ]
+        },
+        "zlayers": {
+          "description": "Bitmask of the floors it's on, as MetaForge reports it.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
         }
       },
       "additionalProperties": false,

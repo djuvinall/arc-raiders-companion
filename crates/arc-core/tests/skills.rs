@@ -210,7 +210,9 @@ fn real_tree_has_all_48_skills_and_the_published_gates() {
     assert_eq!((broad.max_rank, broad.branch.as_str()), (Some(5), "conditioning"));
     assert!(broad.details.as_deref().unwrap().contains("2 points"));
     let unknown: Vec<_> = t.nodes.iter().filter(|n| n.max_rank.is_none()).map(|n| n.id.as_str()).collect();
-    assert_eq!(unknown.len(), 5, "{unknown:?}");
+    assert!(unknown.is_empty(), "{unknown:?}");
+    let right_back = t.nodes.iter().find(|n| n.id == "right-back-at-it").unwrap();
+    assert_eq!((right_back.max_rank, right_back.kind.as_str()), (Some(1), "toggle"));
 }
 
 #[test]
@@ -254,8 +256,8 @@ fn real_tree_reproduces_the_screenshot_build() {
         ("stubborn-mule", 4), ("vault-n-carry", 1),
         ("youthful-lungs", 1), ("sure-footed-scrambler", 5), ("nimble-climber", 5),
         ("fight-or-flight", 1), ("vaults-on-vaults-on-vaults", 1), ("effortless-roll", 5),
-        ("slip-and-slide", 5), ("right-back-at-it", 4), ("off-the-wall", 4),
-        ("marathon-runner", 4), ("swift-start", 4), ("sprinting-on-fumes", 1), ("wall-run", 1),
+        ("slip-and-slide", 5), ("right-back-at-it", 1), ("off-the-wall", 5),
+        ("marathon-runner", 5), ("swift-start", 5), ("sprinting-on-fumes", 1), ("wall-run", 1),
         ("in-round-crafting", 1), ("looters-instincts", 4), ("silent-scavenger", 2),
         ("sturdy-ankles", 1), ("agile-croucher", 1),
     ] {

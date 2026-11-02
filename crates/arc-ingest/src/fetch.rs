@@ -56,7 +56,7 @@ fn prune_markers(body: &Value) -> Value {
                 || m["lootAreas"].as_str().is_some_and(|l| !l.is_empty())
         })
         .map(|m| json!({
-            "id": m["id"], "lat": m["lat"], "lng": m["lng"], "category": m["category"],
+            "id": m["id"], "lat": m["lat"], "lng": m["lng"], "zlayers": m["zlayers"], "category": m["category"],
             "subcategory": m["subcategory"], "instanceName": m["instanceName"],
             "lootAreas": m["lootAreas"],
         }))

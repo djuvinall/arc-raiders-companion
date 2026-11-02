@@ -35,6 +35,19 @@ fn stat_dps_is_damage_times_fire_rate() {
 }
 
 #[test]
+fn levels_carry_their_upgrades_into_the_sheet() {
+    let ds = real();
+    let level = |id: &str| apply_mods(&ds, id, &[], 100.0).unwrap();
+    assert!(level("anvil-i").upgrades.is_empty());
+    let top = level("anvil-iv");
+    let names: Vec<_> = top.upgrades.iter().map(|u| (u.label.as_str(), u.pct)).collect();
+    assert_eq!(names, [("Increased Fire Rate", 75.0), ("Reduced Dispersion Recovery Time", 18.75)]);
+    assert!((row(&top, "stat_dps").value.unwrap() - 40.0 * 10.3 * 1.75).abs() < 1e-9);
+    let stiletto: Vec<_> = level("stiletto-iv").upgrades.iter().map(|u| u.pct).collect();
+    assert_eq!(stiletto, [25.7, 31.6]);
+}
+
+#[test]
 fn every_version_of_a_gun_opens_the_same_family() {
     let ds = real();
     let family = weapon_family_view(&ds, "anvil-iii").unwrap();
@@ -240,6 +253,18 @@ fn steam_feed_keeps_official_notes_and_finds_the_patch() {
 }
 
 #[test]
+fn two_floor_maps_list_both_floors() {
+    let ds = real();
+    let floors = |id: &str| ds.files.maps.iter().find(|m| m.id == id).unwrap().image.layers.clone();
+    assert_eq!(floors("spaceport").iter().map(|l| l.name.as_str()).collect::<Vec<_>>(), ["Surface", "Tunnels"]);
+    assert!(!floors("spaceport")[0].url.contains("underground"));
+    assert_eq!(floors("blue-gate").len(), 2);
+    assert_eq!(floors("stella-montis").len(), 2);
+    assert!(floors("dam").is_empty());
+    assert!(ds.files.pois.iter().all(|p| p.zlayers.is_some()));
+}
+
+#[test]
 fn dataset_records_the_patch_and_map_tiles() {
     let ds = real();
     assert_eq!(ds.files.version.game_patch.as_deref(), Some("2.3.0"));
@@ -264,6 +289,82 @@ fn quest_status_follows_prerequisites_and_objectives() {
     assert_eq!(status(&p), "done");
     set_objective(&ds, &mut p, &quest.id, &atomics[0], false);
     assert_eq!(status(&p), "active");
+}
+
+fn chain(ds: &Dataset) -> (String, String, String) {
+    ds.files.quests.iter().find_map(|last| {
+        let before = |quest: &Quest| {
+            let id = &quest.prerequisites.first()?.quest_id;
+            ds.files.quests.iter().find(|q| q.id == *id)
+        };
+        let middle = before(last)?;
+        let first = before(middle)?;
+        Some((first.id.clone(), middle.id.clone(), last.id.clone()))
+    }).unwrap()
+}
+
+fn status<'a>(rows: &'a [QuestRow], id: &str) -> &'a QuestRow {
+    rows.iter().find(|r| r.quest.id == id).unwrap()
+}
+
+#[test]
+fn quests_behind_a_tracked_quest_are_needed() {
+    let ds = real();
+    let (first, middle, last) = chain(&ds);
+    let mut profile = Profile::default();
+    assert_ne!(status(&quest_rows(&ds, &profile), &first).status, "needed");
+
+    profile.quests.insert(last.clone(), QuestProgress::default());
+    let rows = quest_rows(&ds, &profile);
+    assert_eq!(status(&rows, &first).status, "needed");
+    assert_eq!(status(&rows, &middle).status, "needed");
+    assert_eq!(status(&rows, &middle).needed_for[0].id, last);
+    assert_eq!(status(&rows, &last).status, "active");
+
+    profile.quests.insert(first.clone(), QuestProgress { done: true, ..Default::default() });
+    let rows = quest_rows(&ds, &profile);
+    assert_eq!(status(&rows, &first).status, "done");
+    assert_eq!(status(&rows, &middle).status, "needed");
+}
+
+#[test]
+fn share_codes_round_trip_and_stay_short() {
+    let ds = real();
+    let mut profile = Profile::default();
+    for quest in &ds.files.quests {
+        profile.quests.insert(quest.id.clone(), QuestProgress { done: true, ..Default::default() });
+    }
+    let (_, _, last) = chain(&ds);
+    profile.quests.insert(last.clone(), QuestProgress::default());
+    let code = encode_progress(&ds, &profile, " Devon ");
+    assert!(code.len() < 500, "{}", code.len());
+    let friend = decode_progress(&ds, &code).unwrap();
+    assert_eq!(friend.name, "Devon");
+    assert_eq!(friend.active, [last]);
+    assert_eq!(friend.done.len(), ds.files.quests.len() - 1);
+    assert!(decode_progress(&ds, "hello").is_err());
+    assert!(decode_progress(&ds, "ARCQ1-").is_err());
+}
+
+#[test]
+fn the_party_plan_starts_with_the_older_quest() {
+    let ds = real();
+    let (first, middle, _) = chain(&ds);
+    let done = |ids: &[&String]| ids.iter().map(|i| (i.to_string(), QuestProgress { done: true, ..Default::default() })).collect();
+    let behind = |d: &[&String]| Profile { quests: done(d), ..Default::default() };
+
+    // Everything before the first quest is finished by both, so only the chain differs.
+    let early: Vec<String> = ds.files.quests.iter().filter(|q| q.prerequisites.is_empty()).map(|q| q.id.clone()).collect();
+    let mut me = behind(&early.iter().collect::<Vec<_>>());
+    me.quests.insert(first.clone(), QuestProgress { done: true, ..Default::default() });
+    let them = Friend { name: "Sam".into(), done: early.into_iter().filter(|q| *q != first).collect(), active: vec![] };
+
+    let plan = party_plan(&ds, &me, &them);
+    assert_eq!(plan.friend, "Sam");
+    assert!(plan.friend_catch_up.iter().any(|q| q.quest.id == first));
+    assert!(!plan.together.iter().any(|q| q.quest.id == middle));
+    assert!(plan.together.windows(2).all(|w| w[0].depth <= w[1].depth));
+    assert!(plan.maps.windows(2).all(|w| w[0].1 >= w[1].1));
 }
 
 #[test]

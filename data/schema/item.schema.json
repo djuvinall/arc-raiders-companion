@@ -295,6 +295,13 @@
                 "$ref": "#/$defs/ModSlot"
               }
             },
+            "upgrades": {
+              "description": "What this level or version adds, such as 25.7% Increased Fire Rate.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/WeaponUpgrade"
+              }
+            },
             "measured": {
               "$ref": "#/$defs/MeasuredStats"
             }
@@ -303,6 +310,7 @@
           "required": [
             "kind",
             "mod_slots",
+            "upgrades",
             "measured"
           ]
         },
@@ -493,6 +501,23 @@
       "required": [
         "slot",
         "tier_max"
+      ]
+    },
+    "WeaponUpgrade": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "pct": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "pct"
       ]
     },
     "MeasuredStats": {

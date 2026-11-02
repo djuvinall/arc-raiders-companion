@@ -152,7 +152,16 @@ pub struct WeaponStats {
     pub firing_mode: Option<String>,
     pub arc_armor_penetration: Option<String>,
     pub mod_slots: Vec<ModSlot>,
+    /// What this level or version adds, such as 25.7% Increased Fire Rate.
+    pub upgrades: Vec<WeaponUpgrade>,
     pub measured: MeasuredStats,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct WeaponUpgrade {
+    pub label: String,
+    pub pct: f64,
 }
 
 /// Data wanted (plan §10): stays null until community-measured numbers exist.
@@ -337,6 +346,17 @@ pub struct MapImage {
     pub world_extent: Option<[f64; 4]>,
     /// ...and the same corners in zoom-0 tile pixels [y, x, y, x].
     pub tile_extent: Option<[f64; 4]>,
+    /// Floors, first one shown by default. Empty on one-floor maps.
+    pub layers: Vec<MapLayer>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MapLayer {
+    pub name: String,
+    pub url: String,
+    /// The bit a marker's `zlayers` sets when it's on this floor.
+    pub mask: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -381,6 +401,8 @@ pub struct Poi {
     pub y: f64,
     pub loot_areas: Vec<String>,
     pub notes: Option<String>,
+    /// Bitmask of the floors it's on, as MetaForge reports it.
+    pub zlayers: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -671,6 +693,17 @@ pub struct Profile {
     pub skill_plans: Vec<SkillPlan>,
     pub weapon_builds: Vec<WeaponBuild>,
     pub tracked_item_ids: Vec<String>,
+    pub player_name: Option<String>,
+    pub friends: Vec<Friend>,
+}
+
+/// A friend's quest progress as of the share code they last sent.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Friend {
+    pub name: String,
+    pub done: Vec<String>,
+    pub active: Vec<String>,
 }
 
 impl Default for Profile {
@@ -687,6 +720,8 @@ impl Default for Profile {
             skill_plans: Vec::new(),
             weapon_builds: Vec::new(),
             tracked_item_ids: Vec::new(),
+            player_name: None,
+            friends: Vec::new(),
         }
     }
 }

@@ -2,15 +2,21 @@
 
 use crate::dataset::Dataset;
 use crate::model::*;
+use crate::skills::{base64_decode, base64_encode};
 use crate::views::{item_link, lines, Link};
 use serde::Serialize;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct QuestRow {
     pub quest: Quest,
-    /// `done`, `active` (tracked), `available` or `locked`.
+    /// `done`, `active` (tracked), `needed` (a tracked quest depends on it),
+    /// `available` or `locked`.
     pub status: &'static str,
+    /// The tracked quests that depend on this one.
+    pub needed_for: Vec<Link>,
+    /// Every prerequisite is done, so it can be started now.
+    pub open: bool,
     pub prerequisites: Vec<Link>,
     pub required: Vec<Link>,
     pub rewards: Vec<Link>,
@@ -26,19 +32,46 @@ fn quest_link(quest: &Quest) -> Link {
     Link { kind: "quest".into(), id: quest.id.clone(), name: quest.name.clone(), icon: None, qty: None, note: None }
 }
 
+/// Unfinished quests behind each tracked quest, walking back through its prerequisites.
+fn needed_by_tracked<'a>(ds: &'a Dataset, profile: &Profile) -> BTreeMap<&'a str, Vec<&'a Quest>> {
+    let done = |id: &str| profile.quests.get(id).is_some_and(|p| p.done);
+    let mut needed: BTreeMap<&str, Vec<&Quest>> = BTreeMap::new();
+    let tracked = ds.files.quests.iter()
+        .filter(|q| profile.quests.get(&q.id).is_some_and(|p| !p.done));
+    for quest in tracked {
+        let mut seen = BTreeSet::new();
+        let mut waiting: Vec<&str> = quest.prerequisites.iter().map(|p| p.quest_id.as_str()).collect();
+        while let Some(id) = waiting.pop() {
+            let Some(earlier) = ds.files.quests.iter().find(|q| q.id == id) else { continue };
+            if done(id) || !seen.insert(id) {
+                continue;
+            }
+            needed.entry(earlier.id.as_str()).or_default().push(quest);
+            waiting.extend(earlier.prerequisites.iter().map(|p| p.quest_id.as_str()));
+        }
+    }
+    needed
+}
+
 pub fn quest_rows(ds: &Dataset, profile: &Profile) -> Vec<QuestRow> {
     let done = |id: &str| profile.quests.get(id).is_some_and(|p| p.done);
+    let needed = needed_by_tracked(ds, profile);
     ds.files.quests.iter().map(|quest| {
         let progress = profile.quests.get(&quest.id);
+        let open = quest.prerequisites.iter().all(|p| done(&p.quest_id));
+        let needed_for = needed.get(quest.id.as_str());
         let status = match progress {
             Some(p) if p.done => "done",
             Some(_) => "active",
-            None if quest.prerequisites.iter().all(|p| done(&p.quest_id)) => "available",
+            None if needed_for.is_some() => "needed",
+            None if open => "available",
             None => "locked",
         };
         let maps: BTreeSet<String> = quest.objectives.iter().flat_map(|o| o.maps.iter().cloned()).collect();
         QuestRow {
             status,
+            open,
+            needed_for: needed_for.map_or(Vec::new(), |tracked| tracked.iter().map(|q| quest_link(q)).collect()),
             prerequisites: quest.prerequisites.iter()
                 .filter_map(|p| ds.files.quests.iter().find(|q| q.id == p.quest_id))
                 .map(quest_link)
@@ -50,6 +83,111 @@ pub fn quest_rows(ds: &Dataset, profile: &Profile) -> Vec<QuestRow> {
             quest: quest.clone(),
         }
     }).collect()
+}
+
+const SHARE_PREFIX: &str = "ARCQ1-";
+const TAG_ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+/// Three characters per quest keep a code short enough to paste into a chat.
+fn quest_tag(id: &str) -> String {
+    let hash = id.bytes().fold(0x811c9dc5u32, |h, b| (h ^ u32::from(b)).wrapping_mul(0x01000193));
+    (0..3).map(|i| TAG_ALPHABET[(hash >> (i * 6)) as usize & 63] as char).collect()
+}
+
+/// A code a friend can paste: this player's name and quest progress, nothing else.
+pub fn encode_progress(ds: &Dataset, profile: &Profile, name: &str) -> String {
+    let tags = |done: bool| -> String {
+        ds.files.quests.iter()
+            .filter(|q| profile.quests.get(&q.id).is_some_and(|p| p.done == done))
+            .map(|q| quest_tag(&q.id))
+            .collect()
+    };
+    format!("{SHARE_PREFIX}{}.{}.{}", base64_encode(name.trim().as_bytes()), tags(true), tags(false))
+}
+
+/// Tags for quests this dataset doesn't know are skipped, so codes survive data updates.
+pub fn decode_progress(ds: &Dataset, code: &str) -> Result<Friend, String> {
+    let bad = || "That isn't a quest share code.".to_string();
+    let body = code.trim().strip_prefix(SHARE_PREFIX).ok_or_else(bad)?;
+    let mut parts = body.split('.');
+    let (name, done, active) = (parts.next().ok_or_else(bad)?, parts.next().ok_or_else(bad)?, parts.next().ok_or_else(bad)?);
+    let name = base64_decode(name).and_then(|n| String::from_utf8(n).ok()).filter(|n| !n.is_empty()).ok_or_else(bad)?;
+    let ids = |tags: &str| -> Vec<String> {
+        let tags: BTreeSet<&[u8]> = tags.as_bytes().chunks(3).collect();
+        ds.files.quests.iter().filter(|q| tags.contains(quest_tag(&q.id).as_bytes())).map(|q| q.id.clone()).collect()
+    };
+    Ok(Friend { name, done: ids(done), active: ids(active) })
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct PartyQuest {
+    pub quest: Link,
+    pub maps: Vec<String>,
+    /// Quests before this one in its longest chain, so low numbers are older quests.
+    pub depth: u32,
+    /// Someone is already tracking it.
+    pub active: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct PartyPlan {
+    pub friend: String,
+    /// Both can do these now.
+    pub together: Vec<PartyQuest>,
+    /// The friend has finished these, and this player can do them now.
+    pub you_catch_up: Vec<PartyQuest>,
+    /// This player has finished these, and the friend can do them now.
+    pub friend_catch_up: Vec<PartyQuest>,
+    /// Maps by how many of the together quests have objectives there.
+    pub maps: Vec<(String, usize)>,
+}
+
+fn quest_depth(ds: &Dataset, id: &str, path: &mut Vec<String>) -> u32 {
+    if path.iter().any(|p| p == id) {
+        return 0;
+    }
+    let Some(quest) = ds.files.quests.iter().find(|q| q.id == id) else { return 0 };
+    path.push(id.to_string());
+    let deepest = quest.prerequisites.iter().map(|p| 1 + quest_depth(ds, &p.quest_id, path)).max().unwrap_or(0);
+    path.pop();
+    deepest
+}
+
+/// What two players should do next. Older quests come first, so whoever is behind
+/// reaches the same point in the chain and the two can then play the rest together.
+pub fn party_plan(ds: &Dataset, profile: &Profile, friend: &Friend) -> PartyPlan {
+    let mine: BTreeSet<&str> = profile.quests.iter().filter(|(_, p)| p.done).map(|(id, _)| id.as_str()).collect();
+    let theirs: BTreeSet<&str> = friend.done.iter().map(String::as_str).collect();
+    let can_do = |quest: &Quest, done: &BTreeSet<&str>| {
+        !done.contains(quest.id.as_str()) && quest.prerequisites.iter().all(|p| done.contains(p.quest_id.as_str()))
+    };
+    let (mut together, mut you_catch_up, mut friend_catch_up) = (Vec::new(), Vec::new(), Vec::new());
+    for quest in &ds.files.quests {
+        let (me, them) = (can_do(quest, &mine), can_do(quest, &theirs));
+        let list = match (me, them) {
+            (true, true) => &mut together,
+            (true, false) if theirs.contains(quest.id.as_str()) => &mut you_catch_up,
+            (false, true) if mine.contains(quest.id.as_str()) => &mut friend_catch_up,
+            _ => continue,
+        };
+        let maps: BTreeSet<String> = quest.objectives.iter().flat_map(|o| o.maps.iter().cloned()).collect();
+        list.push(PartyQuest {
+            quest: quest_link(quest),
+            maps: maps.into_iter().collect(),
+            depth: quest_depth(ds, &quest.id, &mut Vec::new()),
+            active: friend.active.contains(&quest.id) || profile.quests.get(&quest.id).is_some_and(|p| !p.done),
+        });
+    }
+    for list in [&mut together, &mut you_catch_up, &mut friend_catch_up] {
+        list.sort_by(|a, b| a.depth.cmp(&b.depth).then_with(|| a.quest.name.cmp(&b.quest.name)));
+    }
+    let mut counts: BTreeMap<String, usize> = BTreeMap::new();
+    for map in together.iter().flat_map(|q| &q.maps) {
+        *counts.entry(map.clone()).or_default() += 1;
+    }
+    let mut maps: Vec<(String, usize)> = counts.into_iter().collect();
+    maps.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    PartyPlan { friend: friend.name.clone(), together, you_catch_up, friend_catch_up, maps }
 }
 
 /// Ticking the last objective completes the quest; unticking one reopens it.

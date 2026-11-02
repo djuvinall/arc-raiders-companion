@@ -151,7 +151,7 @@ pub fn build(wikitext: &str, overlay: &Overlay) -> Result<SkillTree> {
                 ("choice", Some(format!("{branch}-mid")), 10)
             } else if row.node_type.contains("30/40") {
                 ("choice", Some(format!("{branch}-end")), 30)
-            } else if row.max == Some(1) {
+            } else if row.max.or_else(|| overlay.max_rank.get(&id).copied()) == Some(1) {
                 ("toggle", None, 0)
             } else {
                 ("rank", None, 0)

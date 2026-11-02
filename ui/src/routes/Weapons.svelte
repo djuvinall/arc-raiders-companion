@@ -127,6 +127,12 @@
               </dd>
             {/each}
           </dl>
+          {#if sheet.upgrades.length}
+            <h3 class="section-title">Upgrade modifiers</h3>
+            <dl>
+              {#each sheet.upgrades as upgrade}<dt>{upgrade.label}</dt><dd>{upgrade.pct}%</dd>{/each}
+            </dl>
+          {/if}
           {#if sheet.effects.length}
             <h3 class="section-title">Mod effects</h3>
             <dl>
@@ -188,7 +194,7 @@
 
   <section class="panel foot">
     <p class="dim small">
-      Stat DPS is damage × the in-game fire rate stat. It's derived from UI stats, so it compares
+      Stat DPS is damage × the fire rate stat, including level upgrades. It's derived from UI stats, so it compares
       weapons but isn't real damage per second. Percent mods multiply in sequence, which is an
       assumption: the game's stacking rule isn't published. To contribute measured numbers, edit a
       weapon's <code>measured</code> block in <code>data/items.json</code> and open a pull request.

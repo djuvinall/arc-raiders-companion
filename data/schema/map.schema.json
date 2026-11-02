@@ -118,9 +118,42 @@
           },
           "minItems": 4,
           "maxItems": 4
+        },
+        "layers": {
+          "description": "Floors, first one shown by default. Empty on one-floor maps.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MapLayer"
+          }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "layers"
+      ]
+    },
+    "MapLayer": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "mask": {
+          "description": "The bit a marker's `zlayers` sets when it's on this floor.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url",
+        "mask"
+      ]
     },
     "Bounds": {
       "type": "object",

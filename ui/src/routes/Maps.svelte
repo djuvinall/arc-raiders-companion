@@ -22,6 +22,7 @@
   let kinds = $state<Record<string, boolean>>({ cache: true, extract: true, landmark: false });
   let area = $state("");
   let search = $state("");
+  let floor = $state(0);
 
   function remembered() {
     try {
@@ -50,6 +51,7 @@
 
   async function open(map: GameMap) {
     current = map;
+    floor = 0;
     selected = null;
     pois = await mapPois(map.id);
   }
@@ -57,10 +59,12 @@
   const cover = $derived(plan?.covers.find((c) => c.map_id === current?.id) ?? null);
   const route = $derived(cover?.pois.map((p) => p.id) ?? []);
   const areas = $derived([...new Set(pois.flatMap((p) => p.loot_areas))].sort());
+  const floors = $derived(current?.image.layers ?? []);
+  const onFloor = (p: Poi) => !floors.length || p.zlayers === null || (p.zlayers & floors[floor].mask) !== 0;
   const shown = $derived(
     pois.filter((p) =>
       route.includes(p.id) || (
-        kinds[p.kind] &&
+        kinds[p.kind] && onFloor(p) &&
         (!area || p.loot_areas.includes(area)) &&
         (!search || p.name.toLowerCase().includes(search.toLowerCase()))
       ),
@@ -112,6 +116,13 @@
 
   <div class="center">
     <div class="filters">
+      {#if floors.length}
+        <div class="floors" role="group" aria-label="Floor">
+          {#each floors as layer, i (layer.name)}
+            <button class:on={i === floor} aria-pressed={i === floor} onclick={() => { floor = i; selected = null; }}>{layer.name}</button>
+          {/each}
+        </div>
+      {/if}
       {#each Object.keys(kinds) as kind}
         <label><input type="checkbox" bind:checked={kinds[kind]} /> {kind}</label>
       {/each}
@@ -123,7 +134,7 @@
       <span class="dim small">{shown.length} shown</span>
     </div>
     {#if current}
-      <TileMap map={current} pois={shown} {route} {selected} onselect={(p) => (selected = p)} />
+      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} pois={shown} {route} {selected} onselect={(p) => (selected = p)} />
     {/if}
   </div>
 
@@ -166,6 +177,24 @@
 </div>
 
 <style>
+  .floors {
+    display: flex;
+    gap: 2px;
+  }
+  .floors button {
+    padding: 4px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font: inherit;
+  }
+  .floors .on {
+    border-color: var(--cream);
+    background: var(--cream);
+    color: var(--on-cream);
+  }
   .page {
     display: grid;
     grid-template-columns: 280px minmax(0, 1fr) 280px;

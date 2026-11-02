@@ -190,6 +190,23 @@ export interface Profile {
   weapon_builds: WeaponBuild[];
   tracked_item_ids: string[];
   blueprints_found: string[];
+  player_name: string | null;
+  friends: { name: string; done: string[]; active: string[] }[];
+}
+
+export interface PartyQuest {
+  quest: Link;
+  maps: string[];
+  depth: number;
+  active: boolean;
+}
+
+export interface PartyPlan {
+  friend: string;
+  together: PartyQuest[];
+  you_catch_up: PartyQuest[];
+  friend_catch_up: PartyQuest[];
+  maps: [string, number][];
 }
 
 export interface WeaponMod {
@@ -220,6 +237,7 @@ export interface Sheet {
   arc_armor_penetration: string | null;
   ammo_type: string | null;
   rows: StatRow[];
+  upgrades: { label: string; pct: number }[];
   effects: { stat: string; pct: number }[];
   measured: StatRow[];
   ttk: { target_hp: number; shots: number; seconds: number } | null;
@@ -240,6 +258,7 @@ export interface GameMap {
     max_native_zoom: number | null;
     world_extent: [number, number, number, number] | null;
     tile_extent: [number, number, number, number] | null;
+    layers: { name: string; url: string; mask: number }[];
   };
 }
 
@@ -251,6 +270,7 @@ export interface Poi {
   x: number;
   y: number;
   loot_areas: string[];
+  zlayers: number | null;
 }
 
 export interface LiveEvent {
@@ -305,7 +325,9 @@ export interface QuestRow {
     xp: number | null;
     graph_position: { x: number; y: number } | null;
   };
-  status: "done" | "active" | "available" | "locked";
+  status: "done" | "active" | "needed" | "available" | "locked";
+  needed_for: Link[];
+  open: boolean;
   prerequisites: Link[];
   required: Link[];
   rewards: Link[];
@@ -387,6 +409,11 @@ export const setQuestObjective = (questId: string, objectiveId: string, done: bo
   invoke<void>("set_quest_objective", { questId, objectiveId, done });
 export const setQuestState = (questId: string, tracked: boolean, done: boolean) =>
   invoke<void>("set_quest_state", { questId, tracked, done });
+
+export const questShareCode = (name: string) => invoke<string>("quest_share_code", { name });
+export const addFriend = (code: string) => invoke<string>("add_friend", { code });
+export const removeFriend = (name: string) => invoke<void>("remove_friend", { name });
+export const partyPlan = (name: string) => invoke<PartyPlan>("party_plan", { name });
 
 export const projectList = () => invoke<ProjectView[]>("project_list");
 export const commitResource = (projectId: string, itemId: string, qty: number) =>

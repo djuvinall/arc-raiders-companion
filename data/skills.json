@@ -1418,7 +1418,7 @@
       "kind": "rank",
       "description": "You can slide further and faster.",
       "details": null,
-      "max_rank": null,
+      "max_rank": 5,
       "per_rank": [],
       "cost_per_rank": 1,
       "prereq_ids": [
@@ -1434,10 +1434,10 @@
       "id": "right-back-at-it",
       "name": "Right Back At It",
       "branch": "mobility",
-      "kind": "rank",
+      "kind": "toggle",
       "description": "Reduces the time to get back up after a heavy landing.",
       "details": null,
-      "max_rank": null,
+      "max_rank": 1,
       "per_rank": [],
       "cost_per_rank": 1,
       "prereq_ids": [
@@ -1457,7 +1457,7 @@
       "kind": "rank",
       "description": "You can Wall Leap further.",
       "details": null,
-      "max_rank": null,
+      "max_rank": 5,
       "per_rank": [],
       "cost_per_rank": 1,
       "prereq_ids": [
@@ -1476,7 +1476,7 @@
       "kind": "rank",
       "description": "Moving around costs less stamina.",
       "details": null,
-      "max_rank": null,
+      "max_rank": 5,
       "per_rank": [],
       "cost_per_rank": 1,
       "prereq_ids": [
@@ -1496,7 +1496,7 @@
       "kind": "rank",
       "description": "Increases the duration of the high speed at the start of a sprint.",
       "details": null,
-      "max_rank": null,
+      "max_rank": 5,
       "per_rank": [],
       "cost_per_rank": 1,
       "prereq_ids": [

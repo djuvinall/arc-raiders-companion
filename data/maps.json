@@ -17,9 +17,10 @@
       "tile_extent": [
         47.17178678359251,
         152.00390625,
-        95.26116483234799,
+        95.261164832348,
         82.04135491555881
-      ]
+      ],
+      "layers": []
     },
     "bounds": {
       "x_min": 2478.99,
@@ -363,7 +364,7 @@
     "id": "spaceport",
     "name": "The Spaceport",
     "image": {
-      "url": "https://static.metaforge.app/arc-raiders/maps/spaceport/20260114-q85/underground/{z}/{x}/{y}.webp",
+      "url": "https://static.metaforge.app/arc-raiders/maps/spaceport/20260114-q85/{z}/{x}/{y}.webp",
       "width_px": null,
       "height_px": null,
       "tile_size": 512,
@@ -377,8 +378,20 @@
       "tile_extent": [
         106.76514723178478,
         139.9453125,
-        201.17851768793793,
+        201.1785176879379,
         294.1640625
+      ],
+      "layers": [
+        {
+          "name": "Surface",
+          "url": "https://static.metaforge.app/arc-raiders/maps/spaceport/20260114-q85/{z}/{x}/{y}.webp",
+          "mask": 2
+        },
+        {
+          "name": "Tunnels",
+          "url": "https://static.metaforge.app/arc-raiders/maps/spaceport/20260114-q85/underground/{z}/{x}/{y}.webp",
+          "mask": 1
+        }
       ]
     },
     "bounds": {
@@ -765,7 +778,8 @@
         0.0,
         512.0,
         512.0
-      ]
+      ],
+      "layers": []
     },
     "bounds": {
       "x_min": 4994.65,
@@ -1080,7 +1094,7 @@
     "id": "blue-gate",
     "name": "Blue Gate",
     "image": {
-      "url": "https://static.metaforge.app/arc-raiders/maps/blue-gate/20260112-q85/underground/{z}/{x}/{y}.webp",
+      "url": "https://static.metaforge.app/arc-raiders/maps/blue-gate/20260112-q85/{z}/{x}/{y}.webp",
       "width_px": null,
       "height_px": null,
       "tile_size": 512,
@@ -1096,6 +1110,18 @@
         204.33176267600015,
         107.43762885951963,
         300.40951140668346
+      ],
+      "layers": [
+        {
+          "name": "Surface",
+          "url": "https://static.metaforge.app/arc-raiders/maps/blue-gate/20260112-q85/{z}/{x}/{y}.webp",
+          "mask": 2
+        },
+        {
+          "name": "Underground",
+          "url": "https://static.metaforge.app/arc-raiders/maps/blue-gate/20260112-q85/underground/{z}/{x}/{y}.webp",
+          "mask": 1
+        }
       ]
     },
     "bounds": {
@@ -1368,7 +1394,7 @@
     "id": "stella-montis",
     "name": "Stella Montis",
     "image": {
-      "url": "https://static.metaforge.app/arc-raiders/maps/stella-montis/v3/b1/{z}/{x}_{y}.webp",
+      "url": "https://static.metaforge.app/arc-raiders/maps/stella-montis/v3/default/{z}/{x}_{y}.webp",
       "width_px": null,
       "height_px": null,
       "tile_size": 256,
@@ -1384,6 +1410,18 @@
         64.71875,
         40.25,
         158.78125
+      ],
+      "layers": [
+        {
+          "name": "Top Floor",
+          "url": "https://static.metaforge.app/arc-raiders/maps/stella-montis/v3/default/{z}/{x}_{y}.webp",
+          "mask": 2
+        },
+        {
+          "name": "Bottom Floor",
+          "url": "https://static.metaforge.app/arc-raiders/maps/stella-montis/v3/b1/{z}/{x}_{y}.webp",
+          "mask": 1
+        }
       ]
     },
     "bounds": {
@@ -1703,7 +1741,8 @@
         0.0,
         512.0,
         512.0
-      ]
+      ],
+      "layers": []
     },
     "bounds": {
       "x_min": 3456.71,
@@ -2252,7 +2291,8 @@
         0.0,
         512.0,
         512.0
-      ]
+      ],
+      "layers": []
     },
     "bounds": {
       "x_min": 5580.47,
