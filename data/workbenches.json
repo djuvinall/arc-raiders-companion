@@ -1,0 +1,833 @@
+[
+  {
+    "id": "explosives-station",
+    "name": "Explosives Station",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "chemicals",
+            "qty": 50
+          },
+          {
+            "item_id": "arc-alloy",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "gas-grenade-craft",
+          "gas-mine-craft",
+          "light-impact-grenade-craft",
+          "pulse-mine-craft",
+          "seeker-grenade-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "synthesized-fuel",
+            "qty": 3
+          },
+          {
+            "item_id": "crude-explosives",
+            "qty": 5
+          },
+          {
+            "item_id": "pop-trigger",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "fireworks-box-craft",
+          "jolt-mine-craft",
+          "shrapnel-grenade-craft",
+          "snap-blast-grenade-craft",
+          "trigger-nade-craft",
+          "yank-grenade-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "laboratory-reagents",
+            "qty": 3
+          },
+          {
+            "item_id": "explosive-compound",
+            "qty": 5
+          },
+          {
+            "item_id": "rocketeer-driver",
+            "qty": 3
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "blaze-grenade-craft",
+          "deadline-craft",
+          "explosive-mine-craft",
+          "heavy-fuze-grenade-craft",
+          "showstopper-craft",
+          "surge-coil-craft",
+          "trailblazer-craft",
+          "wolfpack-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gear-bench",
+    "name": "Gear Bench",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "plastic-parts",
+            "qty": 25
+          },
+          {
+            "item_id": "fabric",
+            "qty": 30
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "combat-mk-1-craft",
+          "light-shield-craft",
+          "looting-mk-1-craft",
+          "tactical-mk-1-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "power-cable",
+            "qty": 3
+          },
+          {
+            "item_id": "electrical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "hornet-driver",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "combat-mk-2-craft",
+          "heavy-shield-craft",
+          "looting-mk-2-craft",
+          "medium-shield-craft",
+          "tactical-mk-2-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "industrial-battery",
+            "qty": 3
+          },
+          {
+            "item_id": "advanced-electrical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "bastion-cell",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "combat-mk-3-aggressive-craft",
+          "combat-mk-3-flanking-craft",
+          "looting-mk-3-cautious-craft",
+          "looting-mk-3-safekeeper-craft",
+          "looting-mk-3-survivor-craft",
+          "tactical-mk-3-defensive-craft",
+          "tactical-mk-3-healing-craft",
+          "tactical-mk-3-revival-craft",
+          "tactical-mk-3-smoke-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gunsmith",
+    "name": "Gunsmith",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "metal-parts",
+            "qty": 20
+          },
+          {
+            "item_id": "rubber-parts",
+            "qty": 30
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "angled-grip-i-craft",
+          "anvil-ii-craft",
+          "anvil-iii-craft",
+          "anvil-iv-craft",
+          "arpeggio-ii-craft",
+          "arpeggio-iii-craft",
+          "arpeggio-iv-craft",
+          "bantam-i-craft",
+          "bantam-ii-craft",
+          "bantam-iii-craft",
+          "bantam-iv-craft",
+          "bettina-ii-craft",
+          "bettina-iii-craft",
+          "bettina-iv-craft",
+          "bobcat-ii-craft",
+          "bobcat-iii-craft",
+          "bobcat-iv-craft",
+          "burletta-i-craft",
+          "burletta-ii-craft",
+          "burletta-iii-craft",
+          "burletta-iv-craft",
+          "canto-ii-craft",
+          "canto-iii-craft",
+          "canto-iv-craft",
+          "compensator-i-craft",
+          "extended-barrel-i-craft",
+          "extended-light-mag-i-craft",
+          "extended-medium-mag-i-craft",
+          "extended-shotgun-mag-i-craft",
+          "ferro-i-craft",
+          "ferro-ii-craft",
+          "ferro-iii-craft",
+          "ferro-iv-craft",
+          "hairpin-i-craft",
+          "hairpin-ii-craft",
+          "hairpin-iii-craft",
+          "hairpin-iv-craft",
+          "hullcracker-ii-craft",
+          "hullcracker-iii-craft",
+          "hullcracker-iv-craft",
+          "il-toro-i-craft",
+          "il-toro-ii-craft",
+          "il-toro-iii-craft",
+          "il-toro-iv-craft",
+          "kettle-i-craft",
+          "kettle-ii-craft",
+          "kettle-iii-craft",
+          "kettle-iv-craft",
+          "muzzle-brake-i-craft",
+          "osprey-ii-craft",
+          "osprey-iii-craft",
+          "osprey-iv-craft",
+          "rascal-ii-craft",
+          "rascal-iii-craft",
+          "rascal-iv-craft",
+          "rattler-i-craft",
+          "rattler-ii-craft",
+          "rattler-iii-craft",
+          "rattler-iv-craft",
+          "renegade-ii-craft",
+          "renegade-iii-craft",
+          "renegade-iv-craft",
+          "shotgun-choke-i-craft",
+          "stable-stock-i-craft",
+          "stiletto-i-craft",
+          "stiletto-ii-craft",
+          "stiletto-iii-craft",
+          "stiletto-iv-craft",
+          "stitcher-i-craft",
+          "stitcher-ii-craft",
+          "stitcher-iii-craft",
+          "stitcher-iv-craft",
+          "tempest-ii-craft",
+          "tempest-iii-craft",
+          "tempest-iv-craft",
+          "torrente-ii-craft",
+          "torrente-iii-craft",
+          "torrente-iv-craft",
+          "venator-ii-craft",
+          "venator-iii-craft",
+          "venator-iv-craft",
+          "vertical-grip-i-craft",
+          "vulcano-ii-craft",
+          "vulcano-iii-craft",
+          "vulcano-iv-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "rusted-tools",
+            "qty": 3
+          },
+          {
+            "item_id": "mechanical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "wasp-driver",
+            "qty": 8
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "angled-grip-ii-craft",
+          "anvil-i-craft",
+          "arpeggio-i-craft",
+          "compensator-ii-craft",
+          "extended-barrel-ii-craft",
+          "extended-light-mag-ii-craft",
+          "extended-medium-mag-ii-craft",
+          "extended-shotgun-mag-ii-craft",
+          "muzzle-brake-ii-craft",
+          "osprey-i-craft",
+          "rascal-craft",
+          "shotgun-choke-ii-craft",
+          "silencer-i-craft",
+          "stable-stock-ii-craft",
+          "torrente-i-craft",
+          "venator-i-craft",
+          "vertical-grip-ii-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "rusted-gear",
+            "qty": 3
+          },
+          {
+            "item_id": "advanced-mechanical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "sentinel-firing-core",
+            "qty": 4
+          },
+          {
+            "item_id": "radial-press",
+            "qty": 3
+          },
+          {
+            "item_id": "magnetic-accelerator",
+            "qty": 3
+          },
+          {
+            "item_id": "emperor-modulator",
+            "qty": 1
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "angled-grip-iii-craft",
+          "aphelion-rifle-craft",
+          "bettina-i-craft",
+          "bobcat-i-craft",
+          "canto-i-craft",
+          "compensator-iii-craft",
+          "dolabra-craft",
+          "equalizer-craft",
+          "extended-barrel-iii-craft",
+          "extended-light-mag-iii-craft",
+          "extended-medium-mag-iii-craft",
+          "extended-shotgun-mag-iii-craft",
+          "hullcracker-i-craft",
+          "jupiter-craft",
+          "lightweight-stock-craft",
+          "muzzle-brake-iii-craft",
+          "padded-stock-craft",
+          "renegade-i-craft",
+          "shotgun-choke-iii-craft",
+          "shotgun-silencer-craft",
+          "silencer-ii-craft",
+          "stable-stock-iii-craft",
+          "tempest-i-craft",
+          "vertical-grip-iii-craft",
+          "vulcano-i-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "inventory",
+    "name": "Field Crafting",
+    "max_level": 0,
+    "levels": []
+  },
+  {
+    "id": "medical-lab",
+    "name": "Medical Lab",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "fabric",
+            "qty": 50
+          },
+          {
+            "item_id": "arc-alloy",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "adrenaline-shot-craft",
+          "bandage-craft",
+          "herbal-bandage-craft",
+          "shield-recharger-craft",
+          "white-flag-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "cracked-bioscanner",
+            "qty": 2
+          },
+          {
+            "item_id": "durable-cloth",
+            "qty": 5
+          },
+          {
+            "item_id": "tick-pod",
+            "qty": 8
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "defibrillator-craft",
+          "sterilized-bandage-craft",
+          "surge-shield-recharger-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "rusted-shut-medical-kit",
+            "qty": 3
+          },
+          {
+            "item_id": "antiseptic",
+            "qty": 8
+          },
+          {
+            "item_id": "surveyor-vault",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "vita-shot-craft",
+          "vita-spray-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "refiner",
+    "name": "Refiner",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "metal-parts",
+            "qty": 60
+          },
+          {
+            "item_id": "arc-powercell",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "crude-explosives-craft",
+          "durable-cloth-craft",
+          "electrical-components-craft",
+          "insulation-roll-craft",
+          "mechanical-components-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "toaster",
+            "qty": 3
+          },
+          {
+            "item_id": "arc-motion-core",
+            "qty": 5
+          },
+          {
+            "item_id": "fireball-burner",
+            "qty": 8
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "advanced-electrical-components-craft",
+          "advanced-mechanical-components-craft",
+          "antiseptic-craft",
+          "arc-circuitry-craft",
+          "arc-motion-core-craft",
+          "explosive-compound-craft",
+          "heavy-gun-parts-craft",
+          "light-gun-parts-craft",
+          "medium-gun-parts-craft",
+          "mod-components-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "motor",
+            "qty": 3
+          },
+          {
+            "item_id": "arc-circuitry",
+            "qty": 10
+          },
+          {
+            "item_id": "bombardier-cell",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "complex-gun-parts-craft",
+          "magnetic-accelerator-craft",
+          "power-rod-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "research-station",
+    "name": "Research Station",
+    "max_level": 4,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "mini-pump",
+            "qty": 3
+          },
+          {
+            "item_id": "planks",
+            "qty": 35
+          },
+          {
+            "item_id": "battered-paperback",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "bantam-blueprint-craft",
+          "barricade-kit-blueprint-craft",
+          "burletta-blueprint-craft",
+          "crash-mat-blueprint-craft",
+          "gas-mine-blueprint-craft",
+          "grappling-hook-blueprint-craft",
+          "il-toro-blueprint-craft",
+          "lure-grenade-blueprint-craft",
+          "pulse-mine-blueprint-craft",
+          "remote-raider-flare-blueprint-craft",
+          "seeker-grenade-blueprint-craft",
+          "stiletto-blueprint-craft",
+          "white-flag-blueprint-craft",
+          "yank-grenade-blueprint-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "calculator",
+            "qty": 3
+          },
+          {
+            "item_id": "raider-logbook",
+            "qty": 3
+          },
+          {
+            "item_id": "skulker-targeter",
+            "qty": 5
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "angled-grip-ii-blueprint-craft",
+          "anvil-blueprint-craft",
+          "canto-blueprint-craft",
+          "compensator-ii-blueprint-craft",
+          "defibrillator-blueprint-craft",
+          "explosive-mine-blueprint-craft",
+          "extended-barrel-ii-blueprint-craft",
+          "extended-light-mag-ii-blueprint-craft",
+          "extended-medium-mag-ii-blueprint-craft",
+          "extended-shotgun-mag-ii-blueprint-craft",
+          "heavy-gun-parts-blueprint-craft",
+          "jolt-mine-blueprint-craft",
+          "light-gun-parts-blueprint-craft",
+          "medium-gun-parts-blueprint-craft",
+          "muzzle-brake-ii-blueprint-craft",
+          "osprey-blueprint-craft",
+          "rascal-blueprint-craft",
+          "shotgun-choke-ii-blueprint-craft",
+          "showstopper-blueprint-craft",
+          "silencer-i-blueprint-craft",
+          "smoke-grenade-blueprint-craft",
+          "stable-stock-ii-blueprint-craft",
+          "surge-coil-blueprint-craft",
+          "tagging-grenade-blueprint-craft",
+          "tether-launcher-blueprint-craft",
+          "torrente-blueprint-craft",
+          "trailblazer-blueprint-craft",
+          "trigger-nade-blueprint-2-craft",
+          "venator-blueprint-craft",
+          "vertical-grip-ii-blueprint-craft",
+          "vita-shot-blueprint-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "differential-microphone",
+            "qty": 3
+          },
+          {
+            "item_id": "exodus-technical-handbook",
+            "qty": 3
+          },
+          {
+            "item_id": "bully-fragmenter",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "bettina-blueprint-craft",
+          "combat-mk-3-flanking-blueprint-craft",
+          "complex-gun-parts-blueprint-craft",
+          "deadline-blueprint-craft",
+          "hullcracker-blueprint-craft",
+          "looting-mk-3-safekeeper-blueprint-craft",
+          "powered-descender-blueprint-craft",
+          "silencer-ii-blueprint-craft",
+          "tactical-mk-3-defensive-blueprint-craft",
+          "tactical-mk-3-revival-blueprint-craft",
+          "vertical-grip-iii-blueprint-craft",
+          "vita-spray-blueprint-craft"
+        ]
+      },
+      {
+        "level": 4,
+        "upgrade_inputs": [
+          {
+            "item_id": "thermal-shaker",
+            "qty": 3
+          },
+          {
+            "item_id": "arc-data-module",
+            "qty": 3
+          },
+          {
+            "item_id": "frigate-inductor",
+            "qty": 1
+          }
+        ],
+        "unlocks_recipe_ids": []
+      }
+    ]
+  },
+  {
+    "id": "scrappy",
+    "name": "Scrappy",
+    "max_level": 5,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [],
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "dog-collar",
+            "qty": 1
+          }
+        ],
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "apricot",
+            "qty": 3
+          },
+          {
+            "item_id": "lemon",
+            "qty": 3
+          }
+        ],
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 4,
+        "upgrade_inputs": [
+          {
+            "item_id": "olives",
+            "qty": 6
+          },
+          {
+            "item_id": "prickly-pear",
+            "qty": 6
+          },
+          {
+            "item_id": "cat-bed",
+            "qty": 1
+          }
+        ],
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 5,
+        "upgrade_inputs": [
+          {
+            "item_id": "apricot",
+            "qty": 12
+          },
+          {
+            "item_id": "mushroom",
+            "qty": 12
+          },
+          {
+            "item_id": "very-comfortable-pillow",
+            "qty": 12
+          }
+        ],
+        "unlocks_recipe_ids": []
+      }
+    ]
+  },
+  {
+    "id": "utility-station",
+    "name": "Utility Station",
+    "max_level": 3,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [
+          {
+            "item_id": "plastic-parts",
+            "qty": 50
+          },
+          {
+            "item_id": "arc-alloy",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "advanced-camera-craft",
+          "barricade-kit-craft",
+          "binoculars-craft",
+          "crash-mat-craft",
+          "door-blocker-craft",
+          "firecracker-craft",
+          "grappling-hook-craft",
+          "lil-smoke-grenade-craft",
+          "remote-raider-flare-craft"
+        ]
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "damaged-heat-sink",
+            "qty": 2
+          },
+          {
+            "item_id": "electrical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "snitch-scanner",
+            "qty": 6
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "blue-light-stick-craft",
+          "green-light-stick-craft",
+          "lure-grenade-craft",
+          "raider-hatch-key-craft",
+          "red-light-stick-craft",
+          "smoke-grenade-craft",
+          "tether-launcher-craft",
+          "yellow-light-stick-craft",
+          "zipline-craft"
+        ]
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "fried-motherboard",
+            "qty": 3
+          },
+          {
+            "item_id": "advanced-electrical-components",
+            "qty": 5
+          },
+          {
+            "item_id": "leaper-pulse-unit",
+            "qty": 4
+          }
+        ],
+        "unlocks_recipe_ids": [
+          "photoelectric-cloak-craft",
+          "powered-descender-craft",
+          "snap-hook-craft",
+          "tagging-grenade-craft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "workbench",
+    "name": "Workbench",
+    "max_level": 1,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [],
+        "unlocks_recipe_ids": [
+          "bandage-craft",
+          "basic-camera-craft",
+          "blaze-grenade-trap-craft",
+          "emperor-gateway-conduit-craft",
+          "energy-clip-craft",
+          "gas-grenade-trap-craft",
+          "heavy-ammo-craft",
+          "launcher-ammo-craft",
+          "light-ammo-craft",
+          "light-shield-craft",
+          "lure-grenade-trap-craft",
+          "medium-ammo-craft",
+          "shield-recharger-craft",
+          "shotgun-ammo-craft",
+          "smoke-grenade-trap-craft"
+        ]
+      }
+    ]
+  }
+]

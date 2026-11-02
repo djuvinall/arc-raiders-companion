@@ -1,0 +1,197 @@
+:root {
+  --page: #0b0b0f;
+  --panel: #1b1f2e;
+  --panel-2: #222739;
+  --border: rgba(255, 255, 255, 0.08);
+  --cream: #ece6d6;
+  --on-cream: #15181f;
+  --on-cream-dim: #5a5c63;
+  --yellow: #f5c400;
+  --teal: #2ab0c6;
+  --blue: #4aa3ff;
+  --text: #e8e8ea;
+  --text-dim: #9a9eaa;
+
+  --rarity-common: #9aa0a6;
+  --rarity-uncommon: #3fcf6b;
+  --rarity-rare: #39c3f2;
+  --rarity-epic: #e23fb0;
+  --rarity-legendary: #f5c400;
+
+  --font-head: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  /* Original gradient; never a game capture. */
+  background: radial-gradient(120% 90% at 75% 0%, #1c2336 0%, #11131c 45%, var(--page) 100%);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #333a4e;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--on-cream);
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.button.primary {
+  background: var(--yellow);
+}
+.button.dark {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--text);
+}
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.field {
+  font-variant-numeric: tabular-nums;
+}
+.page-pad {
+  padding: 16px 20px;
+}
+.dim {
+  color: var(--text-dim);
+}
+.pips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pip {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.pip.done {
+  background: var(--teal);
+  color: #0b0b0f;
+}
+.pip.now {
+  background: var(--cream);
+  color: var(--on-cream);
+}
+.bar {
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(150, 150, 150, 0.45);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--teal);
+}
+
+.keycap {
+  display: inline-block;
+  min-width: 24px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  font-family: var(--font-head);
+  font-size: 12px;
+  text-align: center;
+}
+
+.field {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  padding: 7px 10px;
+}

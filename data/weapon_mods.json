@@ -1,0 +1,1458 @@
+[
+  {
+    "id": "angled-grip-i",
+    "name": "Angled Grip I",
+    "family": "angled-grip",
+    "tier": 1,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "angled-grip-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "angled-grip-ii",
+    "name": "Angled Grip II",
+    "family": "angled-grip",
+    "tier": 2,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "angled-grip-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "angled-grip-iii",
+    "name": "Angled Grip III",
+    "family": "angled-grip",
+    "tier": 3,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -40.0
+      },
+      {
+        "stat": "ads_speed",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "angled-grip-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "compensator-i",
+    "name": "Compensator I",
+    "family": "compensator",
+    "tier": 1,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "per_shot_dispersion",
+        "pct": -20.0
+      },
+      {
+        "stat": "max_shot_dispersion",
+        "pct": -10.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "compensator-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "compensator-ii",
+    "name": "Compensator II",
+    "family": "compensator",
+    "tier": 2,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "per_shot_dispersion",
+        "pct": -40.0
+      },
+      {
+        "stat": "max_shot_dispersion",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "compensator-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "compensator-iii",
+    "name": "Compensator III",
+    "family": "compensator",
+    "tier": 3,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "per_shot_dispersion",
+        "pct": -60.0
+      },
+      {
+        "stat": "max_shot_dispersion",
+        "pct": -30.0
+      },
+      {
+        "stat": "durability_burn_rate",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "compensator-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-barrel-i",
+    "name": "Extended Barrel I",
+    "family": "extended-barrel",
+    "tier": 1,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "tempest",
+      "arpeggio",
+      "bettina",
+      "anvil",
+      "torrente"
+    ],
+    "modifiers": [
+      {
+        "stat": "bullet_velocity",
+        "pct": 10.0
+      },
+      {
+        "stat": "falloff_distance",
+        "pct": 5.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "extended-barrel-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-barrel-ii",
+    "name": "Extended Barrel II",
+    "family": "extended-barrel",
+    "tier": 2,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "tempest",
+      "arpeggio",
+      "bettina",
+      "anvil",
+      "torrente"
+    ],
+    "modifiers": [
+      {
+        "stat": "bullet_velocity",
+        "pct": 20.0
+      },
+      {
+        "stat": "falloff_distance",
+        "pct": 10.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "extended-barrel-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-barrel-iii",
+    "name": "Extended Barrel III",
+    "family": "extended-barrel",
+    "tier": 3,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "bullet_velocity",
+        "pct": 30.0
+      },
+      {
+        "stat": "falloff_distance",
+        "pct": 15.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": 15.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "extended-barrel-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-light-mag-i",
+    "name": "Extended Light Mag I",
+    "family": "extended-light-mag",
+    "tier": 1,
+    "slot": "light-mag",
+    "compatible_ammo": [
+      "light"
+    ],
+    "compatible_weapons": [
+      "hairpin",
+      "kettle",
+      "stitcher",
+      "burletta",
+      "bobcat"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 5
+    },
+    "recipe_id": "extended-light-mag-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-light-mag-ii",
+    "name": "Extended Light Mag II",
+    "family": "extended-light-mag",
+    "tier": 2,
+    "slot": "light-mag",
+    "compatible_ammo": [
+      "light"
+    ],
+    "compatible_weapons": [
+      "hairpin",
+      "kettle",
+      "stitcher",
+      "burletta",
+      "bobcat"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 10
+    },
+    "recipe_id": "extended-light-mag-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-light-mag-iii",
+    "name": "Extended Light Mag III",
+    "family": "extended-light-mag",
+    "tier": 3,
+    "slot": "light-mag",
+    "compatible_ammo": [
+      "light"
+    ],
+    "compatible_weapons": [
+      "hairpin",
+      "kettle",
+      "stitcher",
+      "burletta",
+      "bobcat"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 15
+    },
+    "recipe_id": "extended-light-mag-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-medium-mag-i",
+    "name": "Extended Medium Mag I",
+    "family": "extended-medium-mag",
+    "tier": 1,
+    "slot": "medium-mag",
+    "compatible_ammo": [
+      "medium"
+    ],
+    "compatible_weapons": [
+      "arpeggio",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "tempest"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 4
+    },
+    "recipe_id": "extended-medium-mag-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-medium-mag-ii",
+    "name": "Extended Medium Mag II",
+    "family": "extended-medium-mag",
+    "tier": 2,
+    "slot": "medium-mag",
+    "compatible_ammo": [
+      "medium"
+    ],
+    "compatible_weapons": [
+      "arpeggio",
+      "osprey",
+      "renegade",
+      "torrente",
+      "tempest",
+      "venator"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 8
+    },
+    "recipe_id": "extended-medium-mag-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-medium-mag-iii",
+    "name": "Extended Medium Mag III",
+    "family": "extended-medium-mag",
+    "tier": 3,
+    "slot": "medium-mag",
+    "compatible_ammo": [
+      "medium"
+    ],
+    "compatible_weapons": [
+      "arpeggio",
+      "osprey",
+      "renegade",
+      "torrente",
+      "tempest",
+      "venator"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 12
+    },
+    "recipe_id": "extended-medium-mag-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-shotgun-mag-i",
+    "name": "Extended Shotgun Mag I",
+    "family": "extended-shotgun-mag",
+    "tier": 1,
+    "slot": "shotgun-mag",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 2
+    },
+    "recipe_id": "extended-shotgun-mag-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-shotgun-mag-ii",
+    "name": "Extended Shotgun Mag II",
+    "family": "extended-shotgun-mag",
+    "tier": 2,
+    "slot": "shotgun-mag",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 4
+    },
+    "recipe_id": "extended-shotgun-mag-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "extended-shotgun-mag-iii",
+    "name": "Extended Shotgun Mag III",
+    "family": "extended-shotgun-mag",
+    "tier": 3,
+    "slot": "shotgun-mag",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [],
+    "flat": {
+      "magazine_size": 6
+    },
+    "recipe_id": "extended-shotgun-mag-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "horizontal-grip",
+    "name": "Horizontal Grip",
+    "family": "horizontal-grip",
+    "tier": 1,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -30.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": -30.0
+      },
+      {
+        "stat": "ads_speed",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": null,
+    "gunsmith_level": null,
+    "provenance": "wiki"
+  },
+  {
+    "id": "kinetic-converter",
+    "name": "Kinetic Converter",
+    "family": "kinetic-converter",
+    "tier": 1,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "hullcracker",
+      "bettina",
+      "bobcat",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "fire_rate",
+        "pct": 15.0
+      },
+      {
+        "stat": "horizontal_recoil",
+        "pct": 20.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": null,
+    "gunsmith_level": null,
+    "provenance": "wiki"
+  },
+  {
+    "id": "lightweight-stock",
+    "name": "Lightweight Stock",
+    "family": "lightweight-stock",
+    "tier": 1,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "hullcracker",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "ads_speed",
+        "pct": 200.0
+      },
+      {
+        "stat": "equip_time",
+        "pct": -30.0
+      },
+      {
+        "stat": "unequip_time",
+        "pct": -30.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": 50.0
+      },
+      {
+        "stat": "recoil_recovery",
+        "pct": 50.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "lightweight-stock-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "muzzle-brake-i",
+    "name": "Muzzle Brake I",
+    "family": "muzzle-brake",
+    "tier": 1,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -15.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": -15.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "muzzle-brake-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "muzzle-brake-ii",
+    "name": "Muzzle Brake II",
+    "family": "muzzle-brake",
+    "tier": 2,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -20.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "muzzle-brake-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "muzzle-brake-iii",
+    "name": "Muzzle Brake III",
+    "family": "muzzle-brake",
+    "tier": 3,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "horizontal_recoil",
+        "pct": -25.0
+      },
+      {
+        "stat": "vertical_recoil",
+        "pct": -25.0
+      },
+      {
+        "stat": "durability_burn_rate",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "muzzle-brake-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "padded-stock",
+    "name": "Padded Stock",
+    "family": "padded-stock",
+    "tier": 1,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion"
+    ],
+    "modifiers": [
+      {
+        "stat": "vertical_recoil",
+        "pct": -15.0
+      },
+      {
+        "stat": "horizontal_recoil",
+        "pct": -15.0
+      },
+      {
+        "stat": "per_shot_dispersion",
+        "pct": -20.0
+      },
+      {
+        "stat": "equip_time",
+        "pct": 20.0
+      },
+      {
+        "stat": "unequip_time",
+        "pct": 20.0
+      },
+      {
+        "stat": "ads_speed",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "padded-stock-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "shotgun-choke-i",
+    "name": "Shotgun Choke I",
+    "family": "shotgun-choke",
+    "tier": 1,
+    "slot": "shotgun-muzzle",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [
+      {
+        "stat": "base_dispersion",
+        "pct": -10.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "shotgun-choke-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "shotgun-choke-ii",
+    "name": "Shotgun Choke II",
+    "family": "shotgun-choke",
+    "tier": 2,
+    "slot": "shotgun-muzzle",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [
+      {
+        "stat": "base_dispersion",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "shotgun-choke-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "shotgun-choke-iii",
+    "name": "Shotgun Choke III",
+    "family": "shotgun-choke",
+    "tier": 3,
+    "slot": "shotgun-muzzle",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [
+      {
+        "stat": "base_dispersion",
+        "pct": -30.0
+      },
+      {
+        "stat": "durability_burn_rate",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "shotgun-choke-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "shotgun-silencer",
+    "name": "Shotgun Silencer",
+    "family": "shotgun-silencer",
+    "tier": 1,
+    "slot": "shotgun-muzzle",
+    "compatible_ammo": [
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "il-toro",
+      "vulcano"
+    ],
+    "modifiers": [
+      {
+        "stat": "noise",
+        "pct": -50.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "shotgun-silencer-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "silencer-i",
+    "name": "Silencer I",
+    "family": "silencer",
+    "tier": 1,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "noise",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "silencer-i-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "silencer-ii",
+    "name": "Silencer II",
+    "family": "silencer",
+    "tier": 2,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "noise",
+        "pct": -40.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "silencer-ii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "silencer-iii",
+    "name": "Silencer III",
+    "family": "silencer",
+    "tier": 3,
+    "slot": "muzzle",
+    "compatible_ammo": [
+      "heavy",
+      "light",
+      "medium"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "anvil",
+      "arpeggio",
+      "burletta",
+      "osprey",
+      "renegade",
+      "torrente",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest"
+    ],
+    "modifiers": [
+      {
+        "stat": "noise",
+        "pct": -60.0
+      },
+      {
+        "stat": "durability_burn_rate",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": null,
+    "gunsmith_level": null,
+    "provenance": "wiki"
+  },
+  {
+    "id": "stable-stock-i",
+    "name": "Stable Stock I",
+    "family": "stable-stock",
+    "tier": 1,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "recoil_recovery",
+        "pct": -20.0
+      },
+      {
+        "stat": "dispersion_recovery",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "stable-stock-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "stable-stock-ii",
+    "name": "Stable Stock II",
+    "family": "stable-stock",
+    "tier": 2,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "recoil_recovery",
+        "pct": -35.0
+      },
+      {
+        "stat": "dispersion_recovery",
+        "pct": -35.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "stable-stock-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "stable-stock-iii",
+    "name": "Stable Stock III",
+    "family": "stable-stock",
+    "tier": 3,
+    "slot": "stock",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "osprey",
+      "renegade",
+      "torrente",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "recoil_recovery",
+        "pct": -50.0
+      },
+      {
+        "stat": "dispersion_recovery",
+        "pct": -50.0
+      },
+      {
+        "stat": "equip_time",
+        "pct": 20.0
+      },
+      {
+        "stat": "unequip_time",
+        "pct": 20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "stable-stock-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  },
+  {
+    "id": "vertical-grip-i",
+    "name": "Vertical Grip I",
+    "family": "vertical-grip",
+    "tier": 1,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "vertical_recoil",
+        "pct": -20.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "vertical-grip-i-craft",
+    "gunsmith_level": 1,
+    "provenance": "wiki"
+  },
+  {
+    "id": "vertical-grip-ii",
+    "name": "Vertical Grip II",
+    "family": "vertical-grip",
+    "tier": 2,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "vertical_recoil",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "vertical-grip-ii-craft",
+    "gunsmith_level": 2,
+    "provenance": "wiki"
+  },
+  {
+    "id": "vertical-grip-iii",
+    "name": "Vertical Grip III",
+    "family": "vertical-grip",
+    "tier": 3,
+    "slot": "underbarrel",
+    "compatible_ammo": [
+      "energy",
+      "heavy",
+      "launcher",
+      "light",
+      "medium",
+      "shotgun"
+    ],
+    "compatible_weapons": [
+      "ferro",
+      "kettle",
+      "rattler",
+      "stitcher",
+      "arpeggio",
+      "il-toro",
+      "venator",
+      "bettina",
+      "bobcat",
+      "tempest",
+      "vulcano",
+      "aphelion",
+      "hullcracker"
+    ],
+    "modifiers": [
+      {
+        "stat": "vertical_recoil",
+        "pct": -40.0
+      },
+      {
+        "stat": "ads_speed",
+        "pct": -30.0
+      }
+    ],
+    "flat": {
+      "magazine_size": 0
+    },
+    "recipe_id": "vertical-grip-iii-craft",
+    "gunsmith_level": 3,
+    "provenance": "wiki"
+  }
+]

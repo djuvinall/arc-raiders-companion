@@ -1,0 +1,719 @@
+[
+  {
+    "id": "arc-assessor",
+    "name": "ARC Assessor",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/arc-assessor.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "arc-assessor",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "bastion",
+    "name": "Bastion",
+    "class": "Heavy Assault",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/bastion.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-motion-core",
+        "chance": null
+      },
+      {
+        "item_id": "arc-circuitry",
+        "chance": null
+      },
+      {
+        "item_id": "bastion-cell",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "bastion",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "bison",
+    "name": "Leaper",
+    "class": "Siege Engine",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/bison.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "advanced-arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-circuitry",
+        "chance": null
+      },
+      {
+        "item_id": "arc-flex-rubber",
+        "chance": null
+      },
+      {
+        "item_id": "arc-motion-core",
+        "chance": null
+      },
+      {
+        "item_id": "arc-performance-steel",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "explosive-compound",
+        "chance": null
+      },
+      {
+        "item_id": "leaper-pulse-unit",
+        "chance": null
+      },
+      {
+        "item_id": "mechanical-components",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "bison",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "bombardier",
+    "name": "Bombardier",
+    "class": "Heavy Artillery",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/bombardier.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "advanced-arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "bombardier-cell",
+        "chance": null
+      },
+      {
+        "item_id": "launcher-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "bombardier",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "bully",
+    "name": "Bully",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/bully.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "bully",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "comet",
+    "name": "Comet",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/comet.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "comet",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "class": "Area Denial",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/fireball.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "fireball-burner",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "fireball",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "firefly",
+    "name": "Firefly",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/firefly.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "firefly",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "frigate",
+    "name": "ARC Frigate",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/frigate.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "frigate",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "hornet",
+    "name": "Hornet",
+    "class": "Medium Drone",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/hornet.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "hornet-driver",
+        "chance": null
+      },
+      {
+        "item_id": "simple-gun-parts",
+        "chance": null
+      },
+      {
+        "item_id": "medium-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "hornet",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "hydra",
+    "name": "Hydra",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/hydra.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "hydra",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "matriarch",
+    "name": "Matriarch",
+    "class": "Boss",
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/matriarch.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-circuitry",
+        "chance": null
+      },
+      {
+        "item_id": "arc-performance-steel",
+        "chance": null
+      },
+      {
+        "item_id": "advanced-arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-flex-rubber",
+        "chance": null
+      },
+      {
+        "item_id": "arc-synthetic-resin",
+        "chance": null
+      },
+      {
+        "item_id": "magnetic-accelerator",
+        "chance": null
+      },
+      {
+        "item_id": "matriarch-reactor",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "matriarch",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "pop",
+    "name": "Pop",
+    "class": "Explosive",
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/pop.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-thermo-lining",
+        "chance": null
+      },
+      {
+        "item_id": "crude-explosives",
+        "chance": null
+      },
+      {
+        "item_id": "pop-trigger",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "pop",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "queen",
+    "name": "Queen",
+    "class": null,
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/queen.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "queen",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "rocketeer",
+    "name": "Rocketeer",
+    "class": "Flying Artillery",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/rocketeer.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-motion-core",
+        "chance": null
+      },
+      {
+        "item_id": "arc-circuitry",
+        "chance": null
+      },
+      {
+        "item_id": "advanced-arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "heavy-gun-parts",
+        "chance": null
+      },
+      {
+        "item_id": "rocketeer-driver",
+        "chance": null
+      },
+      {
+        "item_id": "heavy-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "rocketeer",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "rollbot",
+    "name": "ARC Surveyor",
+    "class": null,
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/rollbot.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "rollbot",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "sentinel",
+    "name": "Sentinel",
+    "class": "Sniper Turret",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/sentinel.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-coolant",
+        "chance": null
+      },
+      {
+        "item_id": "arc-synthetic-resin",
+        "chance": null
+      },
+      {
+        "item_id": "arc-thermo-lining",
+        "chance": null
+      },
+      {
+        "item_id": "arc-motion-core",
+        "chance": null
+      },
+      {
+        "item_id": "sentinel-firing-core",
+        "chance": null
+      },
+      {
+        "item_id": "heavy-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "sentinel",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "shredder",
+    "name": "Shredder",
+    "class": "Area Denial",
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/shredder.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "shredder-gyro",
+        "chance": null
+      },
+      {
+        "item_id": "shotgun-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "shredder",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "skulker",
+    "name": "Skulker",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/skulker.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "skulker",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "snitch",
+    "name": "Snitch",
+    "class": "Scout Drone",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/snitch.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "arc-synthetic-resin",
+        "chance": null
+      },
+      {
+        "item_id": "sensors",
+        "chance": null
+      },
+      {
+        "item_id": "snitch-scanner",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "snitch",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "spotter",
+    "name": "Spotter",
+    "class": "Scout Drone",
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/spotter.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "spotter-relay",
+        "chance": null
+      },
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "sensors",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "spotter",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "tick",
+    "name": "Tick",
+    "class": "Ambush Predator",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/tick.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "tick-pod",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "tick",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "turbine",
+    "name": "ARC Turbine",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/turbine.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "turbine",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "turret",
+    "name": "Turret",
+    "class": "Defense System",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/turret.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "light-ammo",
+        "chance": null
+      },
+      {
+        "item_id": "simple-gun-parts",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "turret",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "vaporizer",
+    "name": "Vaporizer",
+    "class": null,
+    "hp": null,
+    "icon": "https://static.metaforge.app/arc-raiders/icons/vaporizer.webp",
+    "armor_zones": [],
+    "drops": [],
+    "source_refs": {
+      "metaforge": "vaporizer",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  },
+  {
+    "id": "wasp",
+    "name": "Wasp",
+    "class": "Flying Drone",
+    "hp": null,
+    "icon": "https://unhbvkszwhczbjxgetgk.supabase.co/storage/v1/object/public/images/arc-raiders/icons/wasp.webp",
+    "armor_zones": [],
+    "drops": [
+      {
+        "item_id": "arc-alloy",
+        "chance": null
+      },
+      {
+        "item_id": "arc-powercell",
+        "chance": null
+      },
+      {
+        "item_id": "wasp-driver",
+        "chance": null
+      },
+      {
+        "item_id": "light-ammo",
+        "chance": null
+      }
+    ],
+    "source_refs": {
+      "metaforge": "wasp",
+      "wiki": null,
+      "raidtheory": null
+    },
+    "provenance": "api"
+  }
+]

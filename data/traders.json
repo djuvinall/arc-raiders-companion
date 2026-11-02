@@ -1,0 +1,680 @@
+[
+  {
+    "id": "apollo",
+    "name": "Apollo",
+    "inventory": [
+      {
+        "item_id": "barricade-kit",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "blaze-grenade",
+        "price": 4800,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "dockmasters-detector",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "door-blocker",
+        "price": 810,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "gas-grenade",
+        "price": 810,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "heavy-fuze-grenade",
+        "price": 4800,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "light-impact-grenade",
+        "price": 810,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "noisemaker",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "pulse-mine",
+        "price": 1410,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "recorder",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "seeker-grenade",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "shrapnel-grenade",
+        "price": 2400,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "smoke-grenade",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": 6
+      },
+      {
+        "item_id": "snap-blast-grenade",
+        "price": 2400,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "surge-coil",
+        "price": 6300,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "tagging-grenade",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "trigger-nade",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "zipline",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": 3
+      }
+    ]
+  },
+  {
+    "id": "celeste",
+    "name": "Celeste",
+    "inventory": [
+      {
+        "item_id": "battery",
+        "price": 5,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "canister",
+        "price": 6,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "chemicals",
+        "price": 1,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "complex-gun-parts",
+        "price": 60,
+        "currency": "Assorted Seeds",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "duct-tape",
+        "price": 6,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "exodus-modules",
+        "price": 55,
+        "currency": "Assorted Seeds",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "fabric",
+        "price": 1,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "great-mullein",
+        "price": 5,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "heavy-gun-parts",
+        "price": 15,
+        "currency": "Assorted Seeds",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "light-gun-parts",
+        "price": 15,
+        "currency": "Assorted Seeds",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "magnet",
+        "price": 6,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "medium-gun-parts",
+        "price": 15,
+        "currency": "Assorted Seeds",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "metal-parts",
+        "price": 1,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "moss",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "oil",
+        "price": 6,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "planks",
+        "price": 3,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "plastic-parts",
+        "price": 1,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "processor",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "rope",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "rubber-parts",
+        "price": 1,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "sensors",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "sheet-metal",
+        "price": 3,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "simple-gun-parts",
+        "price": 7,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "speaker-component",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "steel-cable",
+        "price": 20,
+        "currency": "Assorted Seeds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "steel-spring",
+        "price": 6,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "synthesized-fuel",
+        "price": 14,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "syringe",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "voltage-converter",
+        "price": 10,
+        "currency": "Assorted Seeds",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "wires",
+        "price": 4,
+        "currency": "Assorted Seeds",
+        "daily_limit": 10
+      }
+    ]
+  },
+  {
+    "id": "lance",
+    "name": "Lance",
+    "inventory": [
+      {
+        "item_id": "adrenaline-shot",
+        "price": 900,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "bandage",
+        "price": 750,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "combat-mk-1",
+        "price": 1920,
+        "currency": "Free Loadout Augment",
+        "daily_limit": null
+      },
+      {
+        "item_id": "combat-mk-2",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "combat-mk-3-flanking",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "defibrillator",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "heavy-shield",
+        "price": 16500,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "herbal-bandage",
+        "price": 2700,
+        "currency": "Coins",
+        "daily_limit": 10
+      },
+      {
+        "item_id": "light-shield",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "looting-mk-1",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "looting-mk-2",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "looting-mk-3-cautious",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "medium-shield",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "shield-recharger",
+        "price": 1560,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "sterilized-bandage",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "surge-shield-recharger",
+        "price": 3600,
+        "currency": "Coins",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "tactical-mk-1",
+        "price": 1920,
+        "currency": "Free Loadout Augment",
+        "daily_limit": null
+      },
+      {
+        "item_id": "tactical-mk-2",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "tactical-mk-3-healing",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": null
+      }
+    ]
+  },
+  {
+    "id": "shani",
+    "name": "Shani",
+    "inventory": [
+      {
+        "item_id": "advanced-camera",
+        "price": 3000,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "basic-camera",
+        "price": 1920,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "binoculars",
+        "price": 1920,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "blue-light-stick",
+        "price": 3000,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "firecracker",
+        "price": 810,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "fireworks-box",
+        "price": 6000,
+        "currency": "Creds",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "green-light-stick",
+        "price": 3000,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "raider-hatch-key",
+        "price": 9000,
+        "currency": "Creds",
+        "daily_limit": 2
+      },
+      {
+        "item_id": "red-light-stick",
+        "price": 3000,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "remote-raider-flare",
+        "price": 810,
+        "currency": "Creds",
+        "daily_limit": null
+      },
+      {
+        "item_id": "yellow-light-stick",
+        "price": 3000,
+        "currency": "Creds",
+        "daily_limit": null
+      }
+    ]
+  },
+  {
+    "id": "tianwen",
+    "name": "TianWen",
+    "inventory": [
+      {
+        "item_id": "angled-grip-i",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "angled-grip-ii",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "angled-grip-iii",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "arpeggio-i",
+        "price": 16500,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "bantam-i",
+        "price": 11400,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "burletta-i",
+        "price": 8700,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "energy-clip",
+        "price": 3000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "extended-light-mag-i",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "extended-light-mag-ii",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "extended-medium-mag-ii",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "ferro-i",
+        "price": 1425,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "ferro-iv",
+        "price": 8700,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "heavy-ammo",
+        "price": 900,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "il-toro-i",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "kettle-i",
+        "price": 2520,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "launcher-ammo",
+        "price": 4500,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "light-ammo",
+        "price": 900,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "medium-ammo",
+        "price": 900,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "muzzle-brake-i",
+        "price": 1920,
+        "currency": "Coins",
+        "daily_limit": 5
+      },
+      {
+        "item_id": "osprey-i",
+        "price": 21000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "padded-stock",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "rascal",
+        "price": 21000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "renegade-i",
+        "price": 21000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "shotgun-ammo",
+        "price": 900,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "shotgun-choke-ii",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 3
+      },
+      {
+        "item_id": "silencer-i",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": 1
+      },
+      {
+        "item_id": "stable-stock-iii",
+        "price": 15000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "stitcher-i",
+        "price": 2400,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "torrente-i",
+        "price": 21000,
+        "currency": "Coins",
+        "daily_limit": null
+      },
+      {
+        "item_id": "vertical-grip-ii",
+        "price": 6000,
+        "currency": "Coins",
+        "daily_limit": null
+      }
+    ]
+  }
+]

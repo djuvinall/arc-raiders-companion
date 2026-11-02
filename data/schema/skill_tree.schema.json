@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SkillTree",
+  "description": "Nodes come from the wiki. Wiring and in-game positions are hand-entered in\nskills_overlay.json; the two flags say whether that has happened.",
+  "type": "object",
+  "properties": {
+    "tree_version": {
+      "type": "string"
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SkillBranch"
+      }
+    },
+    "choice_groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ChoiceGroup"
+      }
+    },
+    "wires": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SkillWire"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SkillNode"
+      }
+    },
+    "points": {
+      "$ref": "#/$defs/SkillPoints"
+    },
+    "prereqs_entered": {
+      "type": "boolean"
+    },
+    "layout_in_game": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tree_version",
+    "branches",
+    "choice_groups",
+    "wires",
+    "nodes",
+    "points",
+    "prereqs_entered",
+    "layout_in_game"
+  ],
+  "$defs": {
+    "SkillBranch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "points_label": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "color",
+        "points_label"
+      ]
+    },
+    "ChoiceGroup": {
+      "description": "Exclusive picks. The Nth pick needs `gates[N]` points in the branch.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "max_picks": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "slots": {
+          "description": "One diamond per pick: the game shows slots, not the options sharing them.",
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "branch",
+        "max_picks",
+        "gates",
+        "slots"
+      ]
+    },
+    "SkillWire": {
+      "description": "A drawn connection. `from` and `to` are skill or choice group ids; a group wired to\nitself is the stem joining its slots. Prerequisites are derived from these.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "points"
+      ]
+    },
+    "SkillNode": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "details": {
+          "description": "Player-tested values from the wiki; \"may not be completely accurate\".",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_rank": {
+          "description": "Null where the wiki leaves it blank; planners cap those at 5 and warn.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "per_rank": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cost_per_rank": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "prereq_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "branch_points_gate": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "choice_group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "x": {
+          "type": "number",
+          "format": "double"
+        },
+        "y": {
+          "type": "number",
+          "format": "double"
+        },
+        "icon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "branch",
+        "kind",
+        "description",
+        "per_rank",
+        "cost_per_rank",
+        "prereq_ids",
+        "branch_points_gate",
+        "x",
+        "y"
+      ]
+    },
+    "SkillPoints": {
+      "type": "object",
+      "properties": {
+        "from_levels": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "max_level": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "expedition_bonus_max": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "from_levels",
+        "max_level",
+        "expedition_bonus_max"
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "dataset_version": "2026-11-02",
+    "game_patch": "2.3.0",
+    "summary": [
+      "First dataset: 1517 items, 1046 recipes, 123 quests, 17 projects, 48 skills.",
+      "skills: 0 added, 0 removed, 48 changed."
+    ],
+    "files": [
+      {
+        "file": "skills.json",
+        "added": [],
+        "removed": [],
+        "changed": [
+          "A Little Extra",
+          "Agile Croucher",
+          "Back On Your Feet",
+          "Broad Shoulders",
+          "Bull Rush",
+          "Crawl Before You Walk",
+          "Downed But Determined",
+          "Effortless Roll",
+          "Field Repair",
+          "Fight Or Flight",
+          "Gentle Pressure",
+          "In-round Crafting",
+          "In The Flow",
+          "Loaded Arms",
+          "Looter's Instincts",
+          "Looter's Luck",
+          "Marathon Runner",
+          "Minesweeper",
+          "Mule's Gallop",
+          "Nimble Climber",
+          "Nomadic Crafting",
+          "Off The Wall",
+          "Proficient Pryer",
+          "Quick Roll",
+          "Ready To Roll",
+          "Right Back At It",
+          "Road Warrior",
+          "Security Breach",
+          "Silent Scavenger",
+          "Slip And Slide",
+          "Speedy Mule",
+          "Sprinting On Fumes",
+          "Stubborn Mule",
+          "Sturdy Ankles",
+          "Stylish Landing",
+          "Sure-Footed Scrambler",
+          "Swift Start",
+          "Three Deep Breaths",
+          "Traveling Tinkerer",
+          "Turtle Crawl",
+          "Used To The Weight",
+          "Vault 'N' Carry",
+          "Vault Spring",
+          "Vaults On Vaults On Vaults",
+          "Vigorous Vaulter",
+          "Wall Run",
+          "Weapon Bash",
+          "Youthful Lungs"
+        ]
+      }
+    ]
+  }
+]

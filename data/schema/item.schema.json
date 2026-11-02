@@ -1,0 +1,648 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Array_of_Item",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/Item"
+  },
+  "$defs": {
+    "Item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/Category"
+        },
+        "subcategory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rarity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Rarity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tier": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "description": {
+          "type": "string"
+        },
+        "flavor_text": {
+          "type": "string"
+        },
+        "icon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "weight_kg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "stack_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "stats": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stats"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ammo_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "loadout_slots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loot_areas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "drops_from": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sold_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SoldBy"
+          }
+        },
+        "recipe_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recycle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blueprint_required": {
+          "type": "boolean"
+        },
+        "variant_of": {
+          "description": "Amplified weapons point at the tier they upgrade. Not in the plan's example:\nMetaForge lists 94 of them and the grid needs to fold them under the base weapon.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_refs": {
+          "$ref": "#/$defs/SourceRefs"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "category",
+        "description",
+        "flavor_text",
+        "loadout_slots",
+        "loot_areas",
+        "drops_from",
+        "sold_by",
+        "recipe_ids",
+        "recycle_ids",
+        "blueprint_required",
+        "source_refs",
+        "provenance"
+      ]
+    },
+    "Category": {
+      "description": "The plan's enum plus the categories MetaForge has and the plan lacked\n(`weapon-mod`, `recyclable`, `nature`, `research`, `furniture`, `quest-item`, `misc`).",
+      "type": "string",
+      "enum": [
+        "weapon",
+        "weapon-mod",
+        "shield",
+        "augment",
+        "ammo",
+        "healing",
+        "gadget",
+        "grenade",
+        "tool",
+        "key",
+        "material-basic",
+        "material-topside",
+        "material-refined",
+        "recyclable",
+        "nature",
+        "trinket",
+        "valuable",
+        "food",
+        "research",
+        "quest-item",
+        "blueprint",
+        "stencil",
+        "design",
+        "furniture",
+        "cosmetic",
+        "misc"
+      ]
+    },
+    "Rarity": {
+      "type": "string",
+      "enum": [
+        "common",
+        "uncommon",
+        "rare",
+        "epic",
+        "legendary"
+      ]
+    },
+    "Stats": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "weapon"
+            },
+            "damage": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "fire_rate": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "range": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "stability": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "agility": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "stealth": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "magazine_size": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint32",
+              "minimum": 0
+            },
+            "firing_mode": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "arc_armor_penetration": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mod_slots": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ModSlot"
+              }
+            },
+            "measured": {
+              "$ref": "#/$defs/MeasuredStats"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "mod_slots",
+            "measured"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "shield"
+            },
+            "shield_hp": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "charge": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "movement_penalty": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "damage_mitigation": {
+              "description": "Published by MetaForge, absent from the plan's block.",
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "augment"
+            },
+            "backpack_slots": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint32",
+              "minimum": 0
+            },
+            "weight_limit_kg": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "safe_pocket_slots": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint32",
+              "minimum": 0
+            },
+            "quick_use_slots": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint32",
+              "minimum": 0
+            },
+            "shield_compatibility": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "trinket_slots": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "consumable"
+            },
+            "healing": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "healing_per_second": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "use_time": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "duration": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "radius": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "arc_stun": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            },
+            "raider_stun": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "ModSlot": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "string"
+        },
+        "tier_max": {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "slot",
+        "tier_max"
+      ]
+    },
+    "MeasuredStats": {
+      "description": "Data wanted (plan §10): stays null until community-measured numbers exist.",
+      "type": "object",
+      "properties": {
+        "rounds_per_minute": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "bullet_velocity_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "falloff_start_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "falloff_end_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "falloff_min_mult": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "headshot_mult": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "reload_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "ads_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "recoil_pattern_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measured_provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measured_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Provenance": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "api",
+            "wiki",
+            "community_measured",
+            "hand_entered"
+          ]
+        },
+        {
+          "description": "RaidTheory community JSON; added to the plan's list so fallback rows stay visible.",
+          "type": "string",
+          "const": "community"
+        }
+      ]
+    },
+    "SoldBy": {
+      "type": "object",
+      "properties": {
+        "trader": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "currency": {
+          "description": "Not always coins: Celeste trades in Assorted Seeds. Null when no source says.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "daily_limit": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "trader",
+        "price"
+      ]
+    },
+    "SourceRefs": {
+      "type": "object",
+      "properties": {
+        "metaforge": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "wiki": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raidtheory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

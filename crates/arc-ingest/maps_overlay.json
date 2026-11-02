@@ -1,0 +1,54 @@
+{
+  "_note": "Tile sources for MetaForge's interactive maps, read from its map page config on 2026-11-02. Tiles are fetched and cached at runtime, never committed. world_extent is [lat, lng, lat, lng] in marker coordinates and tile_extent the same corners in zoom-0 tile pixels [y, x, y, x]. MetaForge changes the dated path when it re-renders a map, so a 404 here means re-reading its config.",
+  "maps": {
+    "dam": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/dam/20260112-q85/{z}/{x}/{y}.webp",
+      "tile_size": 256,
+      "max_native_zoom": 5,
+      "world_extent": [1634.8691424096007, 5260.799310066582, 3292.914501442535, 2848.1510404315172],
+      "tile_extent": [47.17178678359251, 152.00390625, 95.26116483234798, 82.04135491555881]
+    },
+    "spaceport": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/spaceport/20260114-q85/underground/{z}/{x}/{y}.webp",
+      "tile_size": 512,
+      "max_native_zoom": 5,
+      "world_extent": [1781.4843302764823, 2424.75, 3421.448788892414, 5104.75],
+      "tile_extent": [106.76514723178478, 139.9453125, 201.17851768793790, 294.1640625]
+    },
+    "buried-city": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/buried-city/20260112-q85/{z}/{x}/{y}.webp",
+      "tile_size": 512,
+      "max_native_zoom": 5,
+      "world_extent": [0, 0, 16384, 16384],
+      "tile_extent": [0, 0, 512, 512]
+    },
+    "blue-gate": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/blue-gate/20260112-q85/underground/{z}/{x}/{y}.webp",
+      "tile_size": 512,
+      "max_native_zoom": 5,
+      "world_extent": [7416, 6553.450942288329, 3439.2663383876925, 9597.991683705897],
+      "tile_extent": [233.0236479649544, 204.33176267600016, 107.43762885951965, 300.40951140668345]
+    },
+    "stella-montis": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/stella-montis/v3/b1/{z}/{x}_{y}.webp",
+      "tile_size": 256,
+      "max_native_zoom": 5,
+      "world_extent": [3412, 2206, 1362, 4874],
+      "tile_extent": [112.46875, 64.71875, 40.25, 158.78125]
+    },
+    "riven-tides": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/riven-tides/20260428-q85/{z}/{x}/{y}.webp",
+      "tile_size": 512,
+      "max_native_zoom": 5,
+      "world_extent": [0, 0, 16384, 16384],
+      "tile_extent": [0, 0, 512, 512]
+    },
+    "pendola-pass": {
+      "url": "https://static.metaforge.app/arc-raiders/maps/pendola-pass/20261005b-satellite/{z}/{x}/{y}.webp",
+      "tile_size": 512,
+      "max_native_zoom": 4,
+      "world_extent": [0, 0, 16384, 16384],
+      "tile_extent": [0, 0, 512, 512]
+    }
+  }
+}

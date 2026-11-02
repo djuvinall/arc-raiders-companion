@@ -1,0 +1,20 @@
+[package]
+name = "arc-ingest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "arc-ingest"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+arc-core = { path = "../arc-core" }
+schemars = "1"
+toml = "0.8"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+ureq = { version = "2", features = ["json"] }
+urlencoding = "2"

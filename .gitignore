@@ -1,0 +1,6 @@
+target/
+node_modules/
+ui/dist/
+crates/arc-tauri/gen/
+profile.json
+release/

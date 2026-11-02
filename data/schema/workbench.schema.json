@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Array_of_Workbench",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/Workbench"
+  },
+  "$defs": {
+    "Workbench": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "max_level": {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WorkbenchLevel"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "max_level",
+        "levels"
+      ]
+    },
+    "WorkbenchLevel": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "upgrade_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ItemQty"
+          }
+        },
+        "unlocks_recipe_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "upgrade_inputs",
+        "unlocks_recipe_ids"
+      ]
+    },
+    "ItemQty": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "qty": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "qty"
+      ]
+    }
+  }
+}

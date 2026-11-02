@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Array_of_WeaponMod",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/WeaponMod"
+  },
+  "$defs": {
+    "WeaponMod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "slot": {
+          "type": "string"
+        },
+        "compatible_ammo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "compatible_weapons": {
+          "description": "Weapon family slugs from the wiki; weapons are tiered items, mods fit the family.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Modifier"
+          }
+        },
+        "flat": {
+          "$ref": "#/$defs/FlatModifiers"
+        },
+        "recipe_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gunsmith_level": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "family",
+        "tier",
+        "slot",
+        "compatible_ammo",
+        "compatible_weapons",
+        "modifiers",
+        "flat",
+        "provenance"
+      ]
+    },
+    "Modifier": {
+      "type": "object",
+      "properties": {
+        "stat": {
+          "$ref": "#/$defs/ModStat"
+        },
+        "pct": {
+          "description": "Signed: \"15% Reduced\" is -15, \"15% Increased\" is 15.",
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "stat",
+        "pct"
+      ]
+    },
+    "ModStat": {
+      "description": "Closed list shared by mods and the weapon calculators.",
+      "type": "string",
+      "enum": [
+        "ads_speed",
+        "base_dispersion",
+        "bullet_velocity",
+        "dispersion_recovery",
+        "durability_burn_rate",
+        "equip_time",
+        "falloff_distance",
+        "fire_rate",
+        "horizontal_recoil",
+        "max_shot_dispersion",
+        "noise",
+        "per_shot_dispersion",
+        "recoil_recovery",
+        "unequip_time",
+        "vertical_recoil"
+      ]
+    },
+    "FlatModifiers": {
+      "type": "object",
+      "properties": {
+        "magazine_size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "magazine_size"
+      ]
+    },
+    "Provenance": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "api",
+            "wiki",
+            "community_measured",
+            "hand_entered"
+          ]
+        },
+        {
+          "description": "RaidTheory community JSON; added to the plan's list so fallback rows stay visible.",
+          "type": "string",
+          "const": "community"
+        }
+      ]
+    }
+  }
+}

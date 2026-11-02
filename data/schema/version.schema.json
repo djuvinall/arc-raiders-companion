@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DatasetVersion",
+  "type": "object",
+  "properties": {
+    "dataset_version": {
+      "type": "string"
+    },
+    "game_patch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ingested_from": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "dataset_version",
+    "ingested_from"
+  ]
+}
