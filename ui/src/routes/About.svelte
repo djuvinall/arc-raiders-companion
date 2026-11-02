@@ -1,7 +1,12 @@
 <script lang="ts">
-  import type { Overview } from "../lib/api";
+  import { appVersion, type Overview } from "../lib/api";
+  import { checkForUpdates, updates } from "../lib/updates.svelte";
 
   let { info }: { info: Overview | null } = $props();
+  let version = $state("");
+
+  appVersion().then((v) => (version = v));
+  const upToDate = $derived(updates.checked && !updates.checking && !updates.app && !updates.data && !updates.error);
 </script>
 
 <div class="page">
@@ -10,6 +15,13 @@
     An unofficial, open-source companion. Not affiliated with or endorsed by Embark Studios.
     ARC Raiders and its assets belong to their respective owners.
   </p>
+  <div class="version">
+    <span>Version {version}</span>
+    <button class="button dark" disabled={updates.checking} onclick={() => checkForUpdates(false)}>
+      {updates.checking ? "Checking…" : "Check for updates"}
+    </button>
+    {#if upToDate}<span class="dim">Up to date.</span>{/if}
+  </div>
   {#if info}
     <p class="dim">
       Dataset {info.dataset_version}: {info.item_count} items, {info.recipe_count} recipes.
@@ -42,8 +54,8 @@
 
   <h3 class="section-title">Privacy</h3>
   <p>
-    Your stash, plans and progress stay in <code>profile.json</code> on this computer. Nothing is read from the
-    game and nothing is uploaded.
+    Your stash, plans, progress and stencil screenshots stay on this computer. Nothing is read from the
+    game and nothing is uploaded. The app asks GitHub for new versions and item data when it starts.
   </p>
 </div>
 
@@ -55,6 +67,12 @@
   h2 {
     font-size: 30px;
     margin-bottom: 8px;
+  }
+  .version {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
   }
   .section-title {
     margin-top: 22px;

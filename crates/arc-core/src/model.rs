@@ -104,8 +104,23 @@ pub struct Item {
     /// Amplified weapons point at the tier they upgrade. Not in the plan's example:
     /// MetaForge lists 94 of them and the grid needs to fold them under the base weapon.
     pub variant_of: Option<String>,
+    /// Stencils only.
+    pub stencil: Option<StencilFit>,
     pub source_refs: SourceRefs,
     pub provenance: Provenance,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct StencilFit {
+    /// Flat pattern card, a URL fetched at runtime like other art.
+    pub swatch: String,
+    /// Weapon family ids, community-reported. Embark publishes no list.
+    pub weapons: Vec<String>,
+    /// How to get it, such as "Topside loot".
+    pub source: String,
+    /// Stencil Parts spent each time it's applied.
+    pub parts: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]

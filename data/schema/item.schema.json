@@ -140,6 +140,17 @@
             "null"
           ]
         },
+        "stencil": {
+          "description": "Stencils only.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StencilFit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "source_refs": {
           "$ref": "#/$defs/SourceRefs"
         },
@@ -618,6 +629,39 @@
       "required": [
         "trader",
         "price"
+      ]
+    },
+    "StencilFit": {
+      "type": "object",
+      "properties": {
+        "swatch": {
+          "description": "Flat pattern card, a URL fetched at runtime like other art.",
+          "type": "string"
+        },
+        "weapons": {
+          "description": "Weapon family ids, community-reported. Embark publishes no list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "description": "How to get it, such as \"Topside loot\".",
+          "type": "string"
+        },
+        "parts": {
+          "description": "Stencil Parts spent each time it's applied.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "swatch",
+        "weapons",
+        "source",
+        "parts"
       ]
     },
     "SourceRefs": {

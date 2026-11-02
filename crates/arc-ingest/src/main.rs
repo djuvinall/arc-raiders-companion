@@ -24,6 +24,8 @@ use std::path::{Path, PathBuf};
 const PRECEDENCE: &str = include_str!("../precedence.toml");
 const SKILLS_OVERLAY: &str = include_str!("../skills_overlay.json");
 const MAPS_OVERLAY: &str = include_str!("../maps_overlay.json");
+const STENCILS_OVERLAY: &str = include_str!("../stencils_overlay.json");
+const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
 
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -52,6 +54,36 @@ fn apply_map_tiles(maps: &mut [m::GameMap]) -> Result<()> {
         map.image.max_native_zoom = Some(tiles.max_native_zoom);
         map.image.world_extent = Some(tiles.world_extent);
         map.image.tile_extent = Some(tiles.tile_extent);
+    }
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StencilsOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    stencils: std::collections::BTreeMap<String, StencilEntry>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StencilEntry {
+    weapons: Vec<String>,
+    source: String,
+    parts: u32,
+}
+
+fn apply_stencils(items: &mut [m::Item]) -> Result<()> {
+    let overlay: StencilsOverlay = serde_json::from_str(STENCILS_OVERLAY).context("stencils_overlay.json")?;
+    for item in items.iter_mut().filter(|i| i.category == m::Category::Stencil) {
+        let entry = overlay.stencils.get(&item.id).with_context(|| format!("no overlay for {}", item.id))?;
+        item.stencil = Some(m::StencilFit {
+            swatch: format!("{STENCIL_SWATCHES}/{}.webp", item.id),
+            weapons: entry.weapons.clone(),
+            source: entry.source.clone(),
+            parts: entry.parts,
+        });
     }
     Ok(())
 }
@@ -105,6 +137,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     let sources = Sources { date, metaforge, wiki, raidtheory, skills_wikitext };
     let mut out = normalize::normalize(&sources, &prec, &overlay)?;
     apply_map_tiles(&mut out.files.maps)?;
+    apply_stencils(&mut out.files.items)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

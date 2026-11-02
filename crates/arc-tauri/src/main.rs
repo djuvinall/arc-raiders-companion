@@ -1,8 +1,11 @@
 //! Thin shell over arc-core: commands, profile.json, and the icon cache.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod data_update;
 mod feeds;
 mod icons;
+mod shots;
+mod updates;
 
 use anyhow::{Context, Result};
 use arc_core::events::{self, MapEvents};
@@ -15,6 +18,7 @@ use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Over
 use arc_core::weapons::{self, CompareTable, Sheet, SlotOptions};
 use arc_core::Dataset;
 use serde::Serialize;
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
@@ -34,10 +38,9 @@ macro_rules! embedded {
 embedded!(
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
-    "loot_areas.json", "version.json",
+    "loot_areas.json", "version.json", "changelog.json",
 );
 
-const CHANGELOG: &str = include_str!("../../../data/changelog.json");
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
 const NEWS_SNAPSHOT: &[u8] = include_bytes!("../../../tests/fixtures/steam/2026-11-02.json");
 const NEWS_URL: &str = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=1808500&count=30";
@@ -46,6 +49,7 @@ const EVENT_REGIONS: &[&str] = &["europe", "north-america", "oceania"];
 
 struct AppState {
     dataset: Dataset,
+    changelog: String,
     profile: Mutex<Profile>,
     profile_path: PathBuf,
 }
@@ -283,8 +287,51 @@ fn patch_notes(app: AppHandle) -> NewsView {
 }
 
 #[tauri::command]
-fn dataset_changelog() -> Vec<ChangelogEntry> {
-    serde_json::from_str(CHANGELOG).unwrap_or_default()
+fn dataset_changelog(state: State<AppState>) -> Vec<ChangelogEntry> {
+    serde_json::from_str(&state.changelog).unwrap_or_default()
+}
+
+#[tauri::command]
+fn app_version(app: AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
+#[tauri::command(async)]
+fn check_data_update(app: AppHandle, state: State<AppState>) -> CommandResult<Option<String>> {
+    let dir = app.path().app_data_dir().map_err(|e| e.to_string())?.join("data-update");
+    data_update::fetch(&dir, &state.dataset.files.version.dataset_version).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn restart_app(app: AppHandle) {
+    app.restart()
+}
+
+/// Checks the stencil is real, which also keeps the id safe to use as a folder name.
+fn shot_dir(app: &AppHandle, state: &AppState, stencil_id: &str) -> CommandResult<PathBuf> {
+    if state.dataset.item(stencil_id).and_then(|i| i.stencil.as_ref()).is_none() {
+        return Err(missing("stencil", stencil_id));
+    }
+    Ok(app.path().app_data_dir().map_err(|e| e.to_string())?.join("stencil-shots").join(stencil_id))
+}
+
+#[tauri::command]
+fn stencil_shots(app: AppHandle, state: State<AppState>, stencil_id: String) -> CommandResult<BTreeMap<String, String>> {
+    Ok(shots::list(&shot_dir(&app, &state, &stencil_id)?))
+}
+
+#[tauri::command]
+fn save_stencil_shot(app: AppHandle, state: State<AppState>, stencil_id: String, gun_id: String, image: String) -> CommandResult<()> {
+    let dir = shot_dir(&app, &state, &stencil_id)?;
+    state.dataset.item(&gun_id).ok_or_else(|| missing("weapon", &gun_id))?;
+    shots::save(&dir, &gun_id, &image).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn delete_stencil_shot(app: AppHandle, state: State<AppState>, stencil_id: String, gun_id: String) -> CommandResult<()> {
+    let dir = shot_dir(&app, &state, &stencil_id)?;
+    state.dataset.item(&gun_id).ok_or_else(|| missing("weapon", &gun_id))?;
+    shots::remove(&dir, &gun_id).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -353,17 +400,21 @@ fn save_profile(path: &PathBuf, profile: &Profile) -> Result<()> {
 }
 
 fn main() {
-    let dataset = Dataset::load_with(&embedded).expect("embedded dataset is valid");
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(updates::Pending::default())
         .register_asynchronous_uri_scheme_protocol("arcicon", |ctx, request, responder| {
             let cache = ctx.app_handle().path().app_cache_dir().ok();
             let path = request.uri().path().to_string();
             std::thread::spawn(move || responder.respond(icons::serve(cache, &path)));
         })
-        .setup(move |app| {
-            let profile_path = app.path().app_data_dir()?.join("profile.json");
+        .setup(|app| {
+            let data_dir = app.path().app_data_dir()?;
+            let profile_path = data_dir.join("profile.json");
+            let (dataset, changelog) = data_update::load(&data_dir.join("data-update"), &embedded)?;
             app.manage(AppState {
                 dataset,
+                changelog,
                 profile: Mutex::new(load_profile(&profile_path)),
                 profile_path,
             });
@@ -376,7 +427,9 @@ fn main() {
             save_weapon_build, delete_weapon_build, map_list, map_pois, live_events, route_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, set_project_tracked, collection_list, toggle_found, patch_notes,
-            dataset_changelog, export_profile, import_profile
+            dataset_changelog, export_profile, import_profile, app_version, check_data_update,
+            restart_app, stencil_shots, save_stencil_shot, delete_stencil_shot,
+            updates::check_app_update, updates::install_app_update
         ])
         .run(tauri::generate_context!())
         .expect("error while running the app");

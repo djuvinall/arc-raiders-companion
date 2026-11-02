@@ -6,7 +6,7 @@ Includes the item database and crafting trees, the 2.0 skill tree planner, weapo
 
 ## Download
 
-Get the Windows exe from the [latest release](https://github.com/djuvinall/arc-raiders-companion/releases/latest). There is nothing to install. It isn't code-signed, so Windows may show a SmartScreen warning.
+Get the Windows installer from the [latest release](https://github.com/djuvinall/arc-raiders-companion/releases/latest). It installs for your user only, needs no admin rights, and updates itself from new releases. It isn't code-signed yet, so Windows may show a SmartScreen warning on the first install. See [docs/SIGNING.md](docs/SIGNING.md).
 
 ## Run from source
 
@@ -36,7 +36,9 @@ cargo run -p arc-ingest -- sync --write
 
 `probe` snapshots the sources into `tests/fixtures`, `sync` shows what would change, and `--write` updates `data/` for review and commit. `cargo test` validates schema and references.
 
-See [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DESIGN.md](docs/DESIGN.md).
+The app downloads newer data from this repository's `main` branch at launch, and uses it after a restart if it validates. The **refresh-data** workflow runs these steps on GitHub.
+
+See [docs/RELEASING.md](docs/RELEASING.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DESIGN.md](docs/DESIGN.md).
 
 ## License
 

@@ -82,6 +82,29 @@ fn the_item_list_groups_weapons_into_guns() {
 }
 
 #[test]
+fn every_stencil_reaches_its_guns() {
+    let ds = real();
+    let stencils: Vec<_> = ds.files.items.iter().filter(|i| i.category == Category::Stencil).collect();
+    assert_eq!(stencils.len(), 14);
+    for item in stencils {
+        let fit = item.stencil.as_ref().unwrap();
+        assert!(fit.swatch.starts_with("https://static.metaforge.app/"), "{}", item.id);
+        assert_eq!(stencil_guns(&ds, fit).len(), fit.weapons.len(), "{}", item.id);
+    }
+    let guns = stencil_guns(&ds, ds.item("slipstream-stencil").unwrap().stencil.as_ref().unwrap());
+    assert_eq!(guns.iter().map(|g| g.name.as_str()).collect::<Vec<_>>(), ["Anvil", "Il Toro", "Rattler"]);
+    assert_eq!(guns[0].id, "anvil-i");
+
+    let rows = gun_stencils(&ds, "amplified-anvil-x-rounds");
+    assert!(rows.iter().any(|r| r.stencil.id == "fortuna-stencil"));
+    assert!(!rows.iter().any(|r| r.stencil.id == "bulwark-stencil"));
+    assert!(gun_stencils(&ds, "jupiter").is_empty());
+    assert!(gun_stencils(&ds, "metal-parts").is_empty());
+    let dragon = ds.item("dragons-breath-stencil").unwrap().stencil.as_ref().unwrap();
+    assert_eq!((dragon.source.as_str(), dragon.parts), ("Collector Set DLC", 15));
+}
+
+#[test]
 fn mods_list_only_what_fits_each_slot() {
     let ds = real();
     let slots = slot_options(&ds, "rattler-iv").unwrap();

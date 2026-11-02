@@ -22,7 +22,7 @@ fn age(path: &Path) -> Option<(Duration, i64)> {
     Some((SystemTime::now().duration_since(modified).unwrap_or_default(), at))
 }
 
-fn download(url: &str) -> Option<Vec<u8>> {
+pub fn download(url: &str) -> Option<Vec<u8>> {
     if std::env::var_os("ARC_OFFLINE").is_some() {
         return None;
     }

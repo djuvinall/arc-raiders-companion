@@ -2,6 +2,8 @@
   import { overview, type Overview } from "./lib/api";
   import BottomBar from "./lib/components/BottomBar.svelte";
   import TopBar from "./lib/components/TopBar.svelte";
+  import UpdateBanner from "./lib/components/UpdateBanner.svelte";
+  import { checkForUpdates } from "./lib/updates.svelte";
   import About from "./routes/About.svelte";
   import Codex from "./routes/Codex.svelte";
   import Craft from "./routes/Craft.svelte";
@@ -24,6 +26,7 @@
   let main = $state<HTMLElement>();
 
   overview().then((o) => (info = o));
+  checkForUpdates();
 
   function onHash() {
     parts = current();
@@ -72,6 +75,7 @@
 
 <div class="shell">
   <TopBar {...titles} canGoBack={parts[0] !== "items"} active={TABS.includes(parts[0]) ? parts[0] : "items"} />
+  <div><UpdateBanner /></div>
   <main bind:this={main}>
     {#key parts.join("/")}
       {#if parts[0] === "item"}
@@ -109,7 +113,7 @@
 <style>
   .shell {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
     height: 100%;
   }
   main {

@@ -44,7 +44,7 @@
   <div class="grid">
     {#each entries as entry (entry.id)}
       <div class="tile" class:found={entry.found}>
-        <button aria-label="{entry.name}, {entry.found ? 'found' : 'not found'}" title={entry.name} onclick={() => toggle(entry.id)}>
+        <button class:blueprint={activeId === "blueprints"} aria-label="{entry.name}, {entry.found ? 'found' : 'not found'}" title={entry.name} onclick={() => toggle(entry.id)}>
           <Icon url={entry.icon} name={entry.name} size={64} />
           {#if entry.rarity}<span class="wedge" style:background="var(--rarity-{entry.rarity})"></span>{/if}
           {#if entry.found}<span class="check">✓</span>{/if}
@@ -122,6 +122,9 @@
     overflow: hidden;
     cursor: pointer;
     opacity: 0.6;
+  }
+  .tile button.blueprint {
+    background: var(--blueprint-bg);
   }
   .tile.found button {
     opacity: 1;

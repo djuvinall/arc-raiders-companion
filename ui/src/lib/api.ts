@@ -68,6 +68,7 @@ export interface Item extends ItemSummary {
   stack_size: number | null;
   stats: ({ kind: string } & Record<string, unknown>) | null;
   ammo_type: string | null;
+  stencil: { swatch: string; weapons: string[]; source: string; parts: number } | null;
   blueprint_required: boolean;
   provenance: string;
 }
@@ -82,6 +83,8 @@ export interface ItemDetail {
   dropped_by: Link[];
   base: Link | null;
   family: WeaponFamily | null;
+  stencil_guns: Link[];
+  gun_stencils: { stencil: Link; swatch: string }[];
   quest_rewards: Link[];
   project_rewards: Link[];
 }
@@ -186,6 +189,7 @@ export interface Profile {
   skill_plans: SkillPlan[];
   weapon_builds: WeaponBuild[];
   tracked_item_ids: string[];
+  blueprints_found: string[];
 }
 
 export interface WeaponMod {
@@ -397,6 +401,18 @@ export const patchNotes = () => invoke<{ notes: PatchNote[]; fetched_ms: number 
 export const datasetChangelog = () => invoke<ChangelogEntry[]>("dataset_changelog");
 export const exportProfile = () => invoke<string>("export_profile");
 export const importProfile = (text: string) => invoke<void>("import_profile", { text });
+
+export const appVersion = () => invoke<string>("app_version");
+export const checkAppUpdate = () => invoke<string | null>("check_app_update");
+export const installAppUpdate = () => invoke<void>("install_app_update");
+export const checkDataUpdate = () => invoke<string | null>("check_data_update");
+export const restartApp = () => invoke<void>("restart_app");
+
+export const stencilShots = (stencilId: string) => invoke<Record<string, string>>("stencil_shots", { stencilId });
+export const saveStencilShot = (stencilId: string, gunId: string, image: string) =>
+  invoke<void>("save_stencil_shot", { stencilId, gunId, image });
+export const deleteStencilShot = (stencilId: string, gunId: string) =>
+  invoke<void>("delete_stencil_shot", { stencilId, gunId });
 
 export const iconSrc = (url: string) => convertFileSrc(url, "arcicon");
 

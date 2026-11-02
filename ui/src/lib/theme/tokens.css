@@ -1,4 +1,10 @@
 :root {
+  --blueprint-bg:
+    linear-gradient(rgba(106, 138, 232, 0.3) 1px, transparent 1px) -1px -1px / 24px 24px,
+    linear-gradient(90deg, rgba(106, 138, 232, 0.3) 1px, transparent 1px) -1px -1px / 24px 24px,
+    linear-gradient(rgba(106, 138, 232, 0.12) 1px, transparent 1px) -1px -1px / 6px 6px,
+    linear-gradient(90deg, rgba(106, 138, 232, 0.12) 1px, transparent 1px) -1px -1px / 6px 6px,
+    radial-gradient(circle, #10255f, #071238);
   --page: #0b0b0f;
   --panel: #1b1f2e;
   --panel-2: #222739;

@@ -4,7 +4,7 @@
 use crate::calc::{self, TreeNode, UsedIn};
 use crate::dataset::Dataset;
 use crate::model::*;
-use crate::weapons::{self, WeaponFamily};
+use crate::weapons::{self, GunStencil, WeaponFamily};
 use serde::Serialize;
 use std::collections::BTreeMap;
 
@@ -160,6 +160,8 @@ pub struct ItemDetail {
     pub dropped_by: Vec<Link>,
     pub base: Option<Link>,
     pub family: Option<WeaponFamily>,
+    pub stencil_guns: Vec<Link>,
+    pub gun_stencils: Vec<GunStencil>,
     pub quest_rewards: Vec<Link>,
     pub project_rewards: Vec<Link>,
 }
@@ -193,6 +195,8 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         found_in: found_in(ds, &item),
         base: item.variant_of.as_ref().map(|b| item_link(ds, b, None)),
         family: weapons::weapon_family_view(ds, id),
+        gun_stencils: weapons::gun_stencils(ds, id),
+        stencil_guns: item.stencil.as_ref().map_or(Vec::new(), |s| weapons::stencil_guns(ds, s)),
         sold_by,
         dropped_by,
         quest_rewards,

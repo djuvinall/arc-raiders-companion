@@ -1,16 +1,26 @@
 <script module lang="ts">
   // Lives outside the component so Back returns to the same filtered grid.
+  const stored = (key: string) => {
+    try {
+      return localStorage.getItem(key) === "1";
+    } catch {
+      return false;
+    }
+  };
+
   const filters = $state({
     group: "all",
     search: "",
     rarity: "",
     tier: "",
     area: "",
+    hideBlueprints: stored("hide-blueprints"),
+    hideFound: stored("hide-found"),
   });
 </script>
 
 <script lang="ts">
-  import { listItems, type ItemSummary, type Overview } from "../lib/api";
+  import { getProfile, listItems, type ItemSummary, type Overview } from "../lib/api";
   import ItemTile from "../lib/components/ItemTile.svelte";
   import Rail, { GROUPS } from "../lib/components/Rail.svelte";
 
@@ -18,7 +28,10 @@
   let items = $state<ItemSummary[]>([]);
   let searchBox = $state<HTMLInputElement>();
 
+  let found = $state(new Set<string>());
+
   listItems().then((all) => (items = all));
+  getProfile().then((p) => (found = new Set(p.blueprints_found)));
 
   const visible = $derived.by(() => {
     const group = GROUPS.find((g) => g.id === filters.group);
@@ -26,6 +39,8 @@
     return items.filter((item) => {
       if (group?.categories.length && !group.categories.includes(item.category)) return false;
       if (filters.group === "all" && ["cosmetic", "furniture"].includes(item.category) && !query) return false;
+      if (filters.hideBlueprints && item.category === "blueprint") return false;
+      if (filters.hideFound && found.has(item.id)) return false;
       if (filters.rarity && item.rarity !== filters.rarity) return false;
       if (filters.tier && String(item.tier ?? "") !== filters.tier) return false;
       if (filters.area && !item.loot_areas.includes(filters.area)) return false;
@@ -46,6 +61,22 @@
     return visible.filter((i) => !i.family || lead.get(i.family) === i)
       .map((i) => (i.family ? { ...i, name: i.family_name ?? i.name, tier: null } : i));
   });
+
+  function remember(key: string, on: boolean) {
+    try {
+      localStorage.setItem(key, on ? "1" : "0");
+    } catch {}
+  }
+
+  function setHideBlueprints(hide: boolean) {
+    filters.hideBlueprints = hide;
+    remember("hide-blueprints", hide);
+  }
+
+  function setHideFound(hide: boolean) {
+    filters.hideFound = hide;
+    remember("hide-found", hide);
+  }
 
   function onKey(event: KeyboardEvent) {
     if (event.key === "/" && document.activeElement !== searchBox) {
@@ -90,11 +121,22 @@
           <option value={area.id}>{area.name}</option>
         {/each}
       </select>
+      <label class="toggle">
+        <input
+          type="checkbox" checked={filters.hideBlueprints}
+          onchange={(e) => setHideBlueprints(e.currentTarget.checked)}
+        />
+        Hide blueprints
+      </label>
+      <label class="toggle">
+        <input type="checkbox" checked={filters.hideFound} onchange={(e) => setHideFound(e.currentTarget.checked)} />
+        Hide found
+      </label>
       <span class="count">{tiles.length} items</span>
     </div>
     <div class="grid">
       {#each tiles as item (item.id)}
-        <ItemTile {item} />
+        <ItemTile {item} found={found.has(item.id)} />
       {/each}
     </div>
     {#if items.length && !tiles.length}
@@ -126,6 +168,12 @@
   }
   .search {
     width: 240px;
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
   }
   .count {
     margin-left: auto;

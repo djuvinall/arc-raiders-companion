@@ -1,19 +1,41 @@
 <script lang="ts">
-  import { getItem, getProfile, ROMAN, toggleTrackedItem, type ItemDetail, type Link, type RecipeView } from "../lib/api";
+  import {
+    getItem, getProfile, linkHref, ROMAN, toggleFound, toggleTrackedItem,
+    type ItemDetail, type Link, type RecipeView,
+  } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
   import LinkRow from "../lib/components/LinkRow.svelte";
+  import StencilGuns from "../lib/components/StencilGuns.svelte";
+  import StencilPreview from "../lib/components/StencilPreview.svelte";
   import WeaponPicker from "../lib/components/WeaponPicker.svelte";
 
   let { id }: { id: string } = $props();
   let detail = $state<ItemDetail | null>(null);
   let error = $state("");
   let tracked = $state(false);
+  let found = $state(false);
+  let baseline = $state<ItemDetail | null>(null);
 
-  getProfile().then((p) => (tracked = p.tracked_item_ids.includes(id)));
+  getProfile().then((p) => {
+    tracked = p.tracked_item_ids.includes(id);
+    found = p.blueprints_found.includes(id);
+  });
+
+  // Amplified versions compare with their base, levels with level I.
+  const baselineId = (d: ItemDetail) => {
+    const id = d.base?.id ?? d.family?.levels[0]?.id;
+    return id === d.item.id ? null : id ?? null;
+  };
 
   $effect(() => {
-    getItem(id).then((d) => (detail = d), (e) => (error = String(e)));
+    getItem(id).then(async (d) => {
+      const other = baselineId(d);
+      baseline = other ? await getItem(other) : null;
+      detail = d;
+    }, (e) => (error = String(e)));
   });
+
+  const collectable = $derived(["blueprint", "stencil", "design"].includes(detail?.item.category ?? ""));
 
   const STAT_LABELS: Record<string, string> = {
     damage: "Damage",
@@ -51,6 +73,13 @@
     ) as [string, string | number][],
   );
 
+  const delta = (key: string, value: string | number) => {
+    const before = baseline?.item.stats?.[key];
+    if (typeof value !== "number" || typeof before !== "number") return 0;
+    return Math.round((value - before) * 10) / 10;
+  };
+  const anyDelta = $derived(stats.some(([key, value]) => delta(key, value) !== 0));
+
   const usedIn = $derived.by((): Link[] => {
     if (!detail) return [];
     const u = detail.used_in;
@@ -77,7 +106,7 @@
   {@const item = detail.item}
   <div class="page">
     <aside class="detail">
-      <div class="art"><Icon url={item.icon} name={item.name} size={140} /></div>
+      <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={140} /></div>
       <div class="chips">
         <span class="chip category">{item.category.replace("-", " ")}</span>
         {#if item.rarity}
@@ -98,18 +127,53 @@
         {#if item.stack_size !== null}<dt>Stack</dt><dd>{item.stack_size}</dd>{/if}
         {#if item.ammo_type}<dt>Ammo</dt><dd>{item.ammo_type}</dd>{/if}
         {#each stats as [key, value]}
-          <dt>{STAT_LABELS[key]}</dt><dd>{value}</dd>
+          {@const d = delta(key, value)}
+          <dt>{STAT_LABELS[key]}</dt>
+          <dd>{value}{#if d}<span class="delta" class:down={d < 0}>{d > 0 ? "+" : ""}{d}</span>{/if}</dd>
         {/each}
+        {#if item.stencil}
+          <dt>Source</dt><dd>{item.stencil.source}</dd>
+          <dt>Stencil Parts</dt><dd>{item.stencil.parts} per weapon</dd>
+        {/if}
       </dl>
+      {#if baseline}
+        <p class="compared">
+          {anyDelta ? `Changes compared with ${baseline.item.name}.` : `Same stats as ${baseline.item.name} in the source data.`}
+        </p>
+      {/if}
       {#if canCraft}
         <a class="button primary" href="#/craft/{item.id}">Crafting tree</a>
       {/if}
       <button class="button dark" onclick={async () => (tracked = await toggleTrackedItem(item.id))}>
         {tracked ? "Tracked" : "Track resources"}
       </button>
+      {#if collectable}
+        <button class="button dark" onclick={async () => (found = await toggleFound(item.id))}>
+          {found ? "Found ✓" : "Mark found"}
+        </button>
+      {/if}
     </aside>
 
     <div class="sections">
+      {#if item.stencil && detail.stencil_guns.length}
+        <StencilGuns stencilId={item.id} swatch={item.stencil.swatch} guns={detail.stencil_guns} />
+      {/if}
+
+      {#if detail.gun_stencils.length}
+        <section class="panel">
+          <h3 class="section-title">Stencils ({detail.gun_stencils.length})</h3>
+          <div class="stencils">
+            {#each detail.gun_stencils as row (row.stencil.id)}
+              <a href={linkHref(row.stencil)} title={row.stencil.name}>
+                <StencilPreview gun={item.icon} swatch={row.swatch} name={item.name} size={84} />
+                <span>{row.stencil.name.replace(" Stencil", "")}</span>
+              </a>
+            {/each}
+          </div>
+          <p class="sub">Approximate previews. The list is community-reported.</p>
+        </section>
+      {/if}
+
       {#if detail.crafting.length}
         <section class="panel">
           <h3 class="section-title">Crafting</h3>
@@ -225,6 +289,12 @@
     place-items: center;
     padding: 6px 0 14px;
   }
+  .art.blueprint {
+    margin-bottom: 14px;
+    padding: 14px 0;
+    background: var(--blueprint-bg);
+    border-radius: 4px;
+  }
   .chips {
     display: flex;
     flex-wrap: wrap;
@@ -267,6 +337,35 @@
     margin: 0;
     font-weight: 600;
     text-align: right;
+  }
+  .delta {
+    margin-left: 6px;
+    color: #1f8f4d;
+    font-size: 12px;
+  }
+  .delta.down {
+    color: #c0392b;
+  }
+  .compared {
+    margin: -8px 0 12px;
+    color: var(--on-cream-dim);
+    font-size: 13px;
+  }
+  .stencils {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 104px);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .stencils a {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
   }
   .sections {
     display: flex;

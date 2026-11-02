@@ -4,3 +4,4 @@ ui/dist/
 crates/arc-tauri/gen/
 profile.json
 release/
+dist-release/

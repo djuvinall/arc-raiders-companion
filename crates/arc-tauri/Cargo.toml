@@ -17,4 +17,5 @@ serde.workspace = true
 serde_json.workspace = true
 arc-core = { path = "../arc-core" }
 tauri = { version = "2", features = ["custom-protocol"] }
+tauri-plugin-updater = "2"
 ureq = "2"

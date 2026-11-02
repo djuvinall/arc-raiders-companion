@@ -2,10 +2,10 @@
   import { ROMAN, type ItemSummary } from "../api";
   import Icon from "./Icon.svelte";
 
-  let { item }: { item: ItemSummary } = $props();
+  let { item, found = false }: { item: ItemSummary; found?: boolean } = $props();
 </script>
 
-<a class="tile" href="#/item/{item.id}" title={item.name}>
+<a class="tile" class:blueprint={item.category === "blueprint"} href="#/item/{item.id}" title={item.name}>
   <Icon url={item.icon} name={item.name} size={64} />
   {#if item.rarity}
     <span class="wedge" style:background="var(--rarity-{item.rarity})"></span>
@@ -13,6 +13,7 @@
   {#if item.tier}
     <span class="tier">{ROMAN[item.tier]}</span>
   {/if}
+  {#if found}<span class="check" aria-label="Found">✓</span>{/if}
   <span class="name">{item.name}</span>
 </a>
 
@@ -29,6 +30,9 @@
     overflow: hidden;
     content-visibility: auto;
     contain-intrinsic-size: 96px 96px;
+  }
+  .blueprint {
+    background: var(--blueprint-bg);
   }
   .tile:hover,
   .tile:focus-visible {
@@ -51,6 +55,19 @@
     font-family: var(--font-head);
     font-size: 13px;
     font-weight: 700;
+  }
+  .check {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #0b0b0f;
+    font-size: 12px;
   }
   .name {
     position: absolute;

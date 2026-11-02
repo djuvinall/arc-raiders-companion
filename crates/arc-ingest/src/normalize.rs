@@ -679,6 +679,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
             recycle_ids: Vec::new(),
             blueprint_required: false,
             variant_of: base.map(|(_, b)| b.clone()),
+            stencil: None,
             source_refs: SourceRefs {
                 metaforge: opt_text(i, "id"),
                 wiki: wiki_row.and_then(|r| opt_text(r, "page")),
@@ -713,6 +714,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
             recycle_ids: Vec::new(),
             blueprint_required: false,
             variant_of: None,
+            stencil: None,
             source_refs: SourceRefs { wiki: opt_text(r, "page"), ..Default::default() },
             provenance: Provenance::Wiki,
         });

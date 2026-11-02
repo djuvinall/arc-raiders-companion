@@ -130,6 +130,32 @@ pub fn weapon_family_view(ds: &Dataset, id: &str) -> Option<WeaponFamily> {
     Some(WeaponFamily { name: weapon_family_name(ds, id), levels, amplified })
 }
 
+/// The guns a stencil fits, each shown by its lowest level.
+pub fn stencil_guns(ds: &Dataset, stencil: &StencilFit) -> Vec<Link> {
+    stencil.weapons.iter().filter_map(|family| {
+        let lead = ds.files.items.iter()
+            .filter(|i| weapon_stats(i).is_some() && i.variant_of.is_none() && weapon_family(ds, &i.id) == *family)
+            .min_by_key(|i| i.tier)?;
+        Some(Link { name: weapon_family_name(ds, &lead.id), ..item_link(ds, &lead.id, None) })
+    }).collect()
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct GunStencil {
+    pub stencil: Link,
+    pub swatch: String,
+}
+
+/// The reverse of [`stencil_guns`]: what fits this gun, at any level or version.
+pub fn gun_stencils(ds: &Dataset, id: &str) -> Vec<GunStencil> {
+    let Some(_) = ds.item(id).and_then(weapon_stats) else { return Vec::new() };
+    let family = weapon_family(ds, id);
+    ds.files.items.iter().filter_map(|i| {
+        let fit = i.stencil.as_ref().filter(|s| s.weapons.contains(&family))?;
+        Some(GunStencil { stencil: item_link(ds, &i.id, None), swatch: fit.swatch.clone() })
+    }).collect()
+}
+
 pub fn fits(ds: &Dataset, item_id: &str, slot: &ModSlot, m: &WeaponMod) -> bool {
     let family = weapon_family(ds, item_id);
     m.slot == slot.slot
