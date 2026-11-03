@@ -15,6 +15,11 @@
   --yellow: #f5c400;
   --teal: #2ab0c6;
   --blue: #4aa3ff;
+  --red: #c4383f;
+  --orange: #ff8a3d;
+  --locked: #6b7080;
+  --good: #3fcf6b;
+  --bad: #ff5a5f;
   --text: #e8e8ea;
   --text-dim: #9a9eaa;
 
@@ -133,12 +138,23 @@ h3 {
   border: 1px solid rgba(255, 255, 255, 0.28);
   color: var(--text);
 }
+.button.small {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+.button.danger {
+  background: var(--red);
+  color: #fff;
+}
+.button:not(:disabled):hover {
+  filter: brightness(1.08);
+}
+.button:not(:disabled):active {
+  transform: translateY(1px);
+}
 .button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-.field {
-  font-variant-numeric: tabular-nums;
 }
 .page-pad {
   padding: 16px 20px;
@@ -191,6 +207,27 @@ h3 {
   font-family: var(--font-head);
   font-size: 12px;
   text-align: center;
+}
+
+.link {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--cream);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link:hover {
+  color: var(--yellow);
+}
+.link:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.error {
+  color: var(--bad);
 }
 
 .field {

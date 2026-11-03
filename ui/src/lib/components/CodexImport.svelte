@@ -3,7 +3,7 @@
   import { scanCodex, type ScanResult } from "../codexScan";
 
   let { collection, onchange }: { collection: Collection; onchange: () => void } = $props();
-  let rows = $state<(ScanResult & { keep: boolean; pick: string })[]>([]);
+  let rows = $state<(ScanResult & { pick: string })[]>([]);
   let busy = $state(false);
   let message = $state("");
   let replace = $state(false);
@@ -17,7 +17,7 @@
     rows = [];
     try {
       const results = await scanCodex(file, $state.snapshot(collection.entries));
-      rows = results.map((r) => ({ ...r, keep: !!r.entry, pick: r.entry?.id ?? "" }));
+      rows = results.map((r) => ({ ...r, pick: r.entry?.id ?? "" }));
       if (!rows.length) message = "No learned blueprints found. Use a full screenshot of the Blueprints tab in the game's Codex.";
     } catch (e) {
       message = String(e);
@@ -30,7 +30,7 @@
     if (file) read(file);
   }
 
-  const chosen = $derived(rows.filter((r) => r.keep && r.pick).map((r) => r.pick));
+  const chosen = $derived(rows.filter((r) => r.pick).map((r) => r.pick));
   const marked = $derived(collection.entries.filter((e) => e.found).map((e) => e.id));
   const adds = $derived(chosen.filter((id) => !marked.includes(id)));
   const removes = $derived(marked.filter((id) => !chosen.includes(id)));
@@ -54,7 +54,7 @@
   </p>
   <label class="button dark">
     {busy ? "Reading…" : "Choose screenshot"}
-    <input type="file" accept="image/*" disabled={busy} onchange={(e) => read(e.currentTarget.files?.[0])} />
+    <input type="file" accept="image/*" disabled={busy} onchange={(e) => { const file = e.currentTarget.files?.[0]; e.currentTarget.value = ""; read(file); }} />
   </label>
   {#if message}<p class="message small" role="status">{message}</p>{/if}
 
@@ -90,8 +90,19 @@
   label.button {
     cursor: pointer;
   }
+  label.button {
+    position: relative;
+  }
   label.button input {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+  label.button:focus-within {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
   }
   .grid {
     display: grid;

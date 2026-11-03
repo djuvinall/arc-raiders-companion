@@ -153,4 +153,7 @@
   h4 {
     margin: 8px 0 2px;
   }
+  .list button:hover:not(.active) {
+    background: var(--panel-2);
+  }
 </style>

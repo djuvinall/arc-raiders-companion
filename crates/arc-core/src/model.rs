@@ -709,11 +709,15 @@ pub struct QuestProgress {
 
 /// An entry here means the project is being tracked. `stage` is the 1-based stage in
 /// progress; one past the last means complete.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ProjectProgress {
     pub stage: u32,
     pub committed: BTreeMap<String, u32>,
+    /// How much of each commit came out of the stash, keyed `stage/item`, so taking it
+    /// back returns exactly that much.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub from_stash: BTreeMap<String, u32>,
 }
 
 /// User-local state (plan §4.11). Never written into the repo.

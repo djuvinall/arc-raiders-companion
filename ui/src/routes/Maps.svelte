@@ -103,7 +103,10 @@
     set = null;
     floor = Math.min(savedFloors[map.id] ?? 0, Math.max(0, map.image.layers.length - 1));
     selected = null;
-    [set, pois] = await Promise.all([mapMarkers(map.id), mapPois(map.id)]);
+    const [markers, points] = await Promise.all([mapMarkers(map.id), mapPois(map.id)]);
+    // A quicker click on another map wins; this one's late answer is dropped.
+    if (current?.id !== map.id) return;
+    [set, pois] = [markers, points];
     // A group name in the saved list means all of that group's types.
     const groups = [...hidden].filter((h) => h in GROUPS && h !== "quests");
     if (groups.length) {

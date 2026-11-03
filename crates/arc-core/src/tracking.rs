@@ -349,25 +349,78 @@ pub fn project_views(ds: &Dataset, profile: &Profile) -> Vec<ProjectView> {
 pub fn commit(ds: &Dataset, profile: &mut Profile, project_id: &str, item_id: &str, qty: u32) -> u32 {
     let Some(project) = ds.files.projects.iter().find(|p| p.id == project_id) else { return 0 };
     let progress = profile.projects.entry(project_id.to_string())
-        .or_insert_with(|| ProjectProgress { stage: 1, committed: Default::default() });
+        .or_insert_with(|| ProjectProgress { stage: 1, ..Default::default() });
     let Some(stage) = project.stages.iter().find(|s| s.n == progress.stage) else { return 0 };
     let Some(need) = stage.inputs.iter().find(|i| i.item_id == item_id) else { return 0 };
     let so_far = progress.committed.get(item_id).copied().unwrap_or(0);
     let taken = qty.min(need.qty.saturating_sub(so_far));
     progress.committed.insert(item_id.to_string(), so_far + taken);
+    if let Some(have) = profile.stash.get_mut(item_id) {
+        let spent = taken.min(*have);
+        *have -= spent;
+        if *have == 0 {
+            profile.stash.remove(item_id);
+        }
+        if spent > 0 {
+            *progress.from_stash.entry(format!("{}/{item_id}", progress.stage)).or_insert(0) += spent;
+        }
+    }
+    // A stage whose inputs are all in moves on, including one reopened with nothing taken back.
     let complete = stage.inputs.iter()
         .all(|i| progress.committed.get(&i.item_id).copied().unwrap_or(0) >= i.qty);
     if complete {
         progress.stage += 1;
         progress.committed.clear();
     }
-    if let Some(have) = profile.stash.get_mut(item_id) {
-        *have = have.saturating_sub(taken);
-        if *have == 0 {
-            profile.stash.remove(item_id);
-        }
-    }
     taken
+}
+
+/// Takes back up to `qty` of an item committed to the current stage. What came out of the
+/// stash goes back into it. Returns how many were taken back.
+pub fn uncommit(profile: &mut Profile, project_id: &str, item_id: &str, qty: u32) -> u32 {
+    let Some(progress) = profile.projects.get_mut(project_id) else { return 0 };
+    let so_far = progress.committed.get(item_id).copied().unwrap_or(0);
+    let back = qty.min(so_far);
+    if back == 0 {
+        return 0;
+    }
+    if so_far == back {
+        progress.committed.remove(item_id);
+    } else {
+        progress.committed.insert(item_id.to_string(), so_far - back);
+    }
+    let key = format!("{}/{item_id}", progress.stage);
+    let from_stash = progress.from_stash.get(&key).copied().unwrap_or(0);
+    let refund = back.min(from_stash);
+    if refund > 0 {
+        if from_stash == refund {
+            progress.from_stash.remove(&key);
+        } else {
+            progress.from_stash.insert(key, from_stash - refund);
+        }
+        *profile.stash.entry(item_id.to_string()).or_insert(0) += refund;
+    }
+    back
+}
+
+/// Steps back to the previous stage, as it was when it finished. Anything committed to
+/// the current stage is taken back first. Returns the stage now in progress.
+pub fn reopen_stage(ds: &Dataset, profile: &mut Profile, project_id: &str) -> u32 {
+    let Some(project) = ds.files.projects.iter().find(|p| p.id == project_id) else { return 0 };
+    let Some(stage) = profile.projects.get(project_id).map(|p| p.stage) else { return 0 };
+    if stage <= 1 {
+        return stage;
+    }
+    let current: Vec<(String, u32)> = profile.projects[project_id].committed.clone().into_iter().collect();
+    for (item, qty) in current {
+        uncommit(profile, project_id, &item, qty);
+    }
+    let progress = profile.projects.get_mut(project_id).expect("checked above");
+    progress.stage = stage - 1;
+    progress.committed = project.stages.iter().find(|s| s.n == stage - 1)
+        .map(|s| s.inputs.iter().map(|i| (i.item_id.clone(), i.qty)).collect())
+        .unwrap_or_default();
+    progress.stage
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]

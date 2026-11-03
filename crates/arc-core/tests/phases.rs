@@ -182,7 +182,7 @@ fn needed_items_combine_sources_minus_stash() {
     assert!(needed_items(&ds, &p).iter().all(|n| n.item.id != id), "stash covers it");
 
     let project = &ds.files.projects[0];
-    p.projects.insert(project.id.clone(), ProjectProgress { stage: 1, committed: Default::default() });
+    p.projects.insert(project.id.clone(), ProjectProgress { stage: 1, ..Default::default() });
     let wanted = needed_items(&ds, &p);
     let input = &project.stages[0].inputs[0];
     let row = wanted.iter().find(|n| n.item.id == input.item_id).unwrap();
@@ -531,7 +531,7 @@ fn a_tracked_raw_item_is_not_counted_twice() {
     let mut profile = Profile::default();
     let mut committed = std::collections::BTreeMap::new();
     committed.insert("advanced-arc-powercell".to_string(), 1);
-    profile.projects.insert(project.id.clone(), ProjectProgress { stage: stage.n, committed });
+    profile.projects.insert(project.id.clone(), ProjectProgress { stage: stage.n, committed, ..Default::default() });
     profile.tracked_item_ids.push("advanced-arc-powercell".into());
     let row = needed_items(&ds, &profile).into_iter().find(|n| n.item.id == "advanced-arc-powercell").unwrap();
     assert_eq!(row.qty, need - 1, "the project's remainder, not one more");
@@ -620,6 +620,35 @@ fn committing_spends_stash_and_advances_stages() {
     assert_eq!(p.projects[&project.id].stage, 2);
     let view = project_views(&ds, &p).remove(0);
     assert_eq!(view.stages[0].inputs[0].committed, inputs[0].qty, "finished stages read as full");
+}
+
+#[test]
+fn commits_can_be_taken_back() {
+    let ds = real();
+    let project = ds.files.projects.iter().find(|p| p.stages.len() >= 2 && p.stages[0].inputs.len() >= 2).unwrap();
+    let inputs = &project.stages[0].inputs;
+    let (a, b) = (&inputs[0], &inputs[1]);
+    let mut p = Profile::default();
+    p.stash.insert(a.item_id.clone(), 1);
+    let taken = commit(&ds, &mut p, &project.id, &a.item_id, a.qty);
+    assert_eq!(taken, a.qty);
+    assert!(!p.stash.contains_key(&a.item_id));
+    assert_eq!(uncommit(&mut p, &project.id, &a.item_id, a.qty), a.qty);
+    assert_eq!(p.stash.get(&a.item_id), Some(&1), "only what came from the stash goes back");
+    assert!(p.projects[&project.id].committed.is_empty());
+    assert_eq!(uncommit(&mut p, &project.id, &a.item_id, 5), 0);
+
+    // A click that finishes a stage by mistake can be reopened and taken back.
+    for input in inputs {
+        commit(&ds, &mut p, &project.id, &input.item_id, input.qty);
+    }
+    assert_eq!(p.projects[&project.id].stage, 2);
+    assert_eq!(reopen_stage(&ds, &mut p, &project.id), 1);
+    assert_eq!(p.projects[&project.id].committed[&b.item_id], b.qty);
+    assert_eq!(uncommit(&mut p, &project.id, &b.item_id, 1), 1);
+    assert_eq!(p.projects[&project.id].stage, 1);
+    assert_eq!(commit(&ds, &mut p, &project.id, &b.item_id, 1), 1);
+    assert_eq!(p.projects[&project.id].stage, 2, "recommitting finishes it again");
 }
 
 #[test]

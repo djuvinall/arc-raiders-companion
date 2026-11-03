@@ -1,11 +1,11 @@
 <script lang="ts">
   import QuestParty from "../lib/components/QuestParty.svelte";
-  import { completeImpliedQuests, completeQuestChain, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
+  import { completeImpliedQuests, completeQuestChain, exportProfile, importProfile, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
   const COLORS: Record<string, string> = {
-    done: "#2ab0c6", active: "#f5c400", needed: "#ff8a3d", available: "#ece6d6", locked: "#6b7080",
+    done: "var(--teal)", active: "var(--yellow)", needed: "var(--orange)", available: "var(--cream)", locked: "var(--locked)",
   };
 
   let quests = $state<QuestRow[]>([]);
@@ -29,11 +29,25 @@
   const active = $derived(quests.filter((q) => q.status === "active").length);
   let note = $state("");
 
-  async function fillIn() {
-    const changed = await completeImpliedQuests();
-    note = `Marked ${changed} earlier quests done.`;
+  // Progress as it was before the last change that touched many quests or cleared one.
+  let undoText = $state<string | null>(null);
+
+  async function undoable(action: () => Promise<string>) {
+    const before = await exportProfile();
+    note = await action();
+    undoText = before;
     await load();
   }
+
+  async function undo() {
+    if (!undoText) return;
+    await importProfile(undoText);
+    undoText = null;
+    note = "Undone.";
+    await load();
+  }
+
+  const fillIn = () => undoable(async () => `Marked ${await completeImpliedQuests()} earlier quests done.`);
 
   const selected = $derived(quests.find((q) => q.quest.id === selectedId) ?? null);
   const traders = $derived([...new Set(quests.map((q) => q.quest.trader).filter(Boolean))].sort() as string[]);
@@ -75,9 +89,23 @@
   }
 
   async function setState(tracked: boolean, done: boolean) {
+    const q = selected;
+    // Untracking forgets ticked objectives, so that and Reset can be undone.
+    if (q && !tracked && (q.status === "done" || q.done_objectives.length)) {
+      await undoable(async () => {
+        await setQuestState(q.quest.id, tracked, done);
+        return q.status === "done" ? `Reset ${q.quest.name}.` : `Stopped tracking ${q.quest.name}; its ticked objectives were cleared.`;
+      });
+      return;
+    }
     await setQuestState(selectedId!, tracked, done);
     await load();
   }
+
+  const doneChain = (q: QuestRow) => undoable(async () => {
+    await completeQuestChain(q.quest.id);
+    return `Marked ${q.quest.name} and everything before it done.`;
+  });
 </script>
 
 <div class="page">
@@ -88,7 +116,7 @@
         <button class:on={view === "graph"} onclick={() => (view = "graph")}>Graph</button>
         <button class:on={view === "friends"} onclick={() => (view = "friends")}>Friends</button>
       </div>
-      <input class="field" placeholder="Search quests" bind:value={search} />
+      <input class="field" placeholder="Search quests" aria-label="Search quests" bind:value={search} />
       <select class="field" aria-label="Map" bind:value={map}>
         <option value="">All maps</option>
         {#each maps as m}<option value={m.id}>{m.name}</option>{/each}
@@ -114,7 +142,7 @@
         <button class="button primary" onclick={fillIn}>Mark them done</button>
       </div>
     {:else if note}
-      <p class="dim small">{note}</p>
+      <p class="dim small note" role="status">{note} {#if undoText}<button class="button small dark" onclick={undo}>Undo</button>{/if}</p>
     {/if}
     </div>
 
@@ -143,9 +171,9 @@
             role="button" tabindex="0" aria-label={q.quest.name} class="gnode"
             class:dimmed={!visible.includes(q)}
             onclick={() => (selectedId = q.quest.id)}
-            onkeydown={(e) => e.key === "Enter" && (selectedId = q.quest.id)}
+            onkeydown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), (selectedId = q.quest.id))}
           >
-            <circle cx={p.x} cy={p.y} r={selectedId === q.quest.id ? 36 : 24} fill={COLORS[q.status]} />
+            <circle cx={p.x} cy={p.y} r={selectedId === q.quest.id ? 36 : 24} style:fill={COLORS[q.status]} />
             <title>{q.quest.name}</title>
             <text x={p.x} y={p.y + 64} text-anchor="middle">{q.quest.name}</text>
           </g>
@@ -210,7 +238,7 @@
           <button class="button primary" onclick={() => setState(true, true)}>Mark done</button>
         {/if}
         {#if selected.status !== "done" && !selected.open}
-          <button class="button dark" onclick={async () => { await completeQuestChain(selectedId!); await load(); }}>Done, with all before it</button>
+          <button class="button dark" onclick={() => selected && doneChain(selected)}>Done, with all before it</button>
         {/if}
       </div>
     {:else}
@@ -278,7 +306,6 @@
     cursor: pointer;
     font: inherit;
     text-align: left;
-    text-transform: capitalize;
   }
   .row.active {
     background: var(--panel-2);
@@ -353,5 +380,8 @@
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 16px;
+  }
+  .row:hover:not(.active) {
+    background: var(--panel-2);
   }
 </style>

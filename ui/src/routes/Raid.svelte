@@ -29,17 +29,21 @@
   let selected = $state<MapPoint | null>(null);
   let floor = $state(0);
 
-  Promise.all([mapList(), routePlan(), questList(), liveEvents(region)]).then(([m, p, q, e]) => {
-    [maps, plan, quests, events] = [m, p, q, e];
+  // Events come over the network, so the local plan doesn't wait for them.
+  Promise.all([mapList(), routePlan(), questList()]).then(([m, p, q]) => {
+    [maps, plan, quests] = [m, p, q];
     pick(chosen ?? rows[0]?.map.id ?? m[0].id);
   });
+  liveEvents(region).then((e) => (events = e), () => {});
 
   async function pick(id: string) {
     chosen = id;
     loaded = false;
     floor = 0;
     selected = null;
-    pois = await mapPois(id);
+    const points = await mapPois(id);
+    if (chosen !== id) return;
+    pois = points;
     loaded = true;
   }
 

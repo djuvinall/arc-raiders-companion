@@ -42,7 +42,7 @@
   {/if}
 
   <div class="filters">
-    <input class="field" placeholder="Search" bind:value={search} />
+    <input class="field" placeholder="Search" aria-label="Search the collection" bind:value={search} />
     <label><input type="checkbox" bind:checked={hideFound} /> Hide found</label>
     <span class="dim">Click a tile to mark it found.</span>
   </div>
@@ -162,5 +162,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .card:hover {
+    background: var(--panel-2);
   }
 </style>

@@ -52,7 +52,8 @@
   $effect(() => {
     getItem(id).then(async (d) => {
       const other = baselineId(d);
-      baseline = other ? await getItem(other) : null;
+      // Without its baseline the page still shows, just with no comparison.
+      baseline = other ? await getItem(other).catch(() => null) : null;
       detail = d;
     }, (e) => (error = String(e)));
   });
@@ -156,7 +157,7 @@
       <hr />
       <dl>
         <dt>In your stash</dt>
-        <dd><input class="stash" type="number" min="0" aria-label="In your stash" value={inStash} onchange={(e) => saveStash(e.currentTarget.valueAsNumber)} /></dd>
+        <dd><input class="stash" type="number" min="0" aria-label="In your stash" value={inStash} onchange={(e) => { const n = Math.max(0, Math.floor(e.currentTarget.valueAsNumber) || 0); e.currentTarget.value = String(n); saveStash(n); }} /></dd>
         {#if item.value !== null}<dt>Value</dt><dd>{item.value.toLocaleString()}</dd>{/if}
         {#if item.weight_kg !== null}<dt>Weight</dt><dd>{item.weight_kg} kg</dd>{/if}
         {#if item.stack_size !== null}<dt>Stack</dt><dd>{item.stack_size}</dd>{/if}
@@ -494,6 +495,6 @@
   }
   .error {
     padding: 20px;
-    color: var(--rarity-epic);
+    color: var(--bad);
   }
 </style>

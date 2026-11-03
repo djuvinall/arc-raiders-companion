@@ -40,7 +40,9 @@
   }
 
   function onKey(event: KeyboardEvent) {
-    if (event.key === "Escape" && parts[0] !== "home") {
+    // Esc in a field clears or leaves the field, not the page.
+    const typing = event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]");
+    if (event.key === "Escape" && !event.defaultPrevented && !typing && parts[0] !== "home") {
       history.back();
     }
   }

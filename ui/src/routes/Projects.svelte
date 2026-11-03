@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { commitResource, linkHref, projectList, setProjectTracked, type ProjectView } from "../lib/api";
+  import { commitResource, linkHref, projectList, reopenProjectStage, setProjectTracked, uncommitResource, type ProjectView } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
 
   let { id }: { id?: string } = $props();
@@ -11,6 +11,24 @@
   let amount = $state(1);
   let message = $state("");
   let showPast = $state(false);
+  // The last commit, so one click can undo it, even when it finished the stage.
+  let last = $state<{ project: string; item: string; name: string; qty: number; stage: number } | null>(null);
+  let confirmClear = $state(false);
+  // One action at a time, so a double click can't commit twice or step back two stages.
+  let busy = $state(false);
+
+  async function run(action: () => Promise<void>) {
+    if (busy) return;
+    busy = true;
+    try {
+      await action();
+    } catch (e) {
+      message = `Couldn't save that: ${e}`;
+    } finally {
+      busy = false;
+    }
+  }
+  const count = (n: number, most: number) => Math.min(Math.max(most, 1), Math.max(1, Math.floor(n) || 1));
   const now = Date.now();
   const DAY = 24 * 3600 * 1000;
 
@@ -29,8 +47,10 @@
       .sort((a, b) => (b.ends ?? "").localeCompare(a.ends ?? "")),
   );
 
+  let loaded = $state(false);
   const load = async () => {
     projects = await projectList();
+    loaded = true;
     selectedId ??= (projects.find((p) => !p.expedition && !p.permanent && live(p)) ?? projects.find((p) => p.permanent) ?? projects[0])?.id ?? null;
   };
   load();
@@ -40,18 +60,72 @@
   const stage = $derived(project?.stages.find((s) => s.n === project?.stage) ?? null);
   const input = $derived(stage?.inputs.find((i) => i.item.id === inputId) ?? stage?.inputs[0] ?? null);
   const left = $derived(input ? input.need - input.committed : 0);
+  const stageFull = $derived(!!stage?.inputs.length && stage.inputs.every((i) => i.committed >= i.need));
+  const hasProgress = $derived(!!project && (project.stage > 1 || !!stage?.inputs.some((i) => i.committed > 0)));
 
-  async function commit() {
+  function select(id: string) {
+    selectedId = id;
+    inputId = null;
+    message = "";
+    last = null;
+    confirmClear = false;
+  }
+
+  const commit = () => run(async () => {
     if (!project || !input) return;
-    const taken = await commitResource(project.id, input.item.id, Math.min(amount, left));
+    const before = project.stage;
+    const taken = await commitResource(project.id, input.item.id, count(amount, left));
+    last = taken ? { project: project.id, item: input.item.id, name: input.item.name, qty: taken, stage: before } : null;
     message = `Committed ${taken} ${input.item.name}.`;
     amount = 1;
-    inputId = null;
     await load();
-  }
+    if (project && project.stage > before) message += finished(project) ? " Project complete." : ` Stage ${before} done.`;
+  });
+
+  const undo = () => run(async () => {
+    if (!last) return;
+    const { project: id, item, name, qty, stage: was } = last;
+    last = null;
+    if (projects.find((p) => p.id === id)?.stage !== was) await reopenProjectStage(id);
+    const back = await uncommitResource(id, item, qty);
+    message = `Took back ${back} ${name}.`;
+    await load();
+  });
+
+  const takeBack = () => run(async () => {
+    if (!project || !input) return;
+    const back = await uncommitResource(project.id, input.item.id, count(amount, input.committed));
+    message = `Took back ${back} ${input.item.name}.`;
+    last = null;
+    amount = 1;
+    await load();
+  });
+
+  const reopen = () => run(async () => {
+    if (!project) return;
+    const now = await reopenProjectStage(project.id);
+    message = `Back on stage ${now}, as it was when it finished. Take back what you need to.`;
+    last = null;
+    await load();
+  });
+
+  // Recommitting nothing re-checks a reopened stage that still has everything in.
+  const finishStage = () => run(async () => {
+    if (!project || !stage?.inputs[0]) return;
+    await commitResource(project.id, stage.inputs[0].item.id, 0);
+    message = `Stage ${stage.n} done.`;
+    last = null;
+    await load();
+  });
 
   async function track(on: boolean) {
     if (!project) return;
+    if (!on && hasProgress && !confirmClear) {
+      confirmClear = true;
+      return;
+    }
+    confirmClear = false;
+    last = null;
     await setProjectTracked(project.id, on);
     message = on ? "Tracked: its current stage feeds the map route." : "Tracking and progress cleared.";
     await load();
@@ -59,7 +133,7 @@
 </script>
 
 {#snippet card(p: ProjectView)}
-  <button class="card" class:active={p.id === selectedId} onclick={() => { selectedId = p.id; inputId = null; message = ""; }}>
+  <button class="card" class:active={p.id === selectedId} onclick={() => select(p.id)}>
     <strong>{p.name}</strong>
     {#if p.paused}
       <span class="status">Temporarily paused</span>
@@ -85,7 +159,7 @@
     <h3 class="section-title">Permanent</h3>
     {#each permanent as p (p.id)}{@render card(p)}{/each}
     <h3 class="section-title">Events</h3>
-    {#each events as p (p.id)}{@render card(p)}{:else}<p class="dim">No events running right now.</p>{/each}
+    {#each events as p (p.id)}{@render card(p)}{:else}{#if loaded}<p class="dim">No events running right now.</p>{/if}{/each}
     <label class="toggle"><input type="checkbox" bind:checked={showPast} /> Show past projects ({past.length})</label>
     {#if showPast}
       <h3 class="section-title">Past</h3>
@@ -107,8 +181,17 @@
         <p class="dim">No source publishes this project's stages yet.</p>
       {:else if finished(project)}
         <p class="dim">Project complete.</p>
+        {#if project.tracked && !closed(project)}<button class="button small" disabled={busy} onclick={reopen}>Reopen the last stage</button>{/if}
       {:else if stage}
-        <h3 class="stage">Stage {stage.n}{stage.title && stage.title !== `Stage ${stage.n}` ? `: ${stage.title}` : ""}</h3>
+        <div class="stage-head">
+          <h3 class="stage">Stage {stage.n}{stage.title && stage.title !== `Stage ${stage.n}` ? `: ${stage.title}` : ""}</h3>
+          {#if project.stage > 1 && project.tracked && !closed(project)}
+            <button class="link" disabled={busy} onclick={reopen} title="Go back to stage {stage.n - 1} to take something back">Back to stage {stage.n - 1}</button>
+          {/if}
+        </div>
+        {#if stageFull && !closed(project)}
+          <p class="full-note">Everything for this stage is in. <button class="button small primary" disabled={busy} onclick={finishStage}>Finish stage {stage.n}</button></p>
+        {/if}
         <div class="inputs">
           {#each stage.inputs as row (row.item.id)}
             {@const full = row.committed >= row.need}
@@ -132,10 +215,15 @@
             <div class="stepper">
               <button aria-label="Less" onclick={() => (amount = Math.max(1, amount - 1))}>−</button>
               <input class="field" type="number" min="1" max={left} aria-label="Amount" bind:value={amount} />
-              <button aria-label="More" onclick={() => (amount = Math.min(Math.max(left, 1), amount + 1))}>+</button>
+              <button aria-label="More" onclick={() => (amount = Math.min(Math.max(left, input?.committed ?? 0, 1), amount + 1))}>+</button>
             </div>
-            <button class="button primary" disabled={left <= 0} onclick={commit}>Commit resource</button>
-            <p class="note">Takes the amount from your tracked stash and can't be undone except by clearing the project.</p>
+            <div class="actions">
+              <button class="button primary" disabled={left <= 0 || busy} onclick={commit}>Commit resource</button>
+              {#if input.committed > 0}
+                <button class="button dark" disabled={busy} onclick={takeBack}>Take back</button>
+              {/if}
+            </div>
+            <p class="note">Takes the amount from your tracked stash. Take back returns it, and stash items go back into the stash.</p>
           </div>
         {/if}
         <h3 class="section-title">Rewards</h3>
@@ -148,10 +236,17 @@
         </div>
       {/if}
       <div class="foot">
-        <button class="button" onclick={() => track(!project?.tracked)}>
-          {project.tracked ? "Stop tracking" : "Track resources"}
-        </button>
-        {#if message}<span class="message" role="status">{message}</span>{/if}
+        {#if confirmClear}
+          <span class="warn">Stop tracking and clear all progress on this project?</span>
+          <button class="button danger" onclick={() => track(false)}>Clear progress</button>
+          <button class="button" onclick={() => (confirmClear = false)}>Keep it</button>
+        {:else}
+          <button class="button" onclick={() => track(!project?.tracked)}>
+            {project.tracked ? "Stop tracking" : "Track resources"}
+          </button>
+          {#if message}<span class="message" role="status">{message}</span>{/if}
+          {#if last}<button class="link" disabled={busy} onclick={undo}>Undo</button>{/if}
+        {/if}
       </div>
     </section>
   {/if}
@@ -329,5 +424,28 @@
   }
   .message {
     color: var(--teal);
+  }
+  .warn {
+    color: var(--yellow);
+  }
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .full-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 8px;
+    color: var(--teal);
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .card:hover:not(.active) {
+    background: var(--panel-2);
   }
 </style>

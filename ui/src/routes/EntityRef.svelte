@@ -53,6 +53,6 @@
   }
   .error {
     padding: 20px;
-    color: var(--rarity-epic);
+    color: var(--bad);
   }
 </style>

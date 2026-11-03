@@ -30,7 +30,13 @@
     }
   }
 
+  let confirmRemove = $state(false);
   async function removeShot() {
+    if (!confirmRemove) {
+      confirmRemove = true;
+      return;
+    }
+    confirmRemove = false;
     await deleteStencilShot(stencilId, chosen.id);
     await load();
   }
@@ -56,7 +62,7 @@
         {shots[chosen.id] ? "Replace screenshot" : "Add your screenshot"}
         <input type="file" accept="image/png,image/jpeg,image/webp" onchange={addShot} />
       </label>
-      {#if shots[chosen.id]}<button class="button dark" onclick={removeShot}>Remove</button>{/if}
+      {#if shots[chosen.id]}<button class="button dark" class:danger={confirmRemove} onclick={removeShot}>{confirmRemove ? "Remove screenshot?" : "Remove"}</button>{/if}
     </div>
     {#if message}<p class="note">{message}</p>{/if}
   </div>
@@ -105,10 +111,19 @@
     margin-top: 4px;
   }
   .actions input {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
   }
   .actions label {
+    position: relative;
     cursor: pointer;
+  }
+  .actions label:focus-within {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
   }
   .note {
     margin: 8px 0;

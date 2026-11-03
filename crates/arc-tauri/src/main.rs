@@ -379,12 +379,22 @@ fn commit_resource(state: State<AppState>, project_id: String, item_id: String, 
 }
 
 #[tauri::command]
+fn uncommit_resource(state: State<AppState>, project_id: String, item_id: String, qty: u32) -> CommandResult<u32> {
+    with_profile(&state, |p| tracking::uncommit(p, &project_id, &item_id, qty))
+}
+
+#[tauri::command]
+fn reopen_project_stage(state: State<AppState>, project_id: String) -> CommandResult<u32> {
+    with_profile(&state, |p| tracking::reopen_stage(&state.dataset, p, &project_id))
+}
+
+#[tauri::command]
 fn set_project_tracked(state: State<AppState>, project_id: String, tracked: bool) -> CommandResult<()> {
     with_profile(&state, |p| {
         if tracked {
             p.projects.entry(project_id).or_insert_with(|| arc_core::model::ProjectProgress {
                 stage: 1,
-                committed: Default::default(),
+                ..Default::default()
             });
         } else {
             p.projects.remove(&project_id);
@@ -574,7 +584,7 @@ fn main() {
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
             save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
-            commit_resource, set_project_tracked, collection_list, toggle_found, patch_notes,
+            commit_resource, uncommit_resource, reopen_project_stage, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,
             home_view, set_found, set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
             toggle_tracked_bench, complete_quest_chain, complete_implied_quests, open_mini,

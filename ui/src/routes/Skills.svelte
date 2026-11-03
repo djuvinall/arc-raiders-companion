@@ -28,11 +28,19 @@
   });
   getProfile().then((p) => (saved = p.skill_plans));
 
+  // Only the newest answer counts, so a slow one can't overwrite a later plan.
+  let asked = 0;
   $effect(() => {
     if (plan.tree_version) {
-      skillPlanState($state.snapshot(plan)).then((s) => (view = s));
+      const n = ++asked;
+      const snapshot = $state.snapshot(plan);
+      snapshot.expedition_bonus = Math.max(0, Math.floor(Number(snapshot.expedition_bonus)) || 0);
+      skillPlanState(snapshot).then((s) => {
+        if (n === asked) view = s;
+      });
     }
   });
+  let confirmDrop = $state<string | null>(null);
 
   const rank = (id: string) => plan.ranks[id] ?? 0;
   const color = (node: SkillNode) => tree?.branches.find((b) => b.id === node.branch)?.color ?? "#fff";
@@ -63,7 +71,8 @@
     selected = node;
     if (!node.choice_group) group = null;
     message = "";
-    if (view?.addable.includes(node.id)) plan.ranks[node.id] = rank(node.id) + 1;
+    // The view can lag a fast double click, so the rank cap is checked here too.
+    if (view?.addable.includes(node.id) && rank(node.id) < limit(node)) plan.ranks[node.id] = rank(node.id) + 1;
     else message = `${node.name} can't take a point right now.`;
   }
 
@@ -80,7 +89,18 @@
     else plan.ranks[node.id] = rank(node.id) - 1;
   }
 
+  // A plan with points that matches no saved plan would be lost, so New asks twice.
+  let confirmNew = $state(false);
+  const unsaved = () => Object.keys(plan.ranks).length > 0 &&
+    !saved.some((p) => JSON.stringify(p) === JSON.stringify($state.snapshot(plan)));
+
   function fresh() {
+    if (!confirmNew && unsaved()) {
+      confirmNew = true;
+      message = "This plan isn't saved. Click New again to start over anyway.";
+      return;
+    }
+    confirmNew = false;
     plan = { name: "New plan", tree_version: tree!.tree_version, expedition_bonus: 0, ranks: {} };
     group = null;
     selected = null;
@@ -89,7 +109,9 @@
   }
 
   async function save() {
-    await saveSkillPlan($state.snapshot(plan));
+    const snapshot = $state.snapshot(plan);
+    snapshot.expedition_bonus = Math.max(0, Math.floor(Number(snapshot.expedition_bonus)) || 0);
+    await saveSkillPlan(snapshot);
     saved = (await getProfile()).skill_plans;
     message = `Saved "${plan.name}".`;
   }
@@ -250,7 +272,7 @@
         <div class="actions">
           <button class="button primary" onclick={save}>Save</button>
           <button class="button" onclick={share}>Share</button>
-          <button class="button" onclick={fresh}>New</button>
+          <button class="button" class:danger={confirmNew} onclick={fresh}>{confirmNew ? "Discard and start new" : "New"}</button>
         </div>
         {#if message}<p class="message" role="status">{message}</p>{/if}
         {#each view.report.errors as error}<p class="error">{error}</p>{/each}
@@ -300,7 +322,7 @@
           {#each saved as item (item.name)}
             <div class="saved">
               <button class="link" onclick={() => open(item)}>{item.name}</button>
-              <button class="link dim" aria-label="Delete {item.name}" onclick={() => drop(item.name)}>Delete</button>
+              <button class="link dim" class:confirm={confirmDrop === item.name} aria-label="Delete {item.name}" onclick={() => (confirmDrop === item.name ? (confirmDrop = null, drop(item.name)) : (confirmDrop = item.name))}>{confirmDrop === item.name ? "Click again to delete" : "Delete"}</button>
             </div>
           {/each}
         </section>
@@ -423,7 +445,7 @@
     margin: 8px 0;
   }
   .points.over {
-    color: var(--rarity-epic);
+    color: var(--bad);
   }
   label {
     display: flex;
@@ -455,7 +477,7 @@
     color: var(--yellow);
   }
   .error {
-    color: var(--rarity-epic);
+    color: var(--bad);
   }
   .detail {
     min-height: 130px;
@@ -491,5 +513,8 @@
   }
   .link.dim {
     color: var(--text-dim);
+  }
+  .link.confirm {
+    color: var(--bad);
   }
 </style>

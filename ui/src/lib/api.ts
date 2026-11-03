@@ -516,6 +516,9 @@ export const partyPlan = (name: string) => invoke<PartyPlan>("party_plan", { nam
 export const projectList = () => invoke<ProjectView[]>("project_list");
 export const commitResource = (projectId: string, itemId: string, qty: number) =>
   invoke<number>("commit_resource", { projectId, itemId, qty });
+export const uncommitResource = (projectId: string, itemId: string, qty: number) =>
+  invoke<number>("uncommit_resource", { projectId, itemId, qty });
+export const reopenProjectStage = (projectId: string) => invoke<number>("reopen_project_stage", { projectId });
 export const setProjectTracked = (projectId: string, tracked: boolean) =>
   invoke<void>("set_project_tracked", { projectId, tracked });
 

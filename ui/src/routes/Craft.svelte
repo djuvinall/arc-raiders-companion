@@ -20,7 +20,12 @@
   getItem(id).then((d) => (lower = d.family?.levels.filter((l) => l.level < (d.item.tier ?? 0)) ?? []));
 
   $effect(() => {
-    craftPlan(id, qty, owned).then((p) => (plan = p), (e) => (error = String(e)));
+    // An empty or odd quantity while typing plans for one, rather than failing the page.
+    const n = Math.min(999, Math.max(1, Math.floor(qty) || 1));
+    craftPlan(id, n, owned).then((p) => {
+      plan = p;
+      error = "";
+    }, (e) => (error = String(e)));
   });
 
   function startFrom(value: string) {
@@ -74,7 +79,7 @@
               min="0"
               aria-label="Have {total.name}"
               value={held}
-              onchange={(e) => have(total.id, e.currentTarget.valueAsNumber)}
+              onchange={(e) => { const n = Math.max(0, Math.floor(e.currentTarget.valueAsNumber) || 0); e.currentTarget.value = String(n); have(total.id, n); }}
             />
             <span class="need">/ {total.qty}</span>
           </div>
@@ -144,6 +149,6 @@
   }
   .error {
     padding: 20px;
-    color: var(--rarity-epic);
+    color: var(--bad);
   }
 </style>

@@ -41,7 +41,13 @@
     }
   }
 
+  let confirmRemove = $state(false);
   async function remove() {
+    if (!confirmRemove) {
+      confirmRemove = true;
+      return;
+    }
+    confirmRemove = false;
     await removeFriend(friend);
     message = "";
     await load();
@@ -86,7 +92,7 @@
         <select class="field" aria-label="Friend" bind:value={friend} onchange={load}>
           {#each profile.friends as f (f.name)}<option value={f.name}>{f.name}</option>{/each}
         </select>
-        <button class="button dark" onclick={remove}>Remove</button>
+        <button class="button dark" class:danger={confirmRemove} onclick={remove}>{confirmRemove ? `Remove ${friend}?` : "Remove"}</button>
       </div>
     {/if}
   </section>
@@ -163,5 +169,8 @@
   }
   .message {
     color: var(--teal);
+  }
+  .row:hover:not(.on) {
+    background: var(--panel-2);
   }
 </style>

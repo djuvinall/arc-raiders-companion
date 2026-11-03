@@ -17,6 +17,11 @@
   let table = $state<CompareTable | null>(null);
   let saved = $state<WeaponBuild[]>([]);
   let targetHp = $state(100);
+  // An empty or zero field while typing keeps the last sensible target.
+  const hp = () => Math.max(1, Number(targetHp) || 100);
+  let note = $state("");
+  // A delete waits for a second click on the same build.
+  let confirmDrop = $state<string | null>(null);
 
   listItems().then((all) => {
     weapons = all.filter((i) => i.category === "weapon").sort((a, b) => a.name.localeCompare(b.name));
@@ -27,7 +32,7 @@
 
   async function refresh(i: number) {
     const column = columns[i];
-    column.sheet = await weaponSheet($state.snapshot(column.build), targetHp);
+    column.sheet = await weaponSheet($state.snapshot(column.build), hp());
     if (columns.length > 1) {
       table = await weaponCompare($state.snapshot(columns).map((c) => c.build));
     } else {
@@ -35,8 +40,18 @@
     }
   }
 
+  // Names stay distinct, so two builds of one gun compare and save separately.
+  function uniqueName(name: string) {
+    const taken = new Set(columns.map((c) => c.build.name));
+    if (!taken.has(name)) return name;
+    let n = 2;
+    while (taken.has(`${name} (${n})`)) n++;
+    return `${name} (${n})`;
+  }
+
   async function addColumn(build: WeaponBuild) {
     if (columns.length >= MAX) return;
+    build.name = uniqueName(build.name);
     columns.push({ build, slots: await weaponSlots(build.item_id), sheet: null });
     await refresh(columns.length - 1);
   }
@@ -63,13 +78,22 @@
   }
 
   async function save(i: number) {
-    await saveWeaponBuild($state.snapshot(columns[i].build));
+    const build = $state.snapshot(columns[i].build);
+    const replacing = saved.some((b) => b.name === build.name);
+    await saveWeaponBuild(build);
     saved = (await getProfile()).weapon_builds;
+    note = replacing ? `Updated saved build "${build.name}".` : `Saved "${build.name}".`;
   }
 
   async function drop(name: string) {
+    if (confirmDrop !== name) {
+      confirmDrop = name;
+      return;
+    }
+    confirmDrop = null;
     await deleteWeaponBuild(name);
     saved = (await getProfile()).weapon_builds;
+    note = `Deleted "${name}".`;
   }
 
   const num = (v: number | null) => (v === null ? "—" : Number(v.toFixed(1)).toLocaleString());
@@ -203,12 +227,13 @@
       Target HP for time to kill
       <input class="field" type="number" min="1" bind:value={targetHp} />
     </label>
+    {#if note}<p class="dim small" role="status">{note}</p>{/if}
     {#if saved.length}
       <h3 class="section-title">Saved builds</h3>
       {#each saved as build (build.name)}
         <div class="saved">
           <button class="link" onclick={() => addColumn(structuredClone($state.snapshot(build)))}>{build.name}</button>
-          <button class="link dim" aria-label="Delete {build.name}" onclick={() => drop(build.name)}>Delete</button>
+          <button class="link dim" class:confirm={confirmDrop === build.name} aria-label="Delete {build.name}" onclick={() => drop(build.name)}>{confirmDrop === build.name ? "Click again to delete" : "Delete"}</button>
         </div>
       {/each}
     {/if}
@@ -338,6 +363,9 @@
   }
   .link.dim {
     color: var(--text-dim);
+  }
+  .link.confirm {
+    color: var(--bad);
   }
   @media (max-width: 1240px) {
     .columns {

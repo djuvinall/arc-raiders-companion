@@ -42,14 +42,27 @@
     message = "Profile JSON is below and copied to the clipboard. Save it anywhere.";
   }
 
+  // The profile as it was before the last import, so one click puts it back.
+  let before = $state<string | null>(null);
+
   async function doImport() {
     try {
+      const previous = await exportProfile();
       await importProfile(text);
+      before = previous;
       await load();
       message = "Profile imported. It replaced what was here.";
     } catch (e) {
       message = String(e);
     }
+  }
+
+  async function undoImport() {
+    if (!before) return;
+    await importProfile(before);
+    before = null;
+    await load();
+    message = "Import undone. Your previous profile is back.";
   }
 </script>
 
@@ -74,7 +87,7 @@
         <Icon url={need.item.icon} name={need.item.name} size={32} />
         <a href={linkHref(need.item)}>{need.qty}× {need.item.name}</a>
         <span class="dim small">{need.reasons.join(", ")}</span>
-        <input class="field have" type="number" min="0" aria-label="{need.item.name} in stash" title="In your stash" value={need.have} onchange={(e) => have(need.item.id, e.currentTarget.valueAsNumber)} />
+        <input class="field have" type="number" min="0" aria-label="{need.item.name} in stash" title="In your stash" value={need.have} onchange={(e) => { const n = Math.max(0, Math.floor(e.currentTarget.valueAsNumber) || 0); e.currentTarget.value = String(n); have(need.item.id, n); }} />
       </div>
     {:else}
       <p class="dim">Nothing outstanding from tracked items, quests or projects.</p>
@@ -90,18 +103,18 @@
         <div class="bench">
           <strong>{bench.name}</strong>
           <div class="stepper">
-            <button aria-label="Lower {bench.name}" onclick={() => level(bench, bench.level - 1)}>−</button>
+            <button aria-label="Lower {bench.name}" disabled={bench.level <= 0} onclick={() => level(bench, bench.level - 1)}>−</button>
             <span>{bench.level}/{bench.max_level}</span>
-            <button aria-label="Raise {bench.name}" onclick={() => level(bench, bench.level + 1)}>+</button>
+            <button aria-label="Raise {bench.name}" disabled={bench.level >= bench.max_level} onclick={() => level(bench, bench.level + 1)}>+</button>
           </div>
           {#each bench.next as row (row.item.id)}
-            <a class="small" href={linkHref(row.item)}>{row.in_stash}/{row.need} {row.item.name}</a>
+            <a class="small" class:met={row.in_stash >= row.need} href={linkHref(row.item)} title="{row.in_stash} in your stash">{row.in_stash >= row.need ? "✓ " : ""}{Math.min(row.in_stash, row.need)}/{row.need} {row.item.name}</a>
           {:else}
             <span class="dim small">{bench.level >= bench.max_level ? "Fully upgraded" : "No upgrade cost listed"}</span>
           {/each}
           {#if bench.requires}<span class="small requires">Requires {bench.requires}</span>{/if}
           {#if bench.next.length}
-            <button class="link" onclick={async () => { await toggleTrackedBench(bench.id); await load(); }}>{bench.tracked ? "Stop tracking" : "Track next level"}</button>
+            <button class="button small dark track" class:on={bench.tracked} onclick={async () => { await toggleTrackedBench(bench.id); await load(); }}>{bench.tracked ? "Stop tracking" : "Track next level"}</button>
           {/if}
         </div>
       {/each}
@@ -119,7 +132,9 @@
       <button class="button" onclick={doExport}>Export</button>
       <button class="button dark" disabled={!text.trim()} onclick={doImport}>Import</button>
     </div>
-    {#if message}<p class="message" role="status">{message}</p>{/if}
+    {#if message}
+      <p class="message" role="status">{message} {#if before}<button class="button small dark" onclick={undoImport}>Undo import</button>{/if}</p>
+    {/if}
   </section>
 </div>
 
@@ -152,6 +167,10 @@
     align-items: center;
     gap: 8px;
   }
+  .stepper button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
   .stepper button {
     width: 24px;
     height: 24px;
@@ -180,6 +199,16 @@
   }
   .small {
     font-size: 13px;
+  }
+  .met {
+    color: var(--teal);
+  }
+  .track {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .track.on {
+    border-color: var(--teal);
   }
   .link {
     background: none;

@@ -32,7 +32,9 @@
   async function choose(item: ItemSummary) {
     pick = item;
     search = "";
-    verdict = await itemVerdict(item.id);
+    verdict = null;
+    const v = await itemVerdict(item.id);
+    if (pick?.id === item.id) verdict = v;
   }
 
   async function tick(quest: string, objective: string, done: boolean) {

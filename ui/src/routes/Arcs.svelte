@@ -204,4 +204,7 @@
     background: var(--panel-2);
     border-radius: 4px;
   }
+  .row:hover {
+    background: var(--panel-2);
+  }
 </style>
