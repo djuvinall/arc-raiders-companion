@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    getItem, getProfile, linkHref, ROMAN, toggleFound, toggleTrackedItem,
-    type ItemDetail, type Link, type RecipeView,
+    getItem, getProfile, itemVerdict, linkHref, ROMAN, setStash, toggleFound, toggleTrackedItem,
+    type ItemDetail, type Link, type RecipeView, type Verdict,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
   import LinkRow from "../lib/components/LinkRow.svelte";
@@ -15,10 +15,32 @@
   let tracked = $state(false);
   let found = $state(false);
   let baseline = $state<ItemDetail | null>(null);
+  let verdict = $state<Verdict | null>(null);
+  let inStash = $state(0);
+  let benches = $state<Record<string, number>>({});
+
+  async function refreshVerdict() {
+    verdict = await itemVerdict(id);
+  }
+  refreshVerdict();
+
+  async function saveStash(value: number) {
+    inStash = Math.max(0, Math.floor(value) || 0);
+    await setStash(id, inStash);
+    await refreshVerdict();
+  }
+
+  // A station note reads "Level 2"; compare it with the tracked bench level.
+  const shortOf = (station: Link) => {
+    const level = Number(station.note?.replace("Level ", "") ?? 0);
+    return station.id in benches && benches[station.id] < level;
+  };
 
   getProfile().then((p) => {
     tracked = p.tracked_item_ids.includes(id);
     found = p.blueprints_found.includes(id);
+    inStash = p.stash[id] ?? 0;
+    benches = p.workbenches;
   });
 
   // Amplified versions compare with their base, levels with level I.
@@ -110,7 +132,7 @@
   {@const item = detail.item}
   <div class="page">
     <aside class="detail">
-      <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={140} /></div>
+      <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={112} /></div>
       <div class="chips">
         <span class="chip category">{item.category.replace("-", " ")}</span>
         {#if item.rarity}
@@ -119,6 +141,13 @@
         {#if item.tier}<span class="chip">Tier {ROMAN[item.tier]}</span>{/if}
       </div>
       <h2>{item.name}</h2>
+      {#if verdict}
+        <div class="verdict {verdict.action}">
+          <strong>{verdict.headline}</strong>
+          {#each verdict.reasons.slice(0, 3) as reason}<span>{reason}</span>{/each}
+          {#if verdict.reasons.length > 3}<span>And {verdict.reasons.length - 3} more</span>{/if}
+        </div>
+      {/if}
       {#if detail.family && (detail.family.levels.length > 1 || detail.family.amplified.length)}
         <WeaponPicker family={detail.family} {item} baseId={detail.base?.id ?? null} />
       {/if}
@@ -126,6 +155,8 @@
       {#if item.flavor_text}<p class="flavor">{item.flavor_text}</p>{/if}
       <hr />
       <dl>
+        <dt>In your stash</dt>
+        <dd><input class="stash" type="number" min="0" aria-label="In your stash" value={inStash} onchange={(e) => saveStash(e.currentTarget.valueAsNumber)} /></dd>
         {#if item.value !== null}<dt>Value</dt><dd>{item.value.toLocaleString()}</dd>{/if}
         {#if item.weight_kg !== null}<dt>Weight</dt><dd>{item.weight_kg} kg</dd>{/if}
         {#if item.stack_size !== null}<dt>Stack</dt><dd>{item.stack_size}</dd>{/if}
@@ -191,8 +222,9 @@
             <div class="recipe">
               <div class="meta">
                 {#each recipe.stations as station}
-                  <a class="chip station" href="#/ref/workbench/{station.id}">
+                  <a class="chip station" class:short={shortOf(station)} href="#/ref/workbench/{station.id}">
                     {station.name}{station.note ? ` · ${station.note}` : ""}
+                    {shortOf(station) ? `· you have ${benches[station.id]}` : ""}
                   </a>
                 {/each}
                 {#if recipe.blueprint}
@@ -285,19 +317,48 @@
     align-items: start;
   }
   .detail {
-    position: sticky;
-    top: 18px;
     background: var(--cream);
     color: var(--on-cream);
     border-radius: 6px;
     padding: 18px;
-    max-height: calc(100vh - 150px);
-    overflow: auto;
+  }
+  .verdict {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #2a7a4b;
+    color: #fff;
+    font-size: 13px;
+  }
+  .verdict strong {
+    font-size: 15px;
+  }
+  .verdict.sell {
+    background: #2f3442;
+  }
+  .verdict.recycle {
+    background: #1d6f86;
+  }
+  .stash {
+    width: 72px;
+    padding: 1px 4px;
+    border: 1px solid var(--on-cream-dim);
+    border-radius: 3px;
+    background: none;
+    color: var(--on-cream);
+    font: inherit;
+    text-align: right;
+  }
+  .short {
+    color: var(--yellow);
   }
   .art {
     display: grid;
     place-items: center;
-    padding: 6px 0 14px;
+    padding: 0 0 10px;
   }
   .art.blueprint {
     margin-bottom: 14px;

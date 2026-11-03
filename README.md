@@ -2,7 +2,7 @@
 
 An open-source, offline-first desktop companion for ARC Raiders: every item linked to its recipes, workbenches, quests, projects, loot areas and maps. Unofficial; not affiliated with Embark Studios.
 
-Includes the item database and crafting trees, the 2.0 skill tree planner, weapon sheets and compare, maps with live events and route ranking, quest and project tracking, Codex collections, and patch notes. Phase 7 (the HollowDeck module) is a later project; `arc-core` is ready for it.
+Includes keep-or-recycle advice, a raid plan, an ARC guide, an always-on-top compact window, the item database and crafting trees, the 2.0 skill tree planner, weapon sheets and compare, maps with live events and route ranking, quest and project tracking, Codex collections, and patch notes. Phase 7 (the HollowDeck module) is a later project; `arc-core` is ready for it.
 
 ## Download
 

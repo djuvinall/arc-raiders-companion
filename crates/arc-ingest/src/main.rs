@@ -5,6 +5,7 @@
 //!   arc-ingest diff             rebuild from the newest fixtures, compare with data/
 //!   arc-ingest sync [--write]   same diff, and write data/ with --write
 
+mod arcs;
 mod fetch;
 mod http;
 mod normalize;
@@ -161,6 +162,8 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     apply_map_tiles(&mut out.files.maps)?;
     apply_stencils(&mut out.files.items)?;
     apply_project_status(&mut out.files.projects)?;
+    let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
+    arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

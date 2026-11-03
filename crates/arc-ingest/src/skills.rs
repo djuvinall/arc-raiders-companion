@@ -47,7 +47,7 @@ const BRANCHES: &[(&str, &str, f64)] = &[
 ];
 const SPACING: f64 = 104.0;
 
-fn clean(cell: &str) -> String {
+pub(crate) fn clean(cell: &str) -> String {
     let mut s = cell.trim().to_string();
     while let (Some(a), Some(b)) = (s.find("<ref"), s.find('>')) {
         let end = if s[..=b].ends_with("/>") {

@@ -33174,37 +33174,6 @@
     "provenance": "api"
   },
   {
-    "id": "leviathans-crown-ship-model-2",
-    "name": "\"Leviathan's Crown\" Ship Model",
-    "category": "trinket",
-    "subcategory": null,
-    "rarity": "legendary",
-    "tier": null,
-    "description": "A majestic sight in any era, this fierce merchant ship is indifferent to the aerodynamic benefits of fiberglass technology.",
-    "flavor_text": "",
-    "icon": null,
-    "value": 10000,
-    "weight_kg": 0.5,
-    "stack_size": 1,
-    "stats": null,
-    "ammo_type": null,
-    "loadout_slots": [],
-    "loot_areas": [],
-    "drops_from": [],
-    "sold_by": [],
-    "recipe_ids": [],
-    "recycle_ids": [],
-    "blueprint_required": false,
-    "variant_of": null,
-    "stencil": null,
-    "source_refs": {
-      "metaforge": null,
-      "wiki": "\"Leviathan's Crown\" Ship Model",
-      "raidtheory": null
-    },
-    "provenance": "wiki"
-  },
-  {
     "id": "library-book",
     "name": "Library Book",
     "category": "trinket",
@@ -54926,7 +54895,9 @@
     "loot_areas": [],
     "drops_from": [],
     "sold_by": [],
-    "recipe_ids": [],
+    "recipe_ids": [
+      "trigger-nade-blueprint-craft"
+    ],
     "recycle_ids": [],
     "blueprint_required": false,
     "variant_of": null,
@@ -54937,39 +54908,6 @@
       "raidtheory": null
     },
     "provenance": "api"
-  },
-  {
-    "id": "trigger-nade-blueprint-2",
-    "name": "Trigger 'Nade Blueprint",
-    "category": "blueprint",
-    "subcategory": null,
-    "rarity": null,
-    "tier": null,
-    "description": "",
-    "flavor_text": "",
-    "icon": null,
-    "value": 5000,
-    "weight_kg": null,
-    "stack_size": 1,
-    "stats": null,
-    "ammo_type": null,
-    "loadout_slots": [],
-    "loot_areas": [],
-    "drops_from": [],
-    "sold_by": [],
-    "recipe_ids": [
-      "trigger-nade-blueprint-2-craft"
-    ],
-    "recycle_ids": [],
-    "blueprint_required": false,
-    "variant_of": null,
-    "stencil": null,
-    "source_refs": {
-      "metaforge": null,
-      "wiki": "Trigger 'Nade Blueprint",
-      "raidtheory": null
-    },
-    "provenance": "wiki"
   },
   {
     "id": "trigger-reset-systems",

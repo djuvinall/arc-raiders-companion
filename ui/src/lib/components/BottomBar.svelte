@@ -1,12 +1,13 @@
 <script lang="ts">
-  import type { Overview } from "../api";
+  import { openMini, type Overview } from "../api";
 
   let { info }: { info: Overview | null } = $props();
 </script>
 
 <footer>
   <span><span class="keycap">ESC</span> Back</span>
-  <span><span class="keycap">/</span> Search</span>
+  <span><span class="keycap">Ctrl K</span> Search anything</span>
+  <button class="mini" onclick={openMini}>Compact window</button>
   <span class="status">
     {#if info}
       Dataset {info.dataset_version}
@@ -17,6 +18,15 @@
 </footer>
 
 <style>
+  .mini {
+    padding: 1px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+  }
   footer {
     display: flex;
     align-items: center;

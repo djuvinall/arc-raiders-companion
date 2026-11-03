@@ -49,6 +49,13 @@
           ],
           "format": "uint32",
           "minimum": 0
+        },
+        "quest_id": {
+          "description": "On quest pins: the quest it belongs to.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false,

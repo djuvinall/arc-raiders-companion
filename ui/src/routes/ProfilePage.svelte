@@ -1,18 +1,20 @@
 <script lang="ts">
   import {
-    exportProfile, getProfile, importProfile, linkHref, listItems, routePlan, toggleTrackedItem,
-    type ItemSummary, type Profile, type RoutePlan,
+    exportProfile, getProfile, importProfile, linkHref, listItems, routePlan, setStash, setWorkbenchLevel,
+    toggleTrackedBench, toggleTrackedItem, workbenchList,
+    type BenchView, type ItemSummary, type Profile, type RoutePlan,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
 
   let profile = $state<Profile | null>(null);
   let plan = $state<RoutePlan | null>(null);
+  let benches = $state<BenchView[]>([]);
   let items = $state<ItemSummary[]>([]);
   let text = $state("");
   let message = $state("");
 
   const load = async () => {
-    [profile, plan] = await Promise.all([getProfile(), routePlan()]);
+    [profile, plan, benches] = await Promise.all([getProfile(), routePlan(), workbenchList()]);
   };
   load();
   listItems().then((all) => (items = all));
@@ -21,6 +23,16 @@
 
   async function untrack(id: string) {
     await toggleTrackedItem(id);
+    await load();
+  }
+
+  async function have(id: string, value: number) {
+    await setStash(id, Math.max(0, Math.floor(value) || 0));
+    await load();
+  }
+
+  async function level(bench: BenchView, value: number) {
+    await setWorkbenchLevel(bench.id, Math.min(bench.max_level, Math.max(0, value)));
     await load();
   }
 
@@ -62,11 +74,37 @@
         <Icon url={need.item.icon} name={need.item.name} size={32} />
         <a href={linkHref(need.item)}>{need.qty}× {need.item.name}</a>
         <span class="dim small">{need.reasons.join(", ")}</span>
+        <input class="field have" type="number" min="0" aria-label="{need.item.name} in stash" title="In your stash" value={need.have} onchange={(e) => have(need.item.id, e.currentTarget.valueAsNumber)} />
       </div>
     {:else}
       <p class="dim">Nothing outstanding from tracked items, quests or projects.</p>
     {/each}
     {#if plan?.needed.length}<a class="button" href="#/maps">Rank maps for this</a>{/if}
+  </section>
+
+  <section class="panel wide">
+    <h3 class="section-title">Workbenches</h3>
+    <p class="dim small">Set your levels so items show what you can craft and what to save. Track one to add its next level to what's needed.</p>
+    <div class="benches">
+      {#each benches as bench (bench.id)}
+        <div class="bench">
+          <strong>{bench.name}</strong>
+          <div class="stepper">
+            <button aria-label="Lower {bench.name}" onclick={() => level(bench, bench.level - 1)}>−</button>
+            <span>{bench.level}/{bench.max_level}</span>
+            <button aria-label="Raise {bench.name}" onclick={() => level(bench, bench.level + 1)}>+</button>
+          </div>
+          {#each bench.next as row (row.item.id)}
+            <a class="small" href={linkHref(row.item)}>{row.in_stash}/{row.need} {row.item.name}</a>
+          {:else}
+            <span class="dim small">{bench.level >= bench.max_level ? "Fully upgraded" : "No upgrade cost listed"}</span>
+          {/each}
+          {#if bench.next.length}
+            <button class="link" onclick={async () => { await toggleTrackedBench(bench.id); await load(); }}>{bench.tracked ? "Stop tracking" : "Track next level"}</button>
+          {/if}
+        </div>
+      {/each}
+    </div>
   </section>
 
   <section class="panel wide">
@@ -85,6 +123,40 @@
 </div>
 
 <style>
+  .row:has(.have) {
+    grid-template-columns: 32px 1fr auto 64px;
+  }
+  .have {
+    width: 64px;
+    padding: 2px 6px;
+  }
+  .benches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px;
+  }
+  .bench {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px;
+    background: var(--panel-2);
+    border-radius: 4px;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stepper button {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+  }
   .page {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

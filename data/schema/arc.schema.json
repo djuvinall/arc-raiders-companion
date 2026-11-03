@@ -34,6 +34,36 @@
             "null"
           ]
         },
+        "armor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attack": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ability": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "weak_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tips": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "armor_zones": {
           "type": "array",
           "items": {
@@ -57,6 +87,7 @@
       "required": [
         "id",
         "name",
+        "weak_points",
         "armor_zones",
         "drops",
         "source_refs",

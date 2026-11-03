@@ -30898,10 +30898,10 @@
     "provenance": "wiki"
   },
   {
-    "id": "trigger-nade-blueprint-2-craft",
+    "id": "trigger-nade-blueprint-craft",
     "kind": "craft",
     "output": {
-      "item_id": "trigger-nade-blueprint-2",
+      "item_id": "trigger-nade-blueprint",
       "qty": 1
     },
     "outputs": [],
@@ -30955,7 +30955,7 @@
     "workbench_level": 2,
     "alt_stations": [],
     "requires_blueprint": true,
-    "blueprint_item_id": "trigger-nade-blueprint-2",
+    "blueprint_item_id": "trigger-nade-blueprint",
     "required_skill": null,
     "craft_time_s": null,
     "source_refs": {

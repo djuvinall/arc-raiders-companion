@@ -422,6 +422,12 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
     for r in wiki_rows(wiki, "items") {
         let name = text(r, "name");
         if res.find(&name).is_none() && !name.is_empty() {
+            // Sources differ on punctuation: Trigger 'Nade Blueprint is Trigger Nade Blueprint.
+            let same = slug(&name);
+            if canon.iter().any(|(id, _)| *id == same) {
+                res.insert(&name, &same);
+                continue;
+            }
             let id = unique_id(slug(&name), &mut used_ids);
             res.insert(&name, &id);
             wiki_only.push((id, r));
@@ -583,6 +589,11 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
         class: None,
         hp: None,
         icon: opt_text(a, "icon"),
+        armor: None,
+        attack: None,
+        ability: None,
+        weak_points: Vec::new(),
+        tips: None,
         armor_zones: Vec::new(),
         drops: Vec::new(),
         source_refs: SourceRefs { metaforge: opt_text(a, "id"), ..Default::default() },
@@ -820,7 +831,10 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
             ys.push(y);
             let sub = text(m, "subcategory");
             let loot_areas = split_areas(&text(m, "lootAreas"));
-            let kind = if !loot_areas.is_empty() {
+            let quest_id = (text(m, "category") == "quests").then(|| sub.clone());
+            let kind = if quest_id.is_some() {
+                PoiKind::QuestTarget
+            } else if !loot_areas.is_empty() {
                 PoiKind::Cache
             } else if ["extract", "exit", "elevator", "hatch", "metro"].iter().any(|k| sub.contains(k)) {
                 PoiKind::Extract
@@ -840,6 +854,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
                 loot_areas,
                 notes: None,
                 zlayers: m["zlayers"].as_u64().and_then(|z| u32::try_from(z).ok()),
+                quest_id,
             });
         }
         let bounds = (!xs.is_empty()).then(|| Bounds {

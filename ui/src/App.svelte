@@ -1,6 +1,7 @@
 <script lang="ts">
   import { overview, type Overview } from "./lib/api";
   import BottomBar from "./lib/components/BottomBar.svelte";
+  import QuickSearch from "./lib/components/QuickSearch.svelte";
   import TopBar from "./lib/components/TopBar.svelte";
   import UpdateBanner from "./lib/components/UpdateBanner.svelte";
   import { checkForUpdates } from "./lib/updates.svelte";
@@ -8,7 +9,10 @@
   import Codex from "./routes/Codex.svelte";
   import Craft from "./routes/Craft.svelte";
   import EntityRef from "./routes/EntityRef.svelte";
+  import Arcs from "./routes/Arcs.svelte";
   import ItemPage from "./routes/ItemPage.svelte";
+  import Mini from "./routes/Mini.svelte";
+  import Raid from "./routes/Raid.svelte";
   import Items from "./routes/Items.svelte";
   import Maps from "./routes/Maps.svelte";
   import Patches from "./routes/Patches.svelte";
@@ -18,7 +22,7 @@
   import Skills from "./routes/Skills.svelte";
   import Weapons from "./routes/Weapons.svelte";
 
-  const TABS = ["skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"];
+  const TABS = ["raid", "arcs", "skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"];
   const current = () => (location.hash.replace(/^#\/?/, "") || "items").split("/");
 
   let parts = $state(current());
@@ -26,7 +30,8 @@
   let main = $state<HTMLElement>();
 
   overview().then((o) => (info = o));
-  checkForUpdates();
+  // svelte-ignore state_referenced_locally
+  if (parts[0] !== "mini") checkForUpdates();
 
   function onHash() {
     parts = current();
@@ -47,6 +52,10 @@
         return { title: "Database", subtitle: "Crafting" };
       case "ref":
         return { title: "Database", subtitle: parts[1].replace("-", " ") };
+      case "raid":
+        return { title: "Raid plan", subtitle: "Next run" };
+      case "arcs":
+        return { title: "ARCs", subtitle: "Enemy guide" };
       case "skills":
         return { title: "Skills", subtitle: "Planner" };
       case "weapons":
@@ -73,6 +82,10 @@
 
 <svelte:window onhashchange={onHash} onkeydown={onKey} />
 
+{#if parts[0] === "mini"}
+  <Mini />
+{:else}
+<QuickSearch />
 <div class="shell">
   <TopBar {...titles} canGoBack={parts[0] !== "items"} active={TABS.includes(parts[0]) ? parts[0] : "items"} />
   <div><UpdateBanner /></div>
@@ -84,6 +97,10 @@
         <Craft id={parts[1]} />
       {:else if parts[0] === "ref"}
         <EntityRef kind={parts[1]} id={parts[2]} />
+      {:else if parts[0] === "raid"}
+        <Raid mapId={parts[1]} />
+      {:else if parts[0] === "arcs"}
+        <Arcs id={parts[1]} />
       {:else if parts[0] === "skills"}
         <Skills />
       {:else if parts[0] === "weapons"}
@@ -91,9 +108,9 @@
       {:else if parts[0] === "maps"}
         <Maps mapId={parts[1]} />
       {:else if parts[0] === "quests"}
-        <Quests />
+        <Quests id={parts[1]} />
       {:else if parts[0] === "projects"}
-        <Projects />
+        <Projects id={parts[1]} />
       {:else if parts[0] === "codex"}
         <Codex />
       {:else if parts[0] === "patches"}
@@ -109,6 +126,7 @@
   </main>
   <BottomBar {info} />
 </div>
+{/if}
 
 <style>
   .shell {

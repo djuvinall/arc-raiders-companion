@@ -13,7 +13,7 @@
   }
   let { map, url, pois, route, selected, onselect }: Props = $props();
 
-  const COLORS: Record<string, string> = { cache: "#2ab0c6", extract: "#3fcf6b", landmark: "#9aa0a6" };
+  const COLORS: Record<string, string> = { cache: "#2ab0c6", extract: "#3fcf6b", landmark: "#9aa0a6", "quest-target": "#e26bff" };
 
   let box = $state<HTMLDivElement>();
   let canvas = $state<HTMLCanvasElement>();

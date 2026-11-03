@@ -190,6 +190,52 @@ pub fn party_plan(ds: &Dataset, profile: &Profile, friend: &Friend) -> PartyPlan
     PartyPlan { friend: friend.name.clone(), together, you_catch_up, friend_catch_up, maps }
 }
 
+/// Marks a quest and everything before it done, for catching up with where you are.
+pub fn complete_chain(ds: &Dataset, profile: &mut Profile, quest_id: &str) {
+    let mut waiting = vec![quest_id.to_string()];
+    while let Some(id) = waiting.pop() {
+        let Some(quest) = ds.files.quests.iter().find(|q| q.id == id) else { continue };
+        if profile.quests.get(&id).is_some_and(|p| p.done) {
+            continue;
+        }
+        profile.quests.entry(id).or_default().done = true;
+        waiting.extend(quest.prerequisites.iter().map(|p| p.quest_id.clone()));
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct BenchView {
+    pub id: String,
+    pub name: String,
+    pub level: u8,
+    pub max_level: u8,
+    pub tracked: bool,
+    /// What the next level costs. Empty at the top level.
+    pub next: Vec<StageInput>,
+}
+
+pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
+    ds.files.workbenches.iter().filter(|b| b.max_level > 0).map(|bench| {
+        let level = profile.workbenches.get(&bench.id).copied().unwrap_or(0);
+        let next = bench.levels.iter().find(|l| l.level == level + 1).map_or(Vec::new(), |l| {
+            l.upgrade_inputs.iter().map(|q| StageInput {
+                item: item_link(ds, &q.item_id, Some(q.qty)),
+                need: q.qty,
+                committed: 0,
+                in_stash: profile.stash.get(&q.item_id).copied().unwrap_or(0),
+            }).collect()
+        });
+        BenchView {
+            id: bench.id.clone(),
+            name: bench.name.clone(),
+            level,
+            max_level: bench.max_level,
+            tracked: profile.tracked_benches.contains(&bench.id),
+            next,
+        }
+    }).collect()
+}
+
 /// Ticking the last objective completes the quest; unticking one reopens it.
 pub fn set_objective(ds: &Dataset, profile: &mut Profile, quest_id: &str, objective_id: &str, done: bool) {
     let Some(quest) = ds.files.quests.iter().find(|q| q.id == quest_id) else { return };

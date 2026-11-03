@@ -19,6 +19,8 @@ pub struct ItemSummary {
     pub icon: Option<String>,
     pub loot_areas: Vec<String>,
     pub variant_of: Option<String>,
+    pub value: Option<u32>,
+    pub weight_kg: Option<f64>,
     /// Weapons only: every level and amplified version of a gun shares these.
     pub family: Option<String>,
     pub family_name: Option<String>,
@@ -37,6 +39,8 @@ pub fn item_list(ds: &Dataset) -> Vec<ItemSummary> {
         icon: i.icon.clone(),
         loot_areas: i.loot_areas.clone(),
         variant_of: i.variant_of.clone(),
+        value: i.value,
+        weight_kg: i.weight_kg,
     }).collect()
 }
 
@@ -52,7 +56,7 @@ pub struct Link {
     pub note: Option<String>,
 }
 
-pub(crate) fn item_link(ds: &Dataset, id: &str, qty: Option<u32>) -> Link {
+pub fn item_link(ds: &Dataset, id: &str, qty: Option<u32>) -> Link {
     let item = ds.item(id);
     Link {
         kind: "item",
@@ -219,8 +223,8 @@ fn annotate(ds: &Dataset, node: &mut TreeNode) {
     node.children.iter_mut().for_each(|c| annotate(ds, c));
 }
 
-pub fn craft_plan(ds: &Dataset, id: &str, qty: u32) -> Option<CraftPlan> {
-    let mut tree = calc::craft_tree(ds, id, qty)?;
+pub fn craft_plan(ds: &Dataset, id: &str, qty: u32, owned: Option<&str>) -> Option<CraftPlan> {
+    let mut tree = calc::craft_tree_from(ds, id, qty, owned)?;
     let mut totals: Vec<Link> = calc::raw_totals(&tree).into_iter()
         .map(|(item, n)| item_link(ds, &item, Some(n)))
         .collect();

@@ -15,6 +15,8 @@ pub struct TreeNode {
     pub workbench_level: Option<u8>,
     /// True when this node stopped expanding because it appears among its own ancestors.
     pub cycle: bool,
+    /// Already owned, so it and what's below it cost nothing.
+    pub owned: bool,
     pub children: Vec<TreeNode>,
 }
 
@@ -33,12 +35,17 @@ fn runs(qty: u32, per: u32) -> u32 {
 
 /// Expands recursively to items with no craft recipe. `None` for an unknown id.
 pub fn craft_tree(ds: &Dataset, item_id: &str, qty: u32) -> Option<TreeNode> {
-    ds.item(item_id)?;
-    let mut path = Vec::new();
-    Some(expand(ds, item_id, qty, &mut path))
+    craft_tree_from(ds, item_id, qty, None)
 }
 
-fn expand(ds: &Dataset, item_id: &str, qty: u32, path: &mut Vec<String>) -> TreeNode {
+/// The same, stopping at `owned`: upgrading from Anvil III skips what built Anvil III.
+pub fn craft_tree_from(ds: &Dataset, item_id: &str, qty: u32, owned: Option<&str>) -> Option<TreeNode> {
+    ds.item(item_id)?;
+    let mut path = Vec::new();
+    Some(expand(ds, item_id, qty, owned, &mut path))
+}
+
+fn expand(ds: &Dataset, item_id: &str, qty: u32, owned: Option<&str>, path: &mut Vec<String>) -> TreeNode {
     let mut node = TreeNode {
         item_id: item_id.to_string(),
         name: ds.item_name(item_id).to_string(),
@@ -47,9 +54,10 @@ fn expand(ds: &Dataset, item_id: &str, qty: u32, path: &mut Vec<String>) -> Tree
         workbench_id: None,
         workbench_level: None,
         cycle: path.iter().any(|p| p == item_id),
+        owned: owned == Some(item_id) && !path.is_empty(),
         children: Vec::new(),
     };
-    if node.cycle {
+    if node.cycle || node.owned {
         return node;
     }
     let Some(recipe) = ds.item(item_id).and_then(|i| craft_recipe(ds, i)) else {
@@ -64,7 +72,7 @@ fn expand(ds: &Dataset, item_id: &str, qty: u32, path: &mut Vec<String>) -> Tree
     node.children = recipe
         .inputs
         .iter()
-        .map(|input| expand(ds, &input.item_id, input.qty * batches, path))
+        .map(|input| expand(ds, &input.item_id, input.qty * batches, owned, path))
         .collect();
     path.pop();
     node
@@ -78,7 +86,7 @@ pub fn raw_totals(tree: &TreeNode) -> BTreeMap<String, u32> {
 }
 
 fn add_leaves(node: &TreeNode, totals: &mut BTreeMap<String, u32>) {
-    if node.children.is_empty() {
+    if node.children.is_empty() && !node.owned {
         *totals.entry(node.item_id.clone()).or_insert(0) += node.qty;
     }
     node.children.iter().for_each(|child| add_leaves(child, totals));

@@ -1,15 +1,15 @@
 {
   "items": {
-    "count": 1517,
-    "gameplay_count": 909,
+    "count": 1515,
+    "gameplay_count": 907,
     "by_provenance": {
       "api": 1512,
-      "wiki": 5
+      "wiki": 3
     },
     "by_category": {
       "ammo": 6,
       "augment": 16,
-      "blueprint": 92,
+      "blueprint": 91,
       "cosmetic": 507,
       "design": 101,
       "furniture": 101,
@@ -27,22 +27,22 @@
       "research": 20,
       "shield": 3,
       "stencil": 14,
-      "trinket": 97,
+      "trinket": 96,
       "weapon": 181,
       "weapon-mod": 38
     },
     "populated_pct_gameplay": {
-      "description": 87.0,
-      "icon": 99.4,
+      "description": 87.1,
+      "icon": 99.7,
       "value": 96.1,
       "weight_kg": 74.6,
-      "rarity": 93.5,
+      "rarity": 93.6,
       "tier": 25.2,
-      "stats": 26.8,
+      "stats": 26.9,
       "loot_areas": 27.3,
       "sold_by": 11.9,
-      "recipe_ids": 31.7,
-      "recycle_ids": 43.0,
+      "recipe_ids": 31.8,
+      "recycle_ids": 43.1,
       "drops_from": 4.0
     }
   },
@@ -72,7 +72,7 @@
   "workbenches": 10,
   "projects": 17,
   "maps": 7,
-  "pois": 2161,
+  "pois": 3051,
   "loot_areas": 13,
   "traders": 5,
   "arcs": 26,

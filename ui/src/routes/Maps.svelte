@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    iconSrc, liveEvents, mapList, mapPois, routePlan,
+    iconSrc, liveEvents, mapList, mapPois, questList, routePlan,
     type EventsView, type GameMap, type MapCover, type Poi, type RoutePlan,
   } from "../lib/api";
   import TileMap from "../lib/components/TileMap.svelte";
@@ -23,6 +23,8 @@
   let area = $state("");
   let search = $state("");
   let floor = $state(0);
+  let tracked = $state(new Set<string>());
+  let questPins = $state(true);
 
   function remembered() {
     try {
@@ -37,6 +39,7 @@
     open(all.find((m) => m.id === mapId) ?? all[0]);
   });
   routePlan().then((p) => (plan = p));
+  questList().then((rows) => (tracked = new Set(rows.filter((r) => r.status === "active" || r.status === "needed").map((r) => r.quest.id))));
 
   $effect(() => {
     try {
@@ -63,7 +66,7 @@
   const onFloor = (p: Poi) => !floors.length || p.zlayers === null || (p.zlayers & floors[floor].mask) !== 0;
   const shown = $derived(
     pois.filter((p) =>
-      route.includes(p.id) || (
+      route.includes(p.id) || (questPins && onFloor(p) && !!p.quest_id && tracked.has(p.quest_id)) || (
         kinds[p.kind] && onFloor(p) &&
         (!area || p.loot_areas.includes(area)) &&
         (!search || p.name.toLowerCase().includes(search.toLowerCase()))
@@ -78,6 +81,12 @@
     return `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
   };
   const eventsFor = (id: string) => events?.maps.find((m) => m.map_id === id);
+  // Equal coverage goes to the map with an event running, for more to do on the same trip.
+  const liveCount = (id: string) => eventsFor(id)?.current.length ?? 0;
+  const ranked = $derived(
+    [...(plan?.covers ?? [])].sort((a, b) =>
+      b.covered_items.length - a.covered_items.length || liveCount(b.map_id) - liveCount(a.map_id) || a.pois.length - b.pois.length),
+  );
   const haveNeeds = $derived((plan?.needed.length ?? 0) > 0);
   const rankLabel = (c: MapCover) => `${c.covered_items.length}/${plan?.needed.length ?? 0} items, ${c.pois.length} stops`;
 </script>
@@ -126,6 +135,7 @@
       {#each Object.keys(kinds) as kind}
         <label><input type="checkbox" bind:checked={kinds[kind]} /> {kind}</label>
       {/each}
+      <label><input type="checkbox" bind:checked={questPins} /> Tracked quests</label>
       <select class="field" aria-label="Loot area" bind:value={area}>
         <option value="">All loot areas</option>
         {#each areas as a}<option value={a}>{a.replace("-", " ")}</option>{/each}
@@ -151,10 +161,11 @@
       <h3 class="section-title">Needed gear</h3>
       {#if haveNeeds}
         <p class="small">{plan?.needed.length} items still to find.</p>
-        {#each plan?.covers ?? [] as c (c.map_id)}
+        {#each ranked as c (c.map_id)}
           <button class="cover" class:active={c.map_id === current?.id} onclick={() => { const m = maps.find((x) => x.id === c.map_id); if (m) open(m); }}>
             <strong>{c.map_name}</strong>
             <span class="dim small">{rankLabel(c)}</span>
+            {#each eventsFor(c.map_id)?.current ?? [] as event}<span class="small live">{event.name}</span>{/each}
           </button>
         {/each}
         {#if cover}
@@ -177,6 +188,10 @@
 </div>
 
 <style>
+  .live {
+    display: block;
+    color: var(--yellow);
+  }
   .floors {
     display: flex;
     gap: 2px;

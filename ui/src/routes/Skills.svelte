@@ -312,17 +312,24 @@
 <style>
   .page {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 14px;
-    padding: 14px 20px;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 12px;
+    padding: 12px;
+    height: 100%;
+    min-height: 0;
     align-items: start;
   }
   .board {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
+    height: 100%;
+    min-height: 0;
   }
   svg {
+    flex: 1;
     width: 100%;
-    height: auto;
+    min-height: 0;
     display: block;
   }
   .banner {

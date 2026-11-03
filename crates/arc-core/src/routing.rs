@@ -1,7 +1,7 @@
 //! Phase 4 calculators: what the profile still needs, and which POIs cover it (D11).
 //! No pathing: a walkable graph doesn't exist, so this is greedy set cover. All pure.
 
-use crate::calc::{craft_tree, raw_totals};
+use crate::calc::{craft_tree_from, raw_totals};
 use crate::dataset::Dataset;
 use crate::model::*;
 use crate::views::{item_link, Link};
@@ -13,6 +13,8 @@ pub struct Needed {
     pub item: Link,
     /// Still to find after the stash.
     pub qty: u32,
+    /// Already in the stash.
+    pub have: u32,
     pub reasons: Vec<String>,
 }
 
@@ -28,11 +30,13 @@ fn add(wanted: &mut BTreeMap<String, (u32, Vec<String>)>, id: &str, qty: u32, re
 }
 
 /// Tracked crafts down to raw materials, tracked open quests, and the current stage of
-/// tracked projects (less what's committed), minus the stash.
+/// tracked projects (less what's committed), and the next level of tracked workbenches,
+/// minus the stash.
 pub fn needed_items(ds: &Dataset, profile: &Profile) -> Vec<Needed> {
     let mut wanted = BTreeMap::new();
     for id in &profile.tracked_item_ids {
-        let Some(tree) = craft_tree(ds, id, 1) else { continue };
+        let owned = profile.tracked_from.get(id).map(String::as_str);
+        let Some(tree) = craft_tree_from(ds, id, 1, owned) else { continue };
         for (raw, qty) in raw_totals(&tree) {
             add(&mut wanted, &raw, qty, format!("Tracked: {}", ds.item_name(id)));
         }
@@ -52,9 +56,17 @@ pub fn needed_items(ds: &Dataset, profile: &Profile) -> Vec<Needed> {
             add(&mut wanted, &need.item_id, need.qty.saturating_sub(done), format!("Project: {}", project.name));
         }
     }
+    for bench in ds.files.workbenches.iter().filter(|b| profile.tracked_benches.contains(&b.id)) {
+        let next = profile.workbenches.get(&bench.id).copied().unwrap_or(0) + 1;
+        let Some(level) = bench.levels.iter().find(|l| l.level == next) else { continue };
+        for need in &level.upgrade_inputs {
+            add(&mut wanted, &need.item_id, need.qty, format!("{} level {next}", bench.name));
+        }
+    }
     wanted.into_iter().filter_map(|(id, (qty, reasons))| {
-        let left = qty.saturating_sub(profile.stash.get(&id).copied().unwrap_or(0));
-        (left > 0).then(|| Needed { item: item_link(ds, &id, Some(left)), qty: left, reasons })
+        let have = profile.stash.get(&id).copied().unwrap_or(0);
+        let left = qty.saturating_sub(have);
+        (left > 0).then(|| Needed { item: item_link(ds, &id, Some(left)), qty: left, have, reasons })
     }).collect()
 }
 

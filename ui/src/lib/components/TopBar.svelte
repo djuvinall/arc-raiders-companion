@@ -16,7 +16,7 @@
   </button>
   <h1>{title} <span>— {subtitle}</span></h1>
   <nav>
-    {#each ["items", "skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"] as tab}
+    {#each ["items", "raid", "arcs", "skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"] as tab}
       <a class="tab" class:active={active === tab} href="#/{tab}">{tab}</a>
     {/each}
   </nav>
@@ -76,5 +76,17 @@
   .tab.active {
     border-color: var(--text);
     color: var(--text);
+  }
+  @media (max-width: 1260px) {
+    h1 {
+      display: none;
+    }
+    nav {
+      margin-left: auto;
+      gap: 2px;
+    }
+    .tab {
+      padding-inline: 7px;
+    }
   }
 </style>

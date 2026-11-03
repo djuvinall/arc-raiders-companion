@@ -1,6 +1,6 @@
 <script lang="ts">
   import QuestParty from "../lib/components/QuestParty.svelte";
-  import { linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
+  import { completeQuestChain, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
@@ -11,7 +11,10 @@
   let quests = $state<QuestRow[]>([]);
   let maps = $state<GameMap[]>([]);
   let view = $state<"list" | "graph" | "friends">("list");
-  let selectedId = $state<string | null>(null);
+  let { id }: { id?: string } = $props();
+  // Routes remount on a new address, so the first value is the only one.
+  // svelte-ignore state_referenced_locally
+  let selectedId = $state<string | null>(id ?? null);
   let map = $state("");
   let trader = $state("");
   let status = $state("");
@@ -181,6 +184,9 @@
           </button>
           <button class="button primary" onclick={() => setState(true, true)}>Mark done</button>
         {/if}
+        {#if selected.status !== "done" && !selected.open}
+          <button class="button dark" onclick={async () => { await completeQuestChain(selectedId!); await load(); }}>Done, with all before it</button>
+        {/if}
       </div>
     {:else}
       <p class="dim">Pick a quest to see its objectives. Tracked quests feed the map route.</p>
@@ -310,6 +316,7 @@
   }
   .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 16px;
   }

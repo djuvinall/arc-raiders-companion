@@ -16,6 +16,7 @@
     area: "",
     hideBlueprints: stored("hide-blueprints"),
     hideFound: stored("hide-found"),
+    sort: "",
   });
 </script>
 
@@ -58,9 +59,21 @@
       const [a, b] = [rank(item), held ? rank(held) : [2, 0]];
       if (a[0] < b[0] || (a[0] === b[0] && a[1] < b[1])) lead.set(item.family, item);
     }
-    return visible.filter((i) => !i.family || lead.get(i.family) === i)
+    const rows = visible.filter((i) => !i.family || lead.get(i.family) === i)
       .map((i) => (i.family ? { ...i, name: i.family_name ?? i.name, tier: null } : i));
+    const score = sorters[filters.sort];
+    return score ? rows.filter((i) => score(i) !== null).sort((a, b) => score(b)! - score(a)!) : rows;
   });
+
+  const sorters: Record<string, (i: ItemSummary) => number | null> = {
+    value: (i) => i.value,
+    density: (i) => (i.value !== null && i.weight_kg ? i.value / i.weight_kg : null),
+    weight: (i) => i.weight_kg,
+  };
+  const note = (i: ItemSummary) => {
+    const score = sorters[filters.sort]?.(i);
+    return score === null || score === undefined ? "" : Math.round(score * 10) / 10 + (filters.sort === "weight" ? " kg" : filters.sort === "density" ? "/kg" : "");
+  };
 
   function remember(key: string, on: boolean) {
     try {
@@ -121,6 +134,12 @@
           <option value={area.id}>{area.name}</option>
         {/each}
       </select>
+      <select class="field" aria-label="Sort" bind:value={filters.sort}>
+        <option value="">Sort: default</option>
+        <option value="value">Sort: value</option>
+        <option value="density">Sort: value per kg</option>
+        <option value="weight">Sort: heaviest</option>
+      </select>
       <label class="toggle">
         <input
           type="checkbox" checked={filters.hideBlueprints}
@@ -136,7 +155,7 @@
     </div>
     <div class="grid">
       {#each tiles as item (item.id)}
-        <ItemTile {item} found={found.has(item.id)} />
+        <ItemTile {item} found={found.has(item.id)} note={note(item)} />
       {/each}
     </div>
     {#if items.length && !tiles.length}
@@ -181,7 +200,7 @@
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 96px);
+    grid-template-columns: repeat(auto-fill, 112px);
     gap: 8px;
   }
   .empty {

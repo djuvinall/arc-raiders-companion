@@ -379,6 +379,97 @@ fn projects_carry_what_the_page_sections_need() {
 }
 
 #[test]
+fn no_blueprint_is_listed_twice() {
+    let ds = real();
+    let blueprints: Vec<_> = ds.files.items.iter().filter(|i| i.category == Category::Blueprint).collect();
+    assert_eq!(blueprints.len(), 91, "the game's Codex count");
+    let mut names: Vec<String> = blueprints.iter().map(|b| b.name.replace("'", "").to_lowercase()).collect();
+    names.sort();
+    names.dedup();
+    assert_eq!(names.len(), blueprints.len());
+    assert!(ds.item("trigger-nade-blueprint").is_some() && ds.item("trigger-nade-blueprint-2").is_none());
+}
+
+#[test]
+fn verdicts_put_goals_before_value() {
+    let ds = real();
+    let mut profile = Profile::default();
+    profile.tracked_item_ids.push("rattler-ii".into());
+    let keep = arc_core::advice::item_verdict(&ds, &profile, "metal-parts").unwrap();
+    assert_eq!(keep.action, "keep");
+    assert!(keep.headline.contains("more needed") && !keep.reasons.is_empty());
+
+    let mut stocked = Profile::default();
+    stocked.stash.insert("metal-parts".into(), 5000);
+    let material = arc_core::advice::item_verdict(&ds, &stocked, "metal-parts").unwrap();
+    assert_eq!(material.action, "keep");
+    assert!(material.headline.contains("recipes"));
+
+    let plain = Profile::default();
+    let sold: Vec<_> = ds.files.items.iter().filter(|i| i.category == Category::Recyclable).take(40)
+        .filter_map(|i| arc_core::advice::item_verdict(&ds, &plain, &i.id).map(|v| (i, v))).collect();
+    assert!(!sold.is_empty());
+    for (item, verdict) in sold {
+        if verdict.action == "sell" {
+            assert!(verdict.recycle_value.unwrap_or(0) <= item.value.unwrap());
+        }
+    }
+    assert!(arc_core::advice::item_verdict(&ds, &plain, "jupiter").is_none());
+}
+
+#[test]
+fn an_owned_level_comes_off_the_upgrade_cost() {
+    let ds = real();
+    let full = arc_core::calc::raw_totals(&arc_core::calc::craft_tree(&ds, "anvil-iv", 1).unwrap());
+    let from = arc_core::calc::raw_totals(&arc_core::calc::craft_tree_from(&ds, "anvil-iv", 1, Some("anvil-iii")).unwrap());
+    assert!(from.values().sum::<u32>() < full.values().sum::<u32>());
+
+    let mut profile = Profile::default();
+    profile.tracked_item_ids.push("anvil-iv".into());
+    let before: u32 = needed_items(&ds, &profile).iter().map(|n| n.qty).sum();
+    profile.tracked_from.insert("anvil-iv".into(), "anvil-iii".into());
+    let after: u32 = needed_items(&ds, &profile).iter().map(|n| n.qty).sum();
+    assert!(after < before);
+}
+
+#[test]
+fn a_tracked_bench_adds_its_next_level() {
+    let ds = real();
+    let bench = ds.files.workbenches.iter().find(|b| b.levels.iter().any(|l| !l.upgrade_inputs.is_empty())).unwrap();
+    let level = bench.levels.iter().find(|l| !l.upgrade_inputs.is_empty()).unwrap();
+    let mut profile = Profile::default();
+    profile.workbenches.insert(bench.id.clone(), level.level - 1);
+    profile.tracked_benches.push(bench.id.clone());
+    let needed = needed_items(&ds, &profile);
+    assert!(needed.iter().any(|n| n.item.id == level.upgrade_inputs[0].item_id));
+    let view = workbench_views(&ds, &profile).into_iter().find(|b| b.id == bench.id).unwrap();
+    assert_eq!(view.next.len(), level.upgrade_inputs.len());
+}
+
+#[test]
+fn completing_a_chain_marks_everything_before() {
+    let ds = real();
+    let (first, middle, last) = chain(&ds);
+    let mut profile = Profile::default();
+    complete_chain(&ds, &mut profile, &last);
+    for id in [&first, &middle, &last] {
+        assert!(profile.quests[id].done);
+    }
+}
+
+#[test]
+fn arcs_have_guide_details_and_quests_have_pins() {
+    let ds = real();
+    let bastion = ds.files.arcs.iter().find(|a| a.id == "bastion").unwrap();
+    assert_eq!(bastion.hp, Some(2050.0));
+    assert_eq!(bastion.weak_points, ["Rear plate", "Leg joints"]);
+    assert!(bastion.tips.is_some());
+    assert!(ds.files.arcs.iter().filter(|a| a.hp.is_some()).count() >= 15);
+    let pins = ds.files.pois.iter().filter(|p| p.quest_id.is_some()).count();
+    assert!(pins > 800, "{pins}");
+}
+
+#[test]
 fn committing_spends_stash_and_advances_stages() {
     let ds = real();
     let project = &ds.files.projects[0];
@@ -402,7 +493,7 @@ fn collections_count_found_entries() {
     let ds = real();
     let mut p = Profile::default();
     let first = collections(&ds, &p).remove(0);
-    assert_eq!((first.title, first.found, first.total), ("Blueprints", 0, 92));
+    assert_eq!((first.title, first.found, first.total), ("Blueprints", 0, 91));
     p.blueprints_found.push(first.entries[0].id.clone());
     assert_eq!(collections(&ds, &p)[0].found, 1);
 }

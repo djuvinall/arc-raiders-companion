@@ -21,6 +21,7 @@
       <span class="bench">{node.workbench_id}{node.workbench_level ? ` ${node.workbench_level}` : ""}</span>
     {/if}
     {#if node.cycle}<span class="bench">cycle, not expanded</span>{/if}
+    {#if node.owned}<span class="bench">owned</span>{/if}
   </div>
   {#if open}
     {#each node.children as child}

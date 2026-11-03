@@ -46,6 +46,7 @@ pub fn run(root: &Path) -> Result<()> {
     let rt = load_or_fetch(root, "raidtheory", &date, || fetch::raidtheory(&quick))?;
     load_or_fetch(root, "steam", &date, || fetch::steam(&polite))?;
     load_or_fetch(root, "wiki_skills", &date, || fetch::wiki_skills(&polite))?;
+    load_or_fetch(root, "wiki_arcs", &date, || fetch::wiki_arcs(&polite, &mf))?;
 
     report(&mf, &wiki, &rt);
     Ok(())

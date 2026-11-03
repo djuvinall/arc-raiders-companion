@@ -9,19 +9,20 @@ mod updates;
 
 use anyhow::{Context, Result};
 use arc_core::events::{self, MapEvents};
-use arc_core::model::{ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTree, WeaponBuild};
+use arc_core::advice::{self, Verdict};
+use arc_core::model::{Arc, ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTree, WeaponBuild};
 use arc_core::patches::{self, PatchNote};
 use arc_core::routing::{self, MapCover, Needed};
 use arc_core::skills::{self, PlanState};
-use arc_core::tracking::{self, Collection, PartyPlan, ProjectView, QuestRow};
-use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Overview};
+use arc_core::tracking::{self, BenchView, Collection, PartyPlan, ProjectView, QuestRow};
+use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Link, Overview};
 use arc_core::weapons::{self, CompareTable, Sheet, SlotOptions};
 use arc_core::Dataset;
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, WebviewUrl, WebviewWindowBuilder};
 
 macro_rules! embedded {
     ($($name:literal),* $(,)?) => {
@@ -76,8 +77,71 @@ fn get_item(state: State<AppState>, id: String) -> CommandResult<ItemDetail> {
 }
 
 #[tauri::command]
-fn craft_plan(state: State<AppState>, id: String, qty: u32) -> CommandResult<CraftPlan> {
-    views::craft_plan(&state.dataset, &id, qty.max(1)).ok_or_else(|| missing("item", &id))
+fn craft_plan(state: State<AppState>, id: String, qty: u32, owned: Option<String>) -> CommandResult<CraftPlan> {
+    views::craft_plan(&state.dataset, &id, qty.max(1), owned.as_deref()).ok_or_else(|| missing("item", &id))
+}
+
+#[tauri::command]
+fn set_tracked_from(state: State<AppState>, id: String, owned: Option<String>) -> CommandResult<()> {
+    with_profile(&state, |p| match owned {
+        Some(from) => { p.tracked_from.insert(id, from); }
+        None => { p.tracked_from.remove(&id); }
+    })
+}
+
+#[tauri::command]
+fn item_verdict(state: State<AppState>, id: String) -> Option<Verdict> {
+    advice::item_verdict(&state.dataset, &state.profile.lock().expect("profile lock"), &id)
+}
+
+#[tauri::command]
+fn arc_list(state: State<AppState>) -> Vec<ArcView> {
+    state.dataset.files.arcs.iter().map(|arc| ArcView {
+        drops: arc.drops.iter().map(|d| views::item_link(&state.dataset, &d.item_id, None)).collect(),
+        arc: arc.clone(),
+    }).collect()
+}
+
+#[tauri::command]
+fn workbench_list(state: State<AppState>) -> Vec<BenchView> {
+    tracking::workbench_views(&state.dataset, &state.profile.lock().expect("profile lock"))
+}
+
+#[tauri::command]
+fn set_workbench_level(state: State<AppState>, id: String, level: u8) -> CommandResult<()> {
+    with_profile(&state, |p| { p.workbenches.insert(id, level); })
+}
+
+#[tauri::command]
+fn toggle_tracked_bench(state: State<AppState>, id: String) -> CommandResult<()> {
+    with_profile(&state, |p| {
+        if p.tracked_benches.contains(&id) {
+            p.tracked_benches.retain(|b| *b != id);
+        } else {
+            p.tracked_benches.push(id);
+        }
+    })
+}
+
+#[tauri::command]
+fn complete_quest_chain(state: State<AppState>, quest_id: String) -> CommandResult<()> {
+    with_profile(&state, |p| tracking::complete_chain(&state.dataset, p, &quest_id))
+}
+
+/// The always-on-top window. `async` because Windows deadlocks creating one on the main thread.
+#[tauri::command(async)]
+fn open_mini(app: AppHandle) -> CommandResult<()> {
+    if let Some(window) = app.get_webview_window("mini") {
+        return window.set_focus().map_err(|e| e.to_string());
+    }
+    WebviewWindowBuilder::new(&app, "mini", WebviewUrl::App("index.html#/mini".into()))
+        .title("ARC Companion")
+        .inner_size(340.0, 600.0)
+        .min_inner_size(280.0, 320.0)
+        .always_on_top(true)
+        .build()
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -149,6 +213,12 @@ fn map_list(state: State<AppState>) -> Vec<GameMap> {
 #[tauri::command]
 fn map_pois(state: State<AppState>, id: String) -> Vec<Poi> {
     state.dataset.files.pois.iter().filter(|p| p.map_id == id).cloned().collect()
+}
+
+#[derive(Serialize)]
+struct ArcView {
+    arc: Arc,
+    drops: Vec<Link>,
 }
 
 #[derive(Serialize)]
@@ -417,10 +487,17 @@ fn decode_skill_plan(code: String) -> CommandResult<SkillPlan> {
 }
 
 fn load_profile(path: &PathBuf) -> Profile {
-    std::fs::read(path)
+    let mut profile: Profile = std::fs::read(path)
         .ok()
         .and_then(|bytes| serde_json::from_slice(&bytes).ok())
-        .unwrap_or_default()
+        .unwrap_or_default();
+    // The Trigger Nade blueprint was once listed twice; keep a mark made on the duplicate.
+    let found = &mut profile.blueprints_found;
+    if found.iter().any(|id| id == "trigger-nade-blueprint-2") {
+        found.retain(|id| id != "trigger-nade-blueprint-2" && id != "trigger-nade-blueprint");
+        found.push("trigger-nade-blueprint".to_string());
+    }
+    profile
 }
 
 fn save_profile(path: &PathBuf, profile: &Profile) -> Result<()> {
@@ -461,6 +538,8 @@ fn main() {
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,
+            set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
+            toggle_tracked_bench, complete_quest_chain, open_mini,
             restart_app, quest_share_code, add_friend, remove_friend, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
             updates::check_app_update, updates::install_app_update
         ])

@@ -12,6 +12,8 @@ export interface ItemSummary {
   icon: string | null;
   loot_areas: string[];
   variant_of: string | null;
+  value: number | null;
+  weight_kg: number | null;
   family: string | null;
   family_name: string | null;
 }
@@ -97,6 +99,7 @@ export interface TreeNode {
   workbench_id: string | null;
   workbench_level: number | null;
   cycle: boolean;
+  owned: boolean;
   children: TreeNode[];
 }
 
@@ -112,6 +115,39 @@ export interface EntityPage {
   name: string;
   subtitle: string;
   sections: { title: string; text: string[]; links: Link[] }[];
+}
+
+export interface Verdict {
+  action: "keep" | "recycle" | "sell";
+  headline: string;
+  reasons: string[];
+  sell_value: number | null;
+  recycle_value: number | null;
+  gives: Link[];
+}
+
+export interface ArcView {
+  arc: {
+    id: string;
+    name: string;
+    hp: number | null;
+    icon: string | null;
+    armor: string | null;
+    attack: string | null;
+    ability: string | null;
+    weak_points: string[];
+    tips: string | null;
+  };
+  drops: Link[];
+}
+
+export interface BenchView {
+  id: string;
+  name: string;
+  level: number;
+  max_level: number;
+  tracked: boolean;
+  next: { item: Link; need: number; in_stash: number }[];
 }
 
 export interface Overview {
@@ -192,6 +228,8 @@ export interface Profile {
   blueprints_found: string[];
   player_name: string | null;
   friends: { name: string; done: string[]; active: string[] }[];
+  workbenches: Record<string, number>;
+  tracked_from: Record<string, string>;
 }
 
 export interface PartyQuest {
@@ -271,6 +309,7 @@ export interface Poi {
   y: number;
   loot_areas: string[];
   zlayers: number | null;
+  quest_id: string | null;
 }
 
 export interface LiveEvent {
@@ -304,7 +343,7 @@ export interface MapCover {
 }
 
 export interface RoutePlan {
-  needed: { item: Link; qty: number; reasons: string[] }[];
+  needed: { item: Link; qty: number; have: number; reasons: string[] }[];
   covers: MapCover[];
 }
 
@@ -383,7 +422,16 @@ export interface ChangelogEntry {
 export const overview = () => invoke<Overview>("overview");
 export const listItems = () => invoke<ItemSummary[]>("list_items");
 export const getItem = (id: string) => invoke<ItemDetail>("get_item", { id });
-export const craftPlan = (id: string, qty: number) => invoke<CraftPlan>("craft_plan", { id, qty });
+export const craftPlan = (id: string, qty: number, owned: string | null) =>
+  invoke<CraftPlan>("craft_plan", { id, qty, owned });
+export const setTrackedFrom = (id: string, owned: string | null) => invoke<void>("set_tracked_from", { id, owned });
+export const itemVerdict = (id: string) => invoke<Verdict | null>("item_verdict", { id });
+export const arcList = () => invoke<ArcView[]>("arc_list");
+export const workbenchList = () => invoke<BenchView[]>("workbench_list");
+export const setWorkbenchLevel = (id: string, level: number) => invoke<void>("set_workbench_level", { id, level });
+export const toggleTrackedBench = (id: string) => invoke<void>("toggle_tracked_bench", { id });
+export const completeQuestChain = (questId: string) => invoke<void>("complete_quest_chain", { questId });
+export const openMini = () => invoke<void>("open_mini");
 export const getEntity = (kind: string, id: string) => invoke<EntityPage>("get_entity", { kind, id });
 export const getProfile = () => invoke<Profile>("get_profile");
 export const setStash = (itemId: string, qty: number) => invoke<void>("set_stash", { itemId, qty });

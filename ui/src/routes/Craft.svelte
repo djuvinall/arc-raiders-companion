@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { craftPlan, getProfile, setStash, type CraftPlan } from "../lib/api";
+  import { craftPlan, getItem, getProfile, ROMAN, setStash, setTrackedFrom, type CraftPlan } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
   import TreeRow from "../lib/components/TreeRow.svelte";
 
@@ -8,12 +8,25 @@
   let plan = $state<CraftPlan | null>(null);
   let stash = $state<Record<string, number>>({});
   let error = $state("");
+  let owned = $state<string | null>(null);
+  let lower = $state<{ id: string; level: number }[]>([]);
 
-  getProfile().then((p) => (stash = p.stash));
+  // svelte-ignore state_referenced_locally
+  getProfile().then((p) => {
+    stash = p.stash;
+    owned = p.tracked_from[id] ?? null;
+  });
+  // svelte-ignore state_referenced_locally
+  getItem(id).then((d) => (lower = d.family?.levels.filter((l) => l.level < (d.item.tier ?? 0)) ?? []));
 
   $effect(() => {
-    craftPlan(id, qty).then((p) => (plan = p), (e) => (error = String(e)));
+    craftPlan(id, qty, owned).then((p) => (plan = p), (e) => (error = String(e)));
   });
+
+  function startFrom(value: string) {
+    owned = value || null;
+    setTrackedFrom(id, owned);
+  }
 
   function have(itemId: string, value: number) {
     const n = Math.max(0, Math.floor(value) || 0);
@@ -33,6 +46,12 @@
     <section class="panel tree">
       <div class="head">
         <h2><a href="#/item/{plan.root.id}">{plan.root.name}</a></h2>
+        {#if lower.length}
+          <select class="field" aria-label="Already own" value={owned ?? ""} onchange={(e) => startFrom(e.currentTarget.value)}>
+            <option value="">Starting from nothing</option>
+            {#each lower as l (l.id)}<option value={l.id}>I own level {ROMAN[l.level]}</option>{/each}
+          </select>
+        {/if}
         <label>
           Quantity
           <input class="field qty" type="number" min="1" max="999" bind:value={qty} />

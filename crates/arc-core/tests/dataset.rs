@@ -215,7 +215,7 @@ fn every_item_and_entity_has_a_page() {
             .chain(detail.found_in.iter().map(|f| &f.area)) {
             assert!(entity(&ds, link.kind, &link.id).is_some(), "{} {}", link.kind, link.id);
         }
-        assert!(craft_plan(&ds, &item.id, 1).is_some());
+        assert!(craft_plan(&ds, &item.id, 1, None).is_some());
     }
     for w in &ds.files.workbenches { assert!(entity(&ds, "workbench", &w.id).is_some()); }
     for q in &ds.files.quests { assert!(entity(&ds, "quest", &q.id).is_some()); }

@@ -2,8 +2,11 @@
   import { commitResource, linkHref, projectList, setProjectTracked, type ProjectView } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
 
+  let { id }: { id?: string } = $props();
   let projects = $state<ProjectView[]>([]);
-  let selectedId = $state<string | null>(null);
+  // Routes remount on a new address, so the first value is the only one.
+  // svelte-ignore state_referenced_locally
+  let selectedId = $state<string | null>(id ?? null);
   let inputId = $state<string | null>(null);
   let amount = $state(1);
   let message = $state("");

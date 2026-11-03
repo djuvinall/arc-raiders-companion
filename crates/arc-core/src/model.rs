@@ -403,6 +403,8 @@ pub struct Poi {
     pub notes: Option<String>,
     /// Bitmask of the floors it's on, as MetaForge reports it.
     pub zlayers: Option<u32>,
+    /// On quest pins: the quest it belongs to.
+    pub quest_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -599,6 +601,11 @@ pub struct Arc {
     pub class: Option<String>,
     pub hp: Option<f64>,
     pub icon: Option<String>,
+    pub armor: Option<String>,
+    pub attack: Option<String>,
+    pub ability: Option<String>,
+    pub weak_points: Vec<String>,
+    pub tips: Option<String>,
     pub armor_zones: Vec<ArmorZone>,
     pub drops: Vec<ArcDrop>,
     pub source_refs: SourceRefs,
@@ -702,6 +709,10 @@ pub struct Profile {
     pub tracked_item_ids: Vec<String>,
     pub player_name: Option<String>,
     pub friends: Vec<Friend>,
+    /// Workbenches whose next level counts toward what's needed.
+    pub tracked_benches: Vec<String>,
+    /// For tracked crafts: the version already owned, so its cost isn't counted.
+    pub tracked_from: BTreeMap<String, String>,
 }
 
 /// A friend's quest progress as of the share code they last sent.
@@ -729,6 +740,8 @@ impl Default for Profile {
             tracked_item_ids: Vec::new(),
             player_name: None,
             friends: Vec::new(),
+            tracked_benches: Vec::new(),
+            tracked_from: BTreeMap::new(),
         }
     }
 }

@@ -53,6 +53,7 @@ fn prune_markers(body: &Value) -> Value {
     let kept: Vec<Value> = body["allData"].as_array().map(Vec::as_slice).unwrap_or(&[]).iter()
         .filter(|m| {
             m["category"] == "locations"
+                || m["category"] == "quests"
                 || m["lootAreas"].as_str().is_some_and(|l| !l.is_empty())
         })
         .map(|m| json!({
@@ -162,6 +163,23 @@ pub fn wiki_skills(client: &Client) -> Result<Value> {
     let url = format!("{WIKI_API}?action=parse&page=Skills&prop=wikitext&format=json");
     let doc = client.get_json(&url)?;
     Ok(json!({ "wikitext": doc["parse"]["wikitext"]["*"] }))
+}
+
+/// ARC pages by ARC id. Some ARCs are titled without the `ARC ` prefix, and not all have one.
+pub fn wiki_arcs(client: &Client, metaforge: &Value) -> Result<Value> {
+    let mut pages = serde_json::Map::new();
+    for arc in metaforge["arcs"]["data"].as_array().or(metaforge["arcs"].as_array()).map(Vec::as_slice).unwrap_or(&[]) {
+        let (Some(id), Some(name)) = (arc["id"].as_str(), arc["name"].as_str()) else { continue };
+        for title in [name, name.trim_start_matches("ARC ")] {
+            let url = format!("{WIKI_API}?action=parse&redirects=1&page={}&prop=wikitext&format=json", title.replace(' ', "_"));
+            let text = client.get_json(&url).ok().and_then(|d| d["parse"]["wikitext"]["*"].as_str().map(str::to_string));
+            if let Some(text) = text.filter(|t| t.contains("Infobox arc")) {
+                pages.insert(id.to_string(), Value::String(text));
+                break;
+            }
+        }
+    }
+    Ok(json!({ "pages": pages }))
 }
 
 pub fn steam(client: &Client) -> Result<Value> {
