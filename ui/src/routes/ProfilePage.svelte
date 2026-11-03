@@ -99,6 +99,7 @@
           {:else}
             <span class="dim small">{bench.level >= bench.max_level ? "Fully upgraded" : "No upgrade cost listed"}</span>
           {/each}
+          {#if bench.requires}<span class="small requires">Requires {bench.requires}</span>{/if}
           {#if bench.next.length}
             <button class="link" onclick={async () => { await toggleTrackedBench(bench.id); await load(); }}>{bench.tracked ? "Stop tracking" : "Track next level"}</button>
           {/if}
@@ -125,6 +126,9 @@
 <style>
   .row:has(.have) {
     grid-template-columns: 32px 1fr auto 64px;
+  }
+  .requires {
+    color: var(--yellow);
   }
   .have {
     width: 64px;

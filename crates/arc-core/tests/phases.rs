@@ -447,6 +447,30 @@ fn a_tracked_bench_adds_its_next_level() {
 }
 
 #[test]
+fn bench_costs_match_the_game() {
+    let ds = real();
+    let cost = |bench: &str, level: u8| -> Vec<(String, u32)> {
+        let bench = ds.files.workbenches.iter().find(|b| b.id == bench).unwrap();
+        let mut rows: Vec<_> = bench.levels.iter().find(|l| l.level == level).unwrap()
+            .upgrade_inputs.iter().map(|q| (q.item_id.clone(), q.qty)).collect();
+        rows.sort();
+        rows
+    };
+    let pairs = |rows: &[(&str, u32)]| rows.iter().map(|(i, q)| (i.to_string(), *q)).collect::<Vec<_>>();
+    assert_eq!(cost("gunsmith", 3), pairs(&[("advanced-mechanical-components", 5), ("rusted-gear", 3), ("sentinel-firing-core", 4)]));
+    assert_eq!(cost("gunsmith", 4), pairs(&[("emperor-modulator", 1), ("magnetic-accelerator", 3), ("radial-press", 3)]));
+    assert_eq!(cost("scrappy", 5), pairs(&[("apricot", 12), ("mushroom", 12), ("very-comfortable-pillow", 3)]));
+
+    let gunsmith = ds.files.workbenches.iter().find(|b| b.id == "gunsmith").unwrap();
+    assert_eq!(gunsmith.max_level, 4);
+    let mut profile = Profile::default();
+    profile.workbenches.insert("gunsmith".into(), 3);
+    let view = workbench_views(&ds, &profile).into_iter().find(|b| b.id == "gunsmith").unwrap();
+    assert_eq!(view.requires.as_deref(), Some("Outpost level 4"));
+    assert_eq!(view.next.len(), 3);
+}
+
+#[test]
 fn completing_a_chain_marks_everything_before() {
     let ds = real();
     let (first, middle, last) = chain(&ds);

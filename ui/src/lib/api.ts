@@ -148,6 +148,7 @@ export interface BenchView {
   max_level: number;
   tracked: boolean;
   next: { item: Link; need: number; in_stash: number }[];
+  requires: string | null;
 }
 
 export interface Overview {

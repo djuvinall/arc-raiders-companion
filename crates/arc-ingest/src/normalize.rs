@@ -806,6 +806,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
         let levels = (1..=max_level).map(|level| WorkbenchLevel {
             level,
             upgrade_inputs: upgrade.and_then(|u| u.get(&level)).cloned().unwrap_or_default(),
+            requires: None,
             unlocks_recipe_ids: recipes.iter()
                 .filter(|r| {
                     (r.workbench_id.as_deref() == Some(id) && r.workbench_level == Some(level))

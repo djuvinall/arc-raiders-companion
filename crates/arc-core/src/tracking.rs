@@ -212,12 +212,14 @@ pub struct BenchView {
     pub tracked: bool,
     /// What the next level costs. Empty at the top level.
     pub next: Vec<StageInput>,
+    pub requires: Option<String>,
 }
 
 pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
     ds.files.workbenches.iter().filter(|b| b.max_level > 0).map(|bench| {
         let level = profile.workbenches.get(&bench.id).copied().unwrap_or(0);
-        let next = bench.levels.iter().find(|l| l.level == level + 1).map_or(Vec::new(), |l| {
+        let upcoming = bench.levels.iter().find(|l| l.level == level + 1);
+        let next = upcoming.map_or(Vec::new(), |l| {
             l.upgrade_inputs.iter().map(|q| StageInput {
                 item: item_link(ds, &q.item_id, Some(q.qty)),
                 need: q.qty,
@@ -232,6 +234,7 @@ pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
             max_level: bench.max_level,
             tracked: profile.tracked_benches.contains(&bench.id),
             next,
+            requires: upcoming.and_then(|l| l.requires.clone()),
         }
     }).collect()
 }

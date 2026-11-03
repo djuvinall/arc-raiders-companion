@@ -268,6 +268,8 @@ pub struct Recipe {
 pub struct WorkbenchLevel {
     pub level: u8,
     pub upgrade_inputs: Vec<ItemQty>,
+    /// What the game demands beyond materials, such as an Outpost level.
+    pub requires: Option<String>,
     pub unlocks_recipe_ids: Vec<String>,
 }
 

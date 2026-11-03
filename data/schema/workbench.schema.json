@@ -51,6 +51,13 @@
             "$ref": "#/$defs/ItemQty"
           }
         },
+        "requires": {
+          "description": "What the game demands beyond materials, such as an Outpost level.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "unlocks_recipe_ids": {
           "type": "array",
           "items": {

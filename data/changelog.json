@@ -19,7 +19,8 @@
       "items: 0 added, 2 removed, 1 changed.",
       "projects: 0 added, 0 removed, 1 changed.",
       "recipes: 1 added, 1 removed, 1 changed.",
-      "workbenches: 0 added, 0 removed, 1 changed."
+      "workbenches: 0 added, 0 removed, 1 changed.",
+      "workbenches: 0 added, 0 removed, 9 changed."
     ],
     "files": [
       {
@@ -1273,6 +1274,22 @@
         "removed": [],
         "changed": [
           "Research Station"
+        ]
+      },
+      {
+        "file": "workbenches.json",
+        "added": [],
+        "removed": [],
+        "changed": [
+          "Explosives Station",
+          "Gear Bench",
+          "Gunsmith",
+          "Medical Lab",
+          "Refiner",
+          "Research Station",
+          "Scrappy",
+          "Utility Station",
+          "Workbench"
         ]
       }
     ]

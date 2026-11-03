@@ -25,6 +25,7 @@ use std::path::{Path, PathBuf};
 const PRECEDENCE: &str = include_str!("../precedence.toml");
 const SKILLS_OVERLAY: &str = include_str!("../skills_overlay.json");
 const MAPS_OVERLAY: &str = include_str!("../maps_overlay.json");
+const BENCHES_OVERLAY: &str = include_str!("../benches_overlay.json");
 const PROJECTS_OVERLAY: &str = include_str!("../projects_overlay.json");
 const STENCILS_OVERLAY: &str = include_str!("../stencils_overlay.json");
 const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
@@ -111,6 +112,50 @@ fn apply_project_status(projects: &mut [m::Project]) -> Result<()> {
     Ok(())
 }
 
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BenchesOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    fixes: Vec<BenchFix>,
+    requires: std::collections::BTreeMap<String, std::collections::BTreeMap<u8, String>>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BenchFix {
+    station: String,
+    item: String,
+    level: u8,
+    qty: u32,
+}
+
+/// Moves each listed item to its true level and quantity, adding the level if it's new.
+fn apply_bench_fixes(benches: &mut [m::Workbench]) -> Result<()> {
+    let overlay: BenchesOverlay = serde_json::from_str(BENCHES_OVERLAY).context("benches_overlay.json")?;
+    for fix in &overlay.fixes {
+        let bench = benches.iter_mut().find(|b| b.id == fix.station).with_context(|| format!("no bench {}", fix.station))?;
+        bench.levels.iter_mut().for_each(|l| l.upgrade_inputs.retain(|q| q.item_id != fix.item));
+        if !bench.levels.iter().any(|l| l.level == fix.level) {
+            bench.levels.push(m::WorkbenchLevel {
+                level: fix.level,
+                upgrade_inputs: Vec::new(),
+                requires: None,
+                unlocks_recipe_ids: Vec::new(),
+            });
+            bench.max_level = bench.max_level.max(fix.level);
+        }
+        let level = bench.levels.iter_mut().find(|l| l.level == fix.level).context("level just added")?;
+        level.upgrade_inputs.push(m::ItemQty { item_id: fix.item.clone(), qty: fix.qty });
+    }
+    for bench in benches {
+        for level in &mut bench.levels {
+            level.requires = overlay.requires.get(&bench.id).and_then(|r| r.get(&level.level)).cloned();
+        }
+    }
+    Ok(())
+}
+
 fn newest_fixture(root: &Path, source: &str) -> Result<(String, Value)> {
     let dir = root.join("tests/fixtures").join(source);
     let newest = fs::read_dir(&dir)
@@ -162,6 +207,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     apply_map_tiles(&mut out.files.maps)?;
     apply_stencils(&mut out.files.items)?;
     apply_project_status(&mut out.files.projects)?;
+    apply_bench_fixes(&mut out.files.workbenches)?;
     let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
     arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
     let (_, steam) = newest_fixture(root, "steam")?;

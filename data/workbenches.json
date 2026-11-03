@@ -16,6 +16,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "gas-grenade-craft",
           "gas-mine-craft",
@@ -40,6 +41,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "fireworks-box-craft",
           "jolt-mine-craft",
@@ -65,6 +67,7 @@
             "qty": 3
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "blaze-grenade-craft",
           "deadline-craft",
@@ -95,6 +98,7 @@
             "qty": 30
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "combat-mk-1-craft",
           "light-shield-craft",
@@ -118,6 +122,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "combat-mk-2-craft",
           "heavy-shield-craft",
@@ -142,6 +147,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "combat-mk-3-aggressive-craft",
           "combat-mk-3-flanking-craft",
@@ -159,7 +165,7 @@
   {
     "id": "gunsmith",
     "name": "Gunsmith",
-    "max_level": 3,
+    "max_level": 4,
     "levels": [
       {
         "level": 1,
@@ -173,6 +179,7 @@
             "qty": 30
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "angled-grip-i-craft",
           "anvil-ii-craft",
@@ -277,6 +284,7 @@
             "qty": 8
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "angled-grip-ii-craft",
           "anvil-i-craft",
@@ -311,20 +319,9 @@
           {
             "item_id": "sentinel-firing-core",
             "qty": 4
-          },
-          {
-            "item_id": "radial-press",
-            "qty": 3
-          },
-          {
-            "item_id": "magnetic-accelerator",
-            "qty": 3
-          },
-          {
-            "item_id": "emperor-modulator",
-            "qty": 1
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "angled-grip-iii-craft",
           "aphelion-rifle-craft",
@@ -352,6 +349,25 @@
           "vertical-grip-iii-craft",
           "vulcano-i-craft"
         ]
+      },
+      {
+        "level": 4,
+        "upgrade_inputs": [
+          {
+            "item_id": "radial-press",
+            "qty": 3
+          },
+          {
+            "item_id": "magnetic-accelerator",
+            "qty": 3
+          },
+          {
+            "item_id": "emperor-modulator",
+            "qty": 1
+          }
+        ],
+        "requires": "Outpost level 4",
+        "unlocks_recipe_ids": []
       }
     ]
   },
@@ -378,6 +394,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "adrenaline-shot-craft",
           "bandage-craft",
@@ -402,6 +419,7 @@
             "qty": 8
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "defibrillator-craft",
           "sterilized-bandage-craft",
@@ -424,6 +442,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "vita-shot-craft",
           "vita-spray-craft"
@@ -448,6 +467,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "crude-explosives-craft",
           "durable-cloth-craft",
@@ -472,6 +492,7 @@
             "qty": 8
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "advanced-electrical-components-craft",
           "advanced-mechanical-components-craft",
@@ -501,6 +522,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "complex-gun-parts-craft",
           "magnetic-accelerator-craft",
@@ -530,6 +552,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "bantam-blueprint-craft",
           "barricade-kit-blueprint-craft",
@@ -563,6 +586,7 @@
             "qty": 5
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "angled-grip-ii-blueprint-craft",
           "anvil-blueprint-craft",
@@ -613,6 +637,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "bettina-blueprint-craft",
           "combat-mk-3-flanking-blueprint-craft",
@@ -644,6 +669,7 @@
             "qty": 1
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": []
       }
     ]
@@ -656,6 +682,7 @@
       {
         "level": 1,
         "upgrade_inputs": [],
+        "requires": null,
         "unlocks_recipe_ids": []
       },
       {
@@ -666,6 +693,7 @@
             "qty": 1
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": []
       },
       {
@@ -680,6 +708,7 @@
             "qty": 3
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": []
       },
       {
@@ -698,6 +727,7 @@
             "qty": 1
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": []
       },
       {
@@ -713,9 +743,10 @@
           },
           {
             "item_id": "very-comfortable-pillow",
-            "qty": 12
+            "qty": 3
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": []
       }
     ]
@@ -737,6 +768,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "advanced-camera-craft",
           "barricade-kit-craft",
@@ -765,6 +797,7 @@
             "qty": 6
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "blue-light-stick-craft",
           "green-light-stick-craft",
@@ -793,6 +826,7 @@
             "qty": 4
           }
         ],
+        "requires": null,
         "unlocks_recipe_ids": [
           "photoelectric-cloak-craft",
           "powered-descender-craft",
@@ -810,6 +844,7 @@
       {
         "level": 1,
         "upgrade_inputs": [],
+        "requires": null,
         "unlocks_recipe_ids": [
           "bandage-craft",
           "basic-camera-craft",
