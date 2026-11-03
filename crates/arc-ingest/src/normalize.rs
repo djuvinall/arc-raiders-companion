@@ -230,6 +230,12 @@ impl Resolver {
         [n.clone(), base.to_string(), format!("{n} i"), format!("{base} rifle")]
             .iter()
             .find_map(|k| self.by_name.get(k).cloned())
+            .or_else(|| {
+                // Sources punctuate differently: "Combat Mk 3 Aggressive" is "Combat Mk. 3 (Aggressive)".
+                let bare = |s: &str| s.chars().filter(|c| c.is_alphanumeric()).collect::<String>();
+                let want = bare(&n);
+                self.by_name.iter().find(|(k, _)| bare(k) == want).map(|(_, id)| id.clone())
+            })
     }
 
     fn name(&mut self, context: &str, name: &str) -> Option<String> {
@@ -1171,9 +1177,11 @@ fn build_quests(mf: &Value, wiki: &Value, res: &mut Resolver) -> Vec<Quest> {
                 merge_qty(&mut rewards, item, qty(r));
             }
         }
-        if rewards.is_empty() {
-            for r in page_rows.iter().filter(|r| text(r, "context") == "reward") {
-                if let Some(item) = res.name(&format!("quest {name} reward"), &text(r, "itemName")) {
+        // MetaForge leaves some rewards out, so add the wiki's where it names a known item.
+        // Cosmetic colours and currencies aren't items here, so those are skipped quietly.
+        for r in page_rows.iter().filter(|r| text(r, "context") == "reward") {
+            if let Some(item) = res.find(&text(r, "itemName")) {
+                if !rewards.iter().any(|q| q.item_id == item) {
                     merge_qty(&mut rewards, item, qty(r));
                 }
             }

@@ -18,7 +18,13 @@ The **release** workflow tests, builds the installer, signs it for the updater, 
 
 ## New item data
 
-Run the **refresh-data** workflow from the Actions tab. It snapshots the sources, rebuilds `data/`, runs the tests and commits. Installed apps pick the data up at their next launch, with no new release. It stops without committing if a source changed in a way the tests reject, or a new stencil has no entry in `crates/arc-ingest/stencils_overlay.json`.
+Run the **refresh-data** workflow from the Actions tab of [arc-raiders-data](https://github.com/djuvinall/arc-raiders-data). It snapshots the sources, rebuilds `data/` there, runs the tests and commits. Installed apps pick the data up at their next launch, with no new release. It stops without committing if a source changed in a way the tests reject, or a new stencil has no entry in `overlays/stencils_overlay.json`.
+
+Before a release, move the submodule to the newest data so the installer embeds it:
+
+```bash
+git submodule update --remote dataset
+```
 
 ## The updater key
 

@@ -8,7 +8,7 @@ use arc_core::Dataset;
 use serde_json::Value;
 use std::path::Path;
 
-const BASE_URL: &str = "https://raw.githubusercontent.com/djuvinall/arc-raiders-companion/main/data";
+const BASE_URL: &str = "https://raw.githubusercontent.com/djuvinall/arc-raiders-data/main/data";
 pub const FILES: &[&str] = &[
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
@@ -68,7 +68,7 @@ mod tests {
     use std::path::PathBuf;
 
     fn data() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data")
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../dataset/data")
     }
 
     fn copy_with_version(version: &str) -> PathBuf {

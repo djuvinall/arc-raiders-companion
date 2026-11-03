@@ -95,7 +95,7 @@
       </select>
       <select class="field" aria-label="Trader" bind:value={trader}>
         <option value="">All traders</option>
-        {#each traders as t}<option value={t}>{t}</option>{/each}
+        {#each traders as t}<option value={t}>{t.replace("-", " ")}</option>{/each}
       </select>
       <select class="field" aria-label="Status" bind:value={status}>
         <option value="">Any status</option>
@@ -126,7 +126,7 @@
           <button class="row" class:active={selectedId === q.quest.id} onclick={() => (selectedId = q.quest.id)}>
             <i style:background={COLORS[q.status]}></i>
             <strong>{q.quest.name}</strong>
-            <span class="dim">{q.quest.trader ?? ""}</span>
+            <span class="dim">{q.quest.trader?.replace("-", " ") ?? ""}</span>
             <span class="dim">{q.done_objectives.length}/{atomics(q).length}</span>
           </button>
         {/each}
@@ -159,7 +159,7 @@
     {#if selected}
       <h2>{selected.quest.name}</h2>
       <p class="dim">
-        {selected.quest.trader ?? "No trader"} · {selected.status}
+        {selected.quest.trader?.replace("-", " ") ?? "No trader"} · {selected.status}
         {#if selected.quest.xp}· {selected.quest.xp.toLocaleString()} XP{/if}
       </p>
       {#if selected.maps.length}<p class="dim small">{selected.maps.map(mapName).join(", ")}</p>{/if}

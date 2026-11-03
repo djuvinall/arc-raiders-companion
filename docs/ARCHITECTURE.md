@@ -1,15 +1,15 @@
 # Architecture
 
 - `crates/arc-core`: schema (`model`), loading and integrity (`dataset`), calculators (`calc`), UI read models (`views`). No Tauri and no network; HollowDeck will wrap this crate.
-- `crates/arc-ingest`: CLI. Fetch to `tests/fixtures`, normalize, merge by `precedence.toml`, diff, write `data/`. Deterministic, no LLM (D6).
-- `crates/arc-tauri`: commands over `arc-core`, `profile.json`, and the `arcicon:` cache protocol. It embeds `data/` into the exe.
+- `crates/arc-ingest`: CLI. Fetch to `dataset/fixtures`, normalize, merge by `dataset/overlays/precedence.toml`, diff, write `dataset/data`. Deterministic, no LLM (D6).
+- `crates/arc-tauri`: commands over `arc-core`, `profile.json`, and the `arcicon:` cache protocol. It embeds `dataset/data` into the exe.
 - `ui`: Svelte 5, TypeScript, plain CSS, hash routes. Plain Vite rather than SvelteKit.
 
 Runtime network calls all live in `arc-tauri`: `icons.rs` serves icons and map tiles from `static.metaforge.app` and skill icons from the wiki; `feeds.rs` fetches the event schedule (15 min TTL) and Steam news (6 h TTL). Every call is cached, stale data beats none, and patch notes also ship as a snapshot in the exe. The webview CSP blocks direct remote calls. `ARC_OFFLINE=1` forces the no-network path.
 
 ## Skill planner rules
 
-`arc-core/src/skills.rs` validates a plan as a final state. Prerequisites are derived from the wires in `skills_overlay.json`. Large nodes are slots shared by options, as in the game: one slot of two options at 10 points, two slots of three options at 30 and 40. Options open from any one prior node, other nodes need all of theirs, and a skill after a large node opens from whichever option was picked. A choice pick's gate counts points in the branch excluding that pick and later picks, so the first end pick counts towards the second's 40. Share codes are `ARC1-` plus base64url of skill ids, so they survive layout changes.
+`arc-core/src/skills.rs` validates a plan as a final state. Prerequisites are derived from the wires in `dataset/overlays/skills_overlay.json`. Large nodes are slots shared by options, as in the game: one slot of two options at 10 points, two slots of three options at 30 and 40. Options open from any one prior node, other nodes need all of theirs, and a skill after a large node opens from whichever option was picked. A choice pick's gate counts points in the branch excluding that pick and later picks, so the first end pick counts towards the second's 40. Share codes are `ARC1-` plus base64url of skill ids, so they survive layout changes.
 
 The budget is `76 + expedition_bonus`, capped at 5 as the plan specifies. The wiki says up to 5 per completed Expedition, which may mean the real total can go higher.
 
@@ -42,6 +42,6 @@ The sources required these; each is commented in `model.rs`.
 | `SkillNode.description`, `details`, nullable `max_rank` | The wiki publishes them; some ranks are blank |
 | `ChoiceGroup.slots`, `SkillTree.wires` | The game draws shared slots and routed lines, not one node per option |
 | `MapImage.tile_size`, `max_native_zoom`, `world_extent`, `tile_extent` | Maps are tile pyramids, not single images |
-| `data/changelog.json` | Phase 6: written by `sync --write`, listing what each ingest changed |
+| `dataset/data/changelog.json` | Phase 6: written by `sync --write`, listing what each ingest changed |
 
 Canonical ids are slugs of the display name, because MetaForge ids carry typos and duplicates (`burltetta-recipe`, `burletta-iiii`). MetaForge ids stay in `source_refs`.

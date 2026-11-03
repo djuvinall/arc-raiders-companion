@@ -35,20 +35,49 @@
         <div>
           <h2>{arc.name}</h2>
           <p class="dim">{arc.hp ? `${arc.hp.toLocaleString()} health` : "Health not listed"}{arc.armor ? ` · ${arc.armor} armor` : ""}</p>
+          {#if selected.threat}<span class="threat {selected.threat.toLowerCase()}">{selected.threat} threat</span>{/if}
         </div>
       </div>
 
-      <h3 class="section-title">Weak points</h3>
-      {#each arc.weak_points as point}<p class="point">{point}</p>{:else}<p class="dim">Not listed.</p>{/each}
+      <div class="facts">
+        <div>
+          <h3 class="section-title">Weak points</h3>
+          {#each arc.weak_points as point}<p class="point">{point}</p>{:else}<p class="dim">Not listed.</p>{/each}
+        </div>
+        {#if arc.attack || arc.ability}
+          <div>
+            <h3 class="section-title">Attacks</h3>
+            {#if arc.attack}<p>{arc.attack}</p>{/if}
+            {#if arc.ability}<p class="dim">{arc.ability}</p>{/if}
+          </div>
+        {/if}
+      </div>
 
-      {#if arc.attack || arc.ability}
-        <h3 class="section-title">Attacks</h3>
-        {#if arc.attack}<p>{arc.attack}</p>{/if}
-        {#if arc.ability}<p>{arc.ability}</p>{/if}
+      {#if selected.strategy.length}
+        <h3 class="section-title">Strategy</h3>
+        <ul class="strategy">
+          {#each selected.strategy as line}<li>{line}</li>{/each}
+        </ul>
       {/if}
       {#if arc.tips}
-        <h3 class="section-title">Tips</h3>
+        <h3 class="section-title">Field notes</h3>
         <p>{arc.tips}</p>
+      {/if}
+      {#if arc.armor === "Heavy" && selected.counters.length}
+        <h3 class="section-title">Guns that punch through</h3>
+        <div class="drops">
+          {#each selected.counters as gun (gun.id)}
+            <a href={linkHref(gun)} title={gun.note ?? gun.name}><Icon url={gun.icon} name={gun.name} size={40} /><span>{gun.name}<small class="dim"> · {gun.note?.replace(" ARC armor penetration", "")}</small></span></a>
+          {/each}
+        </div>
+      {/if}
+      {#if selected.spawns.length}
+        <h3 class="section-title">Where it spawns</h3>
+        <div class="spawns">
+          {#each selected.spawns as spawn (spawn.map_id)}
+            <a href="#/maps/{spawn.map_id}" class="spawn"><strong>{spawn.map_name}</strong><span class="dim small">{spawn.count} mapped</span></a>
+          {/each}
+        </div>
       {/if}
       {#if selected.drops.length}
         <h3 class="section-title">Drops</h3>
@@ -58,7 +87,7 @@
           {/each}
         </div>
       {/if}
-      <p class="dim small">From the ARC Raiders Wiki, CC BY-SA 4.0.</p>
+      <p class="dim small">Stats and field notes from the ARC Raiders Wiki (CC BY-SA 4.0); spawns from MetaForge's community map. The strategy is written from that data.</p>
     </section>
   {/if}
 </div>
@@ -106,6 +135,50 @@
   p {
     margin: 4px 0;
     max-width: 70ch;
+  }
+  .threat {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background: var(--panel-2);
+    font-family: var(--font-head);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .threat.boss,
+  .threat.heavy {
+    background: #8a2a2f;
+    color: #fff;
+  }
+  .threat.medium {
+    background: #8a5a1f;
+    color: #fff;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 6px 24px;
+  }
+  .strategy {
+    margin: 4px 0;
+    padding-left: 20px;
+    max-width: 75ch;
+  }
+  .strategy li {
+    margin: 3px 0;
+  }
+  .spawns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .spawn {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 10px;
+    background: var(--panel-2);
+    border-radius: 4px;
   }
   .point {
     color: var(--yellow);

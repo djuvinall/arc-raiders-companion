@@ -50,7 +50,7 @@
   </ul>
 
   <h3 class="section-title">Licenses</h3>
-  <p>Code: MIT. Dataset in <code>data/</code>: CC BY-SA 4.0. Icons and map tiles are fetched at runtime and cached locally.</p>
+  <p>Code: MIT. Dataset: CC BY-SA 4.0, kept in its own repository, arc-raiders-data. Icons and map tiles are fetched at runtime and cached locally.</p>
 
   <h3 class="section-title">Privacy</h3>
   <p>

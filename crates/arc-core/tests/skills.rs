@@ -192,7 +192,7 @@ fn share_codes_round_trip() {
 }
 
 fn real() -> Dataset {
-    Dataset::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data")).unwrap()
+    Dataset::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../dataset/data")).unwrap()
 }
 
 #[test]

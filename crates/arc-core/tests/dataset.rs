@@ -12,7 +12,7 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 fn data_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../dataset/data")
 }
 
 fn dataset() -> Dataset {
@@ -201,7 +201,7 @@ fn trader_prices_name_their_currency() {
     let ds = dataset();
     let sold = &ds.item("voltage-converter").unwrap().sold_by[0];
     assert_eq!((sold.trader.as_str(), sold.currency.as_deref()), ("celeste", Some("Assorted Seeds")));
-    let coins = ds.files.traders.iter().find(|t| t.id == "tianwen").unwrap();
+    let coins = ds.files.traders.iter().find(|t| t.id == "tian-wen").unwrap();
     assert!(coins.inventory.iter().all(|s| s.currency.as_deref() == Some("Coins")));
 }
 

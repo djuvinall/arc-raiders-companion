@@ -14,7 +14,7 @@ fn root() -> PathBuf {
 }
 
 fn real() -> Dataset {
-    Dataset::load(&root().join("data")).unwrap()
+    Dataset::load(&root().join("dataset/data")).unwrap()
 }
 
 fn mods(ids: &[&str]) -> Vec<String> {
@@ -221,7 +221,7 @@ fn events_split_into_current_and_next() {
 fn the_pinned_schedule_reaches_every_map() {
     let ds = real();
     let raw: serde_json::Value = serde_json::from_slice(
-        &std::fs::read(root().join("tests/fixtures/metaforge/2026-11-02.json")).unwrap(),
+        &std::fs::read(root().join("dataset/fixtures/metaforge/2026-11-02.json")).unwrap(),
     ).unwrap();
     let events = parse_schedule(&serde_json::to_vec(&raw["events"]).unwrap()).unwrap();
     assert_eq!(events.len(), 170);
@@ -243,7 +243,7 @@ fn bbcode_turns_into_blocks_without_markup() {
 
 #[test]
 fn steam_feed_keeps_official_notes_and_finds_the_patch() {
-    let notes = parse_news(&std::fs::read(root().join("tests/fixtures/steam/2026-11-02.json")).unwrap()).unwrap();
+    let notes = parse_news(&std::fs::read(root().join("dataset/fixtures/steam/2026-11-02.json")).unwrap()).unwrap();
     assert!(notes.len() >= 5);
     assert!(notes.iter().all(|n| n.title.is_ascii()), "press items dropped");
     assert_eq!(latest_version(&notes).as_deref(), Some("2.3.0"));
@@ -563,6 +563,21 @@ fn active_quests_imply_everything_before_them() {
     assert!(!implied_done(&ds, &both).contains(&middle));
     complete_implied(&ds, &mut both);
     assert!(!both.quests[&middle].done && both.quests[&first].done);
+}
+
+#[test]
+fn the_bestiary_reads_like_a_guide() {
+    let ds = real();
+    let book = arc_core::bestiary::bestiary(&ds);
+    let bastion = book.iter().find(|e| e.arc.id == "bastion").unwrap();
+    assert_eq!(bastion.threat, Some("Heavy"));
+    assert!(bastion.strategy.iter().any(|l| l.contains("rear plate and leg joints")));
+    assert!(bastion.strategy.iter().any(|l| l.contains("armor penetration")));
+    assert!(bastion.counters.iter().all(|c| c.note.as_deref().is_some_and(|n| n.starts_with("strong") || n.starts_with("very strong"))));
+    assert!(!bastion.spawns.is_empty());
+    let pop = book.iter().find(|e| e.arc.id == "pop").unwrap();
+    assert_eq!(pop.threat, Some("Swarm"));
+    assert!(ds.files.arcs.iter().all(|a| a.ability.as_deref().map_or(true, |x| !x.contains('<'))));
 }
 
 #[test]

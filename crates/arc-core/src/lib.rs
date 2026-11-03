@@ -1,6 +1,7 @@
 //! Pure dataset core: load, index, query, calculators. No Tauri, no IO beyond data/.
 
 pub mod advice;
+pub mod bestiary;
 pub mod calc;
 pub mod dataset;
 pub mod events;

@@ -1,9 +1,0 @@
-{
-  "dataset_version": "2026-11-02",
-  "game_patch": "2.3.0",
-  "ingested_from": {
-    "metaforge": "2026-11-02",
-    "raidtheory": "2a4abebb2486a633070f4e260058bcd5ad4511d6",
-    "wiki": "2026-11-02"
-  }
-}

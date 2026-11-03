@@ -197,7 +197,7 @@
       Stat DPS is damage × the fire rate stat, including level upgrades. It's derived from UI stats, so it compares
       weapons but isn't real damage per second. Percent mods multiply in sequence, which is an
       assumption: the game's stacking rule isn't published. To contribute measured numbers, edit a
-      weapon's <code>measured</code> block in <code>data/items.json</code> and open a pull request.
+      weapon's <code>measured</code> block in <code>data/items.json</code> in the arc-raiders-data repository and open a pull request.
     </p>
     <label class="hp">
       Target HP for time to kill

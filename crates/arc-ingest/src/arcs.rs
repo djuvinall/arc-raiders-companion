@@ -24,7 +24,9 @@ fn tips(wikitext: &str) -> Option<String> {
 pub fn apply(arcs: &mut [Arc], pages: &Value) {
     for arc in arcs {
         let Some(page) = pages[arc.id.as_str()].as_str() else { continue };
-        let plain = |key: &str| field(page, key).map(|v| clean(&v)).filter(|v| v != "None");
+        let plain = |key: &str| field(page, key)
+            .map(|v| v.split("<br>").map(|p| clean(p.trim_end_matches('/'))).filter(|p| !p.is_empty()).collect::<Vec<_>>().join(", "))
+            .filter(|v| !v.is_empty() && v != "None");
         if let Some(image) = field(page, "image") {
             arc.icon = Some(format!("https://arcraiders.wiki/wiki/Special:FilePath/{}", image.replace(' ', "_")));
         }

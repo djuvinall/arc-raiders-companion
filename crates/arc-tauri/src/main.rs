@@ -10,12 +10,12 @@ mod updates;
 use anyhow::{Context, Result};
 use arc_core::events::{self, MapEvents};
 use arc_core::advice::{self, Home, Verdict};
-use arc_core::model::{Arc, ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTree, WeaponBuild};
+use arc_core::model::{ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTree, WeaponBuild};
 use arc_core::patches::{self, PatchNote};
 use arc_core::routing::{self, MapCover, Needed};
 use arc_core::skills::{self, PlanState};
 use arc_core::tracking::{self, BenchView, Collection, PartyPlan, ProjectView, QuestRow};
-use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Link, Overview};
+use arc_core::views::{self, CraftPlan, EntityPage, ItemDetail, ItemSummary, Overview};
 use arc_core::weapons::{self, CompareTable, Sheet, SlotOptions};
 use arc_core::Dataset;
 use serde::Serialize;
@@ -28,7 +28,7 @@ macro_rules! embedded {
     ($($name:literal),* $(,)?) => {
         fn embedded(name: &str) -> Result<String> {
             match name {
-                $($name => Ok(include_str!(concat!("../../../data/", $name)).to_string()),)*
+                $($name => Ok(include_str!(concat!("../../../dataset/data/", $name)).to_string()),)*
                 other => anyhow::bail!("{other} is not embedded"),
             }
         }
@@ -43,7 +43,7 @@ embedded!(
 );
 
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
-const NEWS_SNAPSHOT: &[u8] = include_bytes!("../../../tests/fixtures/steam/2026-11-02.json");
+const NEWS_SNAPSHOT: &[u8] = include_bytes!("../../../dataset/fixtures/steam/2026-11-02.json");
 const NEWS_URL: &str = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=1808500&count=30";
 const EVENTS_URL: &str = "https://metaforge.app/api/arc-raiders/events-schedule";
 const EVENT_REGIONS: &[&str] = &["europe", "north-america", "oceania"];
@@ -109,11 +109,8 @@ fn set_found(state: State<AppState>, add: Vec<String>, remove: Vec<String>) -> C
 }
 
 #[tauri::command]
-fn arc_list(state: State<AppState>) -> Vec<ArcView> {
-    state.dataset.files.arcs.iter().map(|arc| ArcView {
-        drops: arc.drops.iter().map(|d| views::item_link(&state.dataset, &d.item_id, None)).collect(),
-        arc: arc.clone(),
-    }).collect()
+fn arc_list(state: State<AppState>) -> Vec<arc_core::bestiary::BestiaryEntry> {
+    arc_core::bestiary::bestiary(&state.dataset)
 }
 
 #[tauri::command]
@@ -260,12 +257,6 @@ fn marker_counts(state: State<AppState>) -> BTreeMap<String, Vec<u32>> {
 #[tauri::command]
 fn map_pois(state: State<AppState>, id: String) -> Vec<Poi> {
     state.dataset.files.pois.iter().filter(|p| p.map_id == id).cloned().collect()
-}
-
-#[derive(Serialize)]
-struct ArcView {
-    arc: Arc,
-    drops: Vec<Link>,
 }
 
 #[derive(Serialize)]

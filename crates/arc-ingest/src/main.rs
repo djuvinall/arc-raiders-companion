@@ -1,9 +1,9 @@
 //! Data pipeline. No LLM anywhere in this path (D6): fetch, normalize, diff, and
 //! a human commits the result.
 //!
-//!   arc-ingest probe            snapshot sources into tests/fixtures, print coverage
-//!   arc-ingest diff             rebuild from the newest fixtures, compare with data/
-//!   arc-ingest sync [--write]   same diff, and write data/ with --write
+//!   arc-ingest probe            snapshot sources into dataset/fixtures, print coverage
+//!   arc-ingest diff             rebuild from the newest fixtures, compare with dataset/data
+//!   arc-ingest sync [--write]   same diff, and write dataset/data with --write
 
 mod arcs;
 mod fetch;
@@ -22,12 +22,12 @@ use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const PRECEDENCE: &str = include_str!("../precedence.toml");
-const SKILLS_OVERLAY: &str = include_str!("../skills_overlay.json");
-const MAPS_OVERLAY: &str = include_str!("../maps_overlay.json");
-const BENCHES_OVERLAY: &str = include_str!("../benches_overlay.json");
-const PROJECTS_OVERLAY: &str = include_str!("../projects_overlay.json");
-const STENCILS_OVERLAY: &str = include_str!("../stencils_overlay.json");
+const PRECEDENCE: &str = include_str!("../../../dataset/overlays/precedence.toml");
+const SKILLS_OVERLAY: &str = include_str!("../../../dataset/overlays/skills_overlay.json");
+const MAPS_OVERLAY: &str = include_str!("../../../dataset/overlays/maps_overlay.json");
+const BENCHES_OVERLAY: &str = include_str!("../../../dataset/overlays/benches_overlay.json");
+const PROJECTS_OVERLAY: &str = include_str!("../../../dataset/overlays/projects_overlay.json");
+const STENCILS_OVERLAY: &str = include_str!("../../../dataset/overlays/stencils_overlay.json");
 const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
 
 #[derive(serde::Deserialize)]
@@ -245,8 +245,36 @@ fn build_markers(fixture: &Value, arcs: &[m::Arc]) -> Result<m::MapMarkers> {
     Ok(m::MapMarkers { categories, maps: out })
 }
 
+/// Names the sources spell differently from the game, and placeholder duplicates.
+fn tidy(files: &mut arc_core::dataset::DatasetFiles) {
+    for trader in &mut files.traders {
+        if trader.id == "tianwen" {
+            trader.id = "tian-wen".into();
+            trader.name = "Tian Wen".into();
+        }
+    }
+    for quest in &mut files.quests {
+        if quest.trader.as_deref() == Some("tianwen") {
+            quest.trader = Some("tian-wen".into());
+        }
+    }
+    for item in &mut files.items {
+        for s in &mut item.sold_by {
+            if s.trader == "tianwen" {
+                s.trader = "tian-wen".into();
+            }
+        }
+    }
+    // MetaForge lists a few cosmetics twice, once under a placeholder id.
+    let named: std::collections::BTreeSet<String> = files.items.iter()
+        .filter(|i| !i.id.starts_with("game-cosmetic-"))
+        .map(|i| i.name.to_lowercase())
+        .collect();
+    files.items.retain(|i| !(i.id.starts_with("game-cosmetic-") && named.contains(&i.name.to_lowercase())));
+}
+
 fn newest_fixture(root: &Path, source: &str) -> Result<(String, Value)> {
-    let dir = root.join("tests/fixtures").join(source);
+    let dir = root.join("dataset/fixtures").join(source);
     let newest = fs::read_dir(&dir)
         .with_context(|| format!("no fixtures in {}; run probe", dir.display()))?
         .filter_map(|e| e.ok().map(|e| e.path()))
@@ -298,6 +326,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     apply_stencils(&mut out.files.items)?;
     apply_project_status(&mut out.files.projects)?;
     apply_bench_fixes(&mut out.files.workbenches)?;
+    tidy(&mut out.files);
     let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
     arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
     let (_, marker_fixture) = newest_fixture(root, "metaforge_markers")?;
@@ -309,7 +338,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     let coverage = output::coverage(&files, &out.unresolved)?;
     let rendered = output::render(&files, &coverage)?;
 
-    let data = root.join("data");
+    let data = root.join("dataset/data");
     let changes = output::diff(&data, &rendered);
     println!("{changes} difference(s); {} unresolved reference(s)", out.unresolved.len());
     if write {
@@ -333,7 +362,7 @@ fn main() -> Result<()> {
         Some("sync") => rebuild(&root, flag).map(|_| ()),
         Some("diff") => {
             if rebuild(&root, false)? > 0 {
-                bail!("data/ does not match the fixtures");
+                bail!("dataset/data does not match the fixtures");
             }
             Ok(())
         }

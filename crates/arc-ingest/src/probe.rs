@@ -1,4 +1,4 @@
-//! `arc-ingest probe`: snapshot every source into tests/fixtures and report, in
+//! `arc-ingest probe`: snapshot every source into dataset/fixtures and report, in
 //! numbers, how much of the item list each one covers with recipes.
 
 use crate::{fetch, http::Client};
@@ -9,7 +9,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub fn fixture_path(root: &Path, source: &str, date: &str) -> PathBuf {
-    root.join("tests/fixtures").join(source).join(format!("{date}.json"))
+    root.join("dataset/fixtures").join(source).join(format!("{date}.json"))
 }
 
 fn save(root: &Path, source: &str, date: &str, doc: &Value) -> Result<()> {

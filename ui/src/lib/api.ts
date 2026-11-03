@@ -161,6 +161,10 @@ export interface ArcView {
     tips: string | null;
   };
   drops: Link[];
+  threat: "Swarm" | "Light" | "Medium" | "Heavy" | "Boss" | null;
+  strategy: string[];
+  counters: Link[];
+  spawns: { map_id: string; map_name: string; count: number }[];
 }
 
 export interface BenchView {

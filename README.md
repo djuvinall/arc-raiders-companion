@@ -20,7 +20,7 @@ cargo run --release -p arc-tauri
 
 ## Data
 
-`data/*.json` is the dataset; the app only reads it. To refresh it:
+The dataset lives in [arc-raiders-data](https://github.com/djuvinall/arc-raiders-data), checked out here as a submodule at `dataset/`. Clone with `--recurse-submodules`, or run `git submodule update --init` after cloning. The app only reads it. To refresh it:
 
 ```bash
 cargo run -p arc-ingest -- probe
@@ -34,12 +34,12 @@ cargo run -p arc-ingest -- sync
 cargo run -p arc-ingest -- sync --write
 ```
 
-`probe` snapshots the sources into `tests/fixtures`, `sync` shows what would change, and `--write` updates `data/` for review and commit. `cargo test` validates schema and references.
+`probe` snapshots the sources into `dataset/fixtures`, `sync` shows what would change, and `--write` updates `dataset/data` for review and commit there. `cargo test` validates schema and references.
 
-The app downloads newer data from this repository's `main` branch at launch, and uses it after a restart if it validates. The **refresh-data** workflow runs these steps on GitHub.
+The app downloads newer data from the data repository's `main` branch at launch, and uses it after a restart if it validates. The **refresh-data** workflow in that repository runs these steps on GitHub.
 
-See [docs/RELEASING.md](docs/RELEASING.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DESIGN.md](docs/DESIGN.md).
+See [docs/RELEASING.md](docs/RELEASING.md), [DATA_SOURCES.md](https://github.com/djuvinall/arc-raiders-data/blob/main/DATA_SOURCES.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DESIGN.md](docs/DESIGN.md).
 
 ## License
 
-Code: MIT. Data in `data/`: CC BY-SA 4.0. Sources are credited in [data/ATTRIBUTION.md](data/ATTRIBUTION.md).
+Code: MIT. The dataset lives in its own repository, [arc-raiders-data](https://github.com/djuvinall/arc-raiders-data), under CC BY-SA 4.0, with its sources credited in its ATTRIBUTION.md. It is checked out here as a submodule at `dataset/`.
