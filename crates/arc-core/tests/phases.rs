@@ -368,6 +368,17 @@ fn the_party_plan_starts_with_the_older_quest() {
 }
 
 #[test]
+fn projects_carry_what_the_page_sections_need() {
+    let ds = real();
+    let views = project_views(&ds, &Profile::default());
+    let view = |id: &str| views.iter().find(|p| p.id == id).unwrap();
+    assert_eq!(view("souls-offering").ends.as_deref(), Some("2026-11-16"));
+    assert!(view("trophy-display").permanent && view("trophy-display").ends.is_none());
+    assert!(view("expedition").expedition && view("expedition").paused);
+    assert_eq!(views.iter().filter(|p| p.permanent || p.paused).count(), 2);
+}
+
+#[test]
 fn committing_spends_stash_and_advances_stages() {
     let ds = real();
     let project = &ds.files.projects[0];

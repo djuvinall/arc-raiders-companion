@@ -7,10 +7,28 @@
   let inputId = $state<string | null>(null);
   let amount = $state(1);
   let message = $state("");
+  let showPast = $state(false);
+  const now = Date.now();
+  const DAY = 24 * 3600 * 1000;
+
+  // Dates are whole days, so an event runs until its last day is over.
+  const endsAt = (p: ProjectView) => Date.parse(`${p.ends}T23:59:59Z`);
+  const live = (p: ProjectView) => !!p.ends && endsAt(p) >= now;
+  const daysLeft = (p: ProjectView) => Math.ceil((endsAt(p) - now) / DAY);
+  const upcoming = (p: ProjectView) => !!p.starts && Date.parse(p.starts) > now;
+  const closed = (p: ProjectView) => p.paused || (!p.permanent && !live(p)) || upcoming(p);
+
+  const expeditions = $derived(projects.filter((p) => p.expedition));
+  const permanent = $derived(projects.filter((p) => p.permanent));
+  const events = $derived(projects.filter((p) => !p.expedition && !p.permanent && live(p)));
+  const past = $derived(
+    projects.filter((p) => !p.expedition && !p.permanent && !live(p))
+      .sort((a, b) => (b.ends ?? "").localeCompare(a.ends ?? "")),
+  );
 
   const load = async () => {
     projects = await projectList();
-    selectedId ??= projects[0]?.id ?? null;
+    selectedId ??= (projects.find((p) => !p.expedition && !p.permanent && live(p)) ?? projects.find((p) => p.permanent) ?? projects[0])?.id ?? null;
   };
   load();
 
@@ -37,24 +55,51 @@
   }
 </script>
 
+{#snippet card(p: ProjectView)}
+  <button class="card" class:active={p.id === selectedId} onclick={() => { selectedId = p.id; inputId = null; message = ""; }}>
+    <strong>{p.name}</strong>
+    {#if p.paused}
+      <span class="status">Temporarily paused</span>
+    {:else if upcoming(p)}
+      <span class="timer">Starts {p.starts}</span>
+    {:else if live(p)}
+      <span class="timer">{daysLeft(p)} {daysLeft(p) === 1 ? "day" : "days"}</span>
+    {:else if p.ends}
+      <span class="status">Ended {p.ends}</span>
+    {/if}
+    <span class="pips">
+      {#each p.stages as s (s.n)}
+        <span class="pip" class:done={s.n < p.stage} class:now={s.n === p.stage}>{s.n < p.stage ? "✓" : s.n}</span>
+      {/each}
+    </span>
+  </button>
+{/snippet}
+
 <div class="page">
   <aside>
-    {#each projects as p (p.id)}
-      <button class="card" class:active={p.id === selectedId} onclick={() => { selectedId = p.id; inputId = null; message = ""; }}>
-        <strong>{p.name}</strong>
-        {#if p.deadline_days}<span class="timer">{p.deadline_days} days</span>{/if}
-        <span class="pips">
-          {#each p.stages as s (s.n)}
-            <span class="pip" class:done={s.n < p.stage} class:now={s.n === p.stage}>{s.n < p.stage ? "✓" : s.n}</span>
-          {/each}
-        </span>
-      </button>
-    {/each}
+    <h3 class="section-title">Expedition</h3>
+    {#each expeditions as p (p.id)}{@render card(p)}{/each}
+    <h3 class="section-title">Permanent</h3>
+    {#each permanent as p (p.id)}{@render card(p)}{/each}
+    <h3 class="section-title">Events</h3>
+    {#each events as p (p.id)}{@render card(p)}{:else}<p class="dim">No events running right now.</p>{/each}
+    <label class="toggle"><input type="checkbox" bind:checked={showPast} /> Show past projects ({past.length})</label>
+    {#if showPast}
+      <h3 class="section-title">Past</h3>
+      {#each past as p (p.id)}{@render card(p)}{/each}
+    {/if}
   </aside>
 
   {#if project}
     <section class="detail">
       <h2>{project.name}</h2>
+      {#if project.paused}
+        <p class="dim">Temporarily paused in the game. Stages are shown for planning.</p>
+      {:else if upcoming(project)}
+        <p class="dim">This event hasn't started yet.</p>
+      {:else if closed(project)}
+        <p class="dim">No longer running{project.ends ? `: it ended ${project.ends}` : ""}. Stages are shown for reference.</p>
+      {/if}
       {#if !project.stages.length}
         <p class="dim">No source publishes this project's stages yet.</p>
       {:else if finished(project)}
@@ -77,7 +122,7 @@
             </button>
           {/each}
         </div>
-        {#if input}
+        {#if input && !closed(project)}
           <div class="commit">
             <h3>Commit {input.item.name}</h3>
             <p>{input.in_stash} in your stash · <a href={linkHref(input.item)}>item page</a></p>
@@ -146,6 +191,17 @@
   }
   .card.active {
     border-color: var(--cream);
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    color: var(--text-dim);
+  }
+  .status {
+    color: var(--text-dim);
+    font-size: 13px;
   }
   .timer {
     align-self: flex-start;

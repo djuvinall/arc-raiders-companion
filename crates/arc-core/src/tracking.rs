@@ -225,6 +225,10 @@ pub struct ProjectView {
     pub name: String,
     pub expedition: bool,
     pub deadline_days: Option<u32>,
+    pub starts: Option<String>,
+    pub ends: Option<String>,
+    pub permanent: bool,
+    pub paused: bool,
     pub tracked: bool,
     /// Stage in progress; `stages.len() + 1` means complete.
     pub stage: u32,
@@ -240,6 +244,10 @@ pub fn project_views(ds: &Dataset, profile: &Profile) -> Vec<ProjectView> {
             name: project.name.clone(),
             expedition: project.expedition,
             deadline_days: project.deadline_days,
+            starts: project.starts.clone(),
+            ends: project.ends.clone(),
+            permanent: project.permanent,
+            paused: project.paused,
             tracked: progress.is_some(),
             stage,
             stages: project.stages.iter().map(|s| StageView {

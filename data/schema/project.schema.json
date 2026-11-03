@@ -32,6 +32,27 @@
         "expedition": {
           "type": "boolean"
         },
+        "starts": {
+          "description": "Dates as YYYY-MM-DD, null when no source gives one.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ends": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permanent": {
+          "description": "Runs with no end date.",
+          "type": "boolean"
+        },
+        "paused": {
+          "description": "On the in-game page but closed for now.",
+          "type": "boolean"
+        },
         "provenance": {
           "$ref": "#/$defs/Provenance"
         }
@@ -42,6 +63,8 @@
         "name",
         "stages",
         "expedition",
+        "permanent",
+        "paused",
         "provenance"
       ]
     },

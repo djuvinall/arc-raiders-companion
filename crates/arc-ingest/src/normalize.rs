@@ -1226,6 +1226,18 @@ fn build_projects(wiki: &Value, res: &mut Resolver) -> Vec<Project> {
             let end = chrono::NaiveDate::parse_from_str(&text(p, "end"), "%Y-%m-%d").ok()?;
             u32::try_from((end - start).num_days()).ok()
         });
-        Project { expedition: name == "Expedition", deadline_days, stages, id, name, provenance: Provenance::Wiki }
+        let date = |key: &str| meta.get(&id).map(|p| text(p, key)).filter(|d| !d.is_empty());
+        Project {
+            expedition: name == "Expedition",
+            starts: date("start"),
+            ends: date("end"),
+            permanent: false,
+            paused: false,
+            deadline_days,
+            stages,
+            id,
+            name,
+            provenance: Provenance::Wiki,
+        }
     }).collect()
 }

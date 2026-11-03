@@ -162,6 +162,10 @@
     ],
     "deadline_days": 29,
     "expedition": false,
+    "starts": "2026-09-08",
+    "ends": "2026-10-07",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -322,6 +326,10 @@
     ],
     "deadline_days": 28,
     "expedition": false,
+    "starts": "2026-04-28",
+    "ends": "2026-05-26",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -330,6 +338,10 @@
     "stages": [],
     "deadline_days": 24,
     "expedition": false,
+    "starts": "2025-11-13",
+    "ends": "2025-12-07",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -517,6 +529,10 @@
     ],
     "deadline_days": 42,
     "expedition": false,
+    "starts": "2026-06-16",
+    "ends": "2026-07-28",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -742,6 +758,10 @@
     ],
     "deadline_days": null,
     "expedition": true,
+    "starts": null,
+    "ends": null,
+    "permanent": false,
+    "paused": true,
     "provenance": "wiki"
   },
   {
@@ -923,6 +943,10 @@
     ],
     "deadline_days": 28,
     "expedition": false,
+    "starts": "2025-12-16",
+    "ends": "2026-01-13",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -931,6 +955,10 @@
     "stages": [],
     "deadline_days": 42,
     "expedition": false,
+    "starts": "2026-06-16",
+    "ends": "2026-07-28",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1060,6 +1088,10 @@
     ],
     "deadline_days": 27,
     "expedition": false,
+    "starts": "2026-03-31",
+    "ends": "2026-04-27",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1068,6 +1100,10 @@
     "stages": [],
     "deadline_days": 28,
     "expedition": false,
+    "starts": "2026-04-28",
+    "ends": "2026-05-26",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1076,6 +1112,10 @@
     "stages": [],
     "deadline_days": 28,
     "expedition": false,
+    "starts": "2026-04-28",
+    "ends": "2026-05-26",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1143,6 +1183,10 @@
     ],
     "deadline_days": null,
     "expedition": false,
+    "starts": null,
+    "ends": null,
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1320,6 +1364,10 @@
     ],
     "deadline_days": 33,
     "expedition": false,
+    "starts": "2026-08-04",
+    "ends": "2026-09-06",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1328,6 +1376,10 @@
     "stages": [],
     "deadline_days": 19,
     "expedition": false,
+    "starts": "2026-08-18",
+    "ends": "2026-09-06",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1336,6 +1388,10 @@
     "stages": [],
     "deadline_days": 14,
     "expedition": false,
+    "starts": "2026-02-10",
+    "ends": "2026-02-24",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1480,6 +1536,10 @@
     ],
     "deadline_days": 20,
     "expedition": false,
+    "starts": "2026-10-27",
+    "ends": "2026-11-16",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1705,6 +1765,10 @@
     ],
     "deadline_days": null,
     "expedition": false,
+    "starts": "2026-01-27",
+    "ends": null,
+    "permanent": true,
+    "paused": false,
     "provenance": "wiki"
   },
   {
@@ -1922,6 +1986,10 @@
     ],
     "deadline_days": 35,
     "expedition": false,
+    "starts": "2026-02-24",
+    "ends": "2026-03-31",
+    "permanent": false,
+    "paused": false,
     "provenance": "wiki"
   }
 ]

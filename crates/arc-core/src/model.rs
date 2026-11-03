@@ -491,6 +491,13 @@ pub struct Project {
     pub stages: Vec<ProjectStage>,
     pub deadline_days: Option<u32>,
     pub expedition: bool,
+    /// Dates as YYYY-MM-DD, null when no source gives one.
+    pub starts: Option<String>,
+    pub ends: Option<String>,
+    /// Runs with no end date.
+    pub permanent: bool,
+    /// On the in-game page but closed for now.
+    pub paused: bool,
     pub provenance: Provenance,
 }
 

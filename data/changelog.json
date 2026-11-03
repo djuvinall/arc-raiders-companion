@@ -10,7 +10,8 @@
       "maps: 0 added, 0 removed, 7 changed.",
       "pois: 0 added, 0 removed, 200 changed.",
       "items: 0 added, 0 removed, 181 changed.",
-      "skills: 0 added, 0 removed, 5 changed."
+      "skills: 0 added, 0 removed, 5 changed.",
+      "projects: 0 added, 0 removed, 17 changed."
     ],
     "files": [
       {
@@ -715,6 +716,30 @@
           "Right Back At It",
           "Slip And Slide",
           "Swift Start"
+        ]
+      },
+      {
+        "file": "projects.json",
+        "added": [],
+        "removed": [],
+        "changed": [
+          "Ascending The Mountain",
+          "Avian Alarm",
+          "Breaking New Ground",
+          "Converging Paths",
+          "Expedition",
+          "Flickering Flames",
+          "Forgotten Relics",
+          "High-Gain Antenna",
+          "Last Resort",
+          "Miniature Voyages",
+          "Outpost",
+          "Phantom Targets",
+          "Phantom Targets (Event)",
+          "Shared Watch",
+          "Soul's Offering",
+          "Trophy Display",
+          "Weather Monitor System"
         ]
       }
     ]

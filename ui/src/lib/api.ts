@@ -347,6 +347,10 @@ export interface ProjectView {
   name: string;
   expedition: boolean;
   deadline_days: number | null;
+  starts: string | null;
+  ends: string | null;
+  permanent: boolean;
+  paused: boolean;
   tracked: boolean;
   stage: number;
   stages: StageView[];

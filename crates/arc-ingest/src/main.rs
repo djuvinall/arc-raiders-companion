@@ -24,6 +24,7 @@ use std::path::{Path, PathBuf};
 const PRECEDENCE: &str = include_str!("../precedence.toml");
 const SKILLS_OVERLAY: &str = include_str!("../skills_overlay.json");
 const MAPS_OVERLAY: &str = include_str!("../maps_overlay.json");
+const PROJECTS_OVERLAY: &str = include_str!("../projects_overlay.json");
 const STENCILS_OVERLAY: &str = include_str!("../stencils_overlay.json");
 const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
 
@@ -91,6 +92,24 @@ fn apply_stencils(items: &mut [m::Item]) -> Result<()> {
     Ok(())
 }
 
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ProjectsOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    permanent: Vec<String>,
+    paused: Vec<String>,
+}
+
+fn apply_project_status(projects: &mut [m::Project]) -> Result<()> {
+    let overlay: ProjectsOverlay = serde_json::from_str(PROJECTS_OVERLAY).context("projects_overlay.json")?;
+    for project in projects {
+        project.permanent = overlay.permanent.contains(&project.id);
+        project.paused = overlay.paused.contains(&project.id);
+    }
+    Ok(())
+}
+
 fn newest_fixture(root: &Path, source: &str) -> Result<(String, Value)> {
     let dir = root.join("tests/fixtures").join(source);
     let newest = fs::read_dir(&dir)
@@ -141,6 +160,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     let mut out = normalize::normalize(&sources, &prec, &overlay)?;
     apply_map_tiles(&mut out.files.maps)?;
     apply_stencils(&mut out.files.items)?;
+    apply_project_status(&mut out.files.projects)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);
