@@ -523,6 +523,49 @@ fn every_map_has_its_full_marker_set() {
 }
 
 #[test]
+fn a_tracked_raw_item_is_not_counted_twice() {
+    let ds = real();
+    let project = ds.files.projects.iter().find(|p| p.id == "souls-offering").unwrap();
+    let stage = project.stages.iter().find(|s| s.inputs.iter().any(|i| i.item_id == "advanced-arc-powercell")).unwrap();
+    let need = stage.inputs.iter().find(|i| i.item_id == "advanced-arc-powercell").unwrap().qty;
+    let mut profile = Profile::default();
+    let mut committed = std::collections::BTreeMap::new();
+    committed.insert("advanced-arc-powercell".to_string(), 1);
+    profile.projects.insert(project.id.clone(), ProjectProgress { stage: stage.n, committed });
+    profile.tracked_item_ids.push("advanced-arc-powercell".into());
+    let row = needed_items(&ds, &profile).into_iter().find(|n| n.item.id == "advanced-arc-powercell").unwrap();
+    assert_eq!(row.qty, need - 1, "the project's remainder, not one more");
+    assert_eq!(row.reasons.len(), 2);
+
+    // On its own, tracking it still asks for one.
+    let alone = Profile { tracked_item_ids: vec!["advanced-arc-powercell".into()], ..Default::default() };
+    assert_eq!(needed_items(&ds, &alone).into_iter().find(|n| n.item.id == "advanced-arc-powercell").unwrap().qty, 1);
+}
+
+#[test]
+fn active_quests_imply_everything_before_them() {
+    let ds = real();
+    let (first, middle, last) = chain(&ds);
+    let mut profile = Profile::default();
+    profile.quests.insert(last.clone(), QuestProgress::default());
+    let implied = implied_done(&ds, &profile);
+    assert!(implied.contains(&first) && implied.contains(&middle) && !implied.contains(&last));
+    let changed = complete_implied(&ds, &mut profile);
+    assert_eq!(changed, implied.len());
+    assert!(profile.quests[&first].done && profile.quests[&middle].done);
+    assert!(!profile.quests[&last].done, "the active quest stays active");
+    assert!(implied_done(&ds, &profile).is_empty());
+
+    // Two active quests in one chain: the earlier one stays active, not done.
+    let mut both = Profile::default();
+    both.quests.insert(middle.clone(), QuestProgress::default());
+    both.quests.insert(last.clone(), QuestProgress::default());
+    assert!(!implied_done(&ds, &both).contains(&middle));
+    complete_implied(&ds, &mut both);
+    assert!(!both.quests[&middle].done && both.quests[&first].done);
+}
+
+#[test]
 fn completing_a_chain_marks_everything_before() {
     let ds = real();
     let (first, middle, last) = chain(&ds);

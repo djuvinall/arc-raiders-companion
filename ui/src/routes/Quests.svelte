@@ -1,6 +1,6 @@
 <script lang="ts">
   import QuestParty from "../lib/components/QuestParty.svelte";
-  import { completeQuestChain, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
+  import { completeImpliedQuests, completeQuestChain, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
@@ -23,6 +23,17 @@
   const load = async () => (quests = await questList());
   load();
   mapList().then((m) => (maps = m));
+
+  // Quests marked Needed sit before an active one, so the game says they're already done.
+  const implied = $derived(quests.filter((q) => q.status === "needed").length);
+  const active = $derived(quests.filter((q) => q.status === "active").length);
+  let note = $state("");
+
+  async function fillIn() {
+    const changed = await completeImpliedQuests();
+    note = `Marked ${changed} earlier quests done.`;
+    await load();
+  }
 
   const selected = $derived(quests.find((q) => q.quest.id === selectedId) ?? null);
   const traders = $derived([...new Set(quests.map((q) => q.quest.trader).filter(Boolean))].sort() as string[]);
@@ -91,6 +102,20 @@
         {#each Object.keys(COLORS) as s}<option value={s}>{s}</option>{/each}
       </select>
       <span class="dim">{visible.length} of {quests.length}</span>
+    </div>
+
+    <div class="slot">
+    {#if implied}
+      <div class="implied" role="status">
+        <span>
+          Your {active} active {active === 1 ? "quest means" : "quests mean"} {implied} earlier
+          {implied === 1 ? "quest is" : "quests are"} already done, since the game only offers a quest once everything before it is finished.
+        </span>
+        <button class="button primary" onclick={fillIn}>Mark them done</button>
+      </div>
+    {:else if note}
+      <p class="dim small">{note}</p>
+    {/if}
     </div>
 
     {#if view === "friends"}
@@ -205,7 +230,7 @@
   }
   .main {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     gap: 8px;
     min-height: 0;
   }
@@ -262,6 +287,15 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
+  }
+  .implied {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--yellow);
+    border-radius: 6px;
+    font-size: 13px;
   }
   .graph-scroll {
     overflow: auto;

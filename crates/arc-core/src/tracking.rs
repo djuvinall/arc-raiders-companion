@@ -190,6 +190,24 @@ pub fn party_plan(ds: &Dataset, profile: &Profile, friend: &Friend) -> PartyPlan
     PartyPlan { friend: friend.name.clone(), together, you_catch_up, friend_catch_up, maps }
 }
 
+/// Quests before any active one. The game only offers a quest once everything before it
+/// is complete, so these must already be done.
+pub fn implied_done(ds: &Dataset, profile: &Profile) -> Vec<String> {
+    needed_by_tracked(ds, profile).keys()
+        .filter(|id| !profile.quests.contains_key(**id))
+        .map(|id| id.to_string())
+        .collect()
+}
+
+/// Marks every quest the active ones imply. Returns how many changed.
+pub fn complete_implied(ds: &Dataset, profile: &mut Profile) -> usize {
+    let ids = implied_done(ds, profile);
+    for id in &ids {
+        profile.quests.entry(id.clone()).or_default().done = true;
+    }
+    ids.len()
+}
+
 /// Marks a quest and everything before it done, for catching up with where you are.
 pub fn complete_chain(ds: &Dataset, profile: &mut Profile, quest_id: &str) {
     let mut waiting = vec![quest_id.to_string()];

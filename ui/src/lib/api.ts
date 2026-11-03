@@ -469,6 +469,7 @@ export const arcList = () => invoke<ArcView[]>("arc_list");
 export const workbenchList = () => invoke<BenchView[]>("workbench_list");
 export const setWorkbenchLevel = (id: string, level: number) => invoke<void>("set_workbench_level", { id, level });
 export const toggleTrackedBench = (id: string) => invoke<void>("toggle_tracked_bench", { id });
+export const completeImpliedQuests = () => invoke<number>("complete_implied_quests");
 export const completeQuestChain = (questId: string) => invoke<void>("complete_quest_chain", { questId });
 export const openMini = () => invoke<void>("open_mini");
 export const getEntity = (kind: string, id: string) => invoke<EntityPage>("get_entity", { kind, id });
@@ -492,6 +493,7 @@ export const deleteWeaponBuild = (name: string) => invoke<void>("delete_weapon_b
 export const mapList = () => invoke<GameMap[]>("map_list");
 export const mapPois = (id: string) => invoke<Poi[]>("map_pois", { id });
 export const mapMarkers = (id: string) => invoke<MarkerSet>("map_markers", { id });
+export const markerCounts = () => invoke<Record<string, number[]>>("marker_counts");
 export const liveEvents = (region: string) => invoke<EventsView>("live_events", { region });
 export const routePlan = () => invoke<RoutePlan>("route_plan");
 export const toggleTrackedItem = (id: string) => invoke<boolean>("toggle_tracked_item", { id });

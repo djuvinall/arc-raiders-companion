@@ -1,12 +1,17 @@
 <script lang="ts">
   import {
-    iconSrc, liveEvents, mapList, mapMarkers, mapPois, questList, routePlan,
+    getItem, iconSrc, liveEvents, mapList, mapMarkers, mapPois, markerCounts, questList, routePlan,
+    type ItemDetail,
     type EventsView, type GameMap, type MapCover, type MarkerSet, type Poi, type RoutePlan,
   } from "../lib/api";
   import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
   import { GROUPS, iconUrl } from "../lib/mapIcons";
 
-  let { mapId }: { mapId?: string } = $props();
+  /** `find` opens the map to show where one item turns up, apart from the usual filters. */
+  let { mapId, find }: { mapId?: string; find?: string } = $props();
+  let finding = $state<ItemDetail | null>(null);
+  // svelte-ignore state_referenced_locally
+  if (find) getItem(find).then((d) => (finding = d));
 
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
   const REGIONS = ["europe", "north-america", "oceania"];
@@ -73,6 +78,9 @@
     }
   }
 
+  let perMap = $state<Record<string, number[]>>({});
+  markerCounts().then((c) => (perMap = c));
+
   mapList().then((all) => {
     maps = all;
     open(all.find((m) => m.id === mapId) ?? all.find((m) => m.id === saved.map) ?? all[0]);
@@ -92,6 +100,7 @@
 
   async function open(map: GameMap) {
     current = map;
+    set = null;
     floor = Math.min(savedFloors[map.id] ?? 0, Math.max(0, map.image.layers.length - 1));
     selected = null;
     [set, pois] = await Promise.all([mapMarkers(map.id), mapPois(map.id)]);
@@ -111,9 +120,10 @@
     remember(SAVED_KEY, JSON.stringify(state));
   }
 
+  // A finding view is a side trip, so it leaves the saved filters alone.
   $effect(() => {
     void [hidden, showLabels, allQuests, collapsed, current, savedFloors];
-    save();
+    if (!find) save();
   });
 
   const floors = $derived(current?.image.layers ?? []);
@@ -148,8 +158,36 @@
     hidden = new Set(show ? [] : (set?.categories ?? []).map((c) => c.id));
   }
 
+  const findAreas = $derived(finding?.item.loot_areas ?? []);
+  const typeOf = (name: string) => set?.categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
+  const spots = $derived(pois.filter((p) => p.loot_areas.some((a) => findAreas.includes(a))));
+  const areaName = (id: string) => finding?.found_in.find((f) => f.area.id === id)?.area.name ?? id.replace("-", " ");
+
+  // Where the item can be, plus exits for planning the way out.
+  const findPoints = $derived.by((): MapPoint[] => {
+    if (!set || !finding) return [];
+    const out: MapPoint[] = spots.filter((p) => onFloor(p.zlayers)).map((p) => {
+      const type = typeOf(p.name);
+      const areas = p.loot_areas.filter((a) => findAreas.includes(a)).map(areaName);
+      return {
+        key: `f${p.id}`, x: p.x, y: p.y, icon: type?.id ?? "containers", group: "containers",
+        title: `${p.name}: ${areas.join(", ")}`, label: showLabels ? p.name : null,
+      };
+    });
+    set.markers.forEach(([index, x, y, z, label], i) => {
+      const category = set!.categories[index];
+      if (category?.id === "locations/extraction" && onFloor(z)) {
+        out.push({ key: `x${i}`, x, y, icon: category.id, group: "locations", title: label ?? "Extraction", label: showLabels ? label ?? "Extraction" : null });
+      }
+    });
+    return out;
+  });
+  const spotCount = (mapId: string) => finding?.found_in.reduce((sum, f) => sum + (f.maps.find((m) => m.map.id === mapId)?.poi_count ?? 0), 0) ?? 0;
+  const areaCounts = $derived(findAreas.map((a) => ({ name: areaName(a), count: spots.filter((p) => p.loot_areas.includes(a)).length })).filter((a) => a.count));
+
   // Quest pins name their quest; the rest are named by their type.
   const points = $derived.by((): MapPoint[] => {
+    if (find) return findPoints;
     if (!set) return [];
     const query = search.trim().toLowerCase();
     const out: MapPoint[] = [];
@@ -187,6 +225,16 @@
       .filter((c) => c.group === group && c.count > 0),
   })).filter((g) => g.rows.length));
 
+  // Every floor counts here: this compares maps, not what's on screen. Quest objectives are
+  // left out because they depend on which quests are tracked.
+  const tabCount = (id: string) => (perMap[id] ?? []).reduce((sum, count, index) => {
+    const category = set?.categories[index];
+    return category && category.group !== "quests" && !hidden.has(category.id) ? sum + count : sum;
+  }, 0);
+  const filtered = $derived(hidden.size > 0);
+  const hiddenHere = $derived(legend.flatMap((g) => g.rows).filter((r) => isHidden(r.id)).length);
+
+  const whole = $derived(set?.markers.map(([, x, y]) => ({ x, y })) ?? []);
   const cover = $derived(plan?.covers.find((c) => c.map_id === current?.id) ?? null);
   const stopPoi = $derived(selected?.group === "route" ? pois.find((p) => `s${p.id}` === selected?.key) ?? null : null);
   const itemName = (id: string) => plan?.needed.find((n) => n.item.id === id)?.item.name ?? id;
@@ -212,6 +260,8 @@
       {#each maps as map (map.id)}
         <button class:on={current?.id === map.id} onclick={() => open(map)} title={map.name}>
           {map.name.replace("The ", "")}{liveCount(map.id) ? " •" : ""}
+          {#if find && finding}<span class="tally">{spotCount(map.id)}</span>
+          {:else if filtered && set}<span class="tally">{tabCount(map.id).toLocaleString()}</span>{/if}
         </button>
       {/each}
     </div>
@@ -231,6 +281,32 @@
       </div>
     {/if}
 
+    {#if find}
+      <section class="panel finding">
+        {#if finding}
+          <div class="find-head">
+            <img src={iconSrc(finding.item.icon ?? "")} alt="" width="44" height="44" />
+            <div>
+              <span class="dim small">Finding</span>
+              <h3>{finding.item.name}</h3>
+            </div>
+          </div>
+          {#if findAreas.length}
+            <p class="small">Found in {findAreas.map(areaName).join(", ")} areas.</p>
+            <p class="small"><strong>{spots.length}</strong> {spots.length === 1 ? "spot" : "spots"} on {current?.name ?? "this map"}{floors.length ? ` (${findPoints.filter((p) => p.group === "containers").length} on this floor)` : ""}.</p>
+            {#each areaCounts as area (area.name)}<p class="small dim">{area.name}: {area.count}</p>{/each}
+            <p class="small dim">The numbers on the map buttons count spots on each map. Exits are shown for planning the way out.</p>
+          {:else}
+            <p class="small">No source maps this item to a loot area, so there's nowhere to point to.</p>
+          {/if}
+          <label class="small"><input type="checkbox" bind:checked={showLabels} /> Labels</label>
+          <a class="button dark" href="#/maps/{current?.id ?? ""}">Back to my map filters</a>
+          <a class="small" href="#/item/{finding.item.id}">Back to {finding.item.name}</a>
+        {:else}
+          <p class="dim small">Loading…</p>
+        {/if}
+      </section>
+    {:else}
     <input class="field" placeholder="Search places and types" aria-label="Search the map" bind:value={search} />
     <div class="bulk">
       <button class="link" onclick={() => setAll(true)}>Show all</button>
@@ -267,6 +343,7 @@
         </section>
       {/each}
     </div>
+    {/if}
   </aside>
 
   <div class="center">
@@ -277,8 +354,25 @@
         {/each}
       </div>
     {/if}
+    {#if current && set && points.length === 0}
+      <p class="empty">
+        {#if find}
+          {finding?.item.name ?? "This item"} isn't found {floors.length ? "on this floor" : "on this map"}. The numbers on the map buttons show where it is.
+        {:else if search.trim()}
+          Nothing here matches "{search.trim()}".
+        {:else if hiddenHere}
+          None of the types you're showing are on this {floors.length ? "floor" : "map"}.
+          The numbers on the map buttons show where they are.
+        {:else}
+          No markers here.
+        {/if}
+      </p>
+    {/if}
     {#if current}
-      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)} />
+      <TileMap
+        map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)}
+        bounds={whole} ready={!!set && (!find || !!finding)}
+      />
     {/if}
     <span class="dim small">{points.length.toLocaleString()} shown · scroll to zoom, drag to move</span>
   </div>
@@ -357,6 +451,38 @@
     border-color: var(--cream);
     background: var(--cream);
     color: var(--on-cream);
+  }
+  .finding {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  .finding h3 {
+    margin: 0;
+  }
+  .find-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tally {
+    margin-left: 4px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 11px;
+  }
+  .tabs .on .tally {
+    background: rgba(0, 0, 0, 0.12);
+  }
+  .empty {
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--yellow);
+    border-radius: 6px;
+    color: var(--yellow);
+    font-size: 13px;
   }
   .events {
     display: flex;

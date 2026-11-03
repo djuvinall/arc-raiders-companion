@@ -24,6 +24,7 @@
   // Routes remount on a new address, so the first value is the only one.
   // svelte-ignore state_referenced_locally
   let chosen = $state<string | null>(mapId ?? null);
+  let loaded = $state(false);
   let pois = $state<Poi[]>([]);
   let selected = $state<MapPoint | null>(null);
   let floor = $state(0);
@@ -35,9 +36,11 @@
 
   async function pick(id: string) {
     chosen = id;
+    loaded = false;
     floor = 0;
     selected = null;
     pois = await mapPois(id);
+    loaded = true;
   }
 
   const working = $derived(quests.filter((q) => q.status === "active" || (q.status === "needed" && q.open)));
@@ -96,7 +99,7 @@
       </div>
     {/if}
     {#if current}
-      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)} />
+      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)} bounds={pois} ready={loaded} />
     {/if}
     <p class="dim small">Numbers are loot stops, pink pins are quest objectives, yellow pins are exits.</p>
   </div>

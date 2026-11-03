@@ -273,7 +273,7 @@
               {/if}
               {#each found.maps as presence}
                 <p class="indent">
-                  <a href="#/ref/map/{presence.map.id}">{presence.map.name}</a>
+                  <a href="#/maps/{presence.map.id}/find/{item.id}" title="Show where on the map">{presence.map.name}</a>
                   <span class="sub">
                     {presence.poi_count} {presence.poi_count === 1 ? "spot" : "spots"}: {presence.places.slice(0, 5).join(", ")}{presence.places.length > 5 ? "…" : ""}
                   </span>

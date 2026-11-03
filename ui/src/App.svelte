@@ -111,7 +111,7 @@
       {:else if parts[0] === "weapons"}
         <Weapons />
       {:else if parts[0] === "maps"}
-        <Maps mapId={parts[1]} />
+        <Maps mapId={parts[1]} find={parts[2] === "find" ? parts[3] : undefined} />
       {:else if parts[0] === "quests"}
         <Quests id={parts[1]} />
       {:else if parts[0] === "projects"}

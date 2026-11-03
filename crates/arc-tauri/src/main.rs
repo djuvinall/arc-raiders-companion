@@ -137,6 +137,12 @@ fn toggle_tracked_bench(state: State<AppState>, id: String) -> CommandResult<()>
     })
 }
 
+/// Marks done every quest the active ones show must be finished.
+#[tauri::command]
+fn complete_implied_quests(state: State<AppState>) -> CommandResult<usize> {
+    with_profile(&state, |p| tracking::complete_implied(&state.dataset, p))
+}
+
 #[tauri::command]
 fn complete_quest_chain(state: State<AppState>, quest_id: String) -> CommandResult<()> {
     with_profile(&state, |p| tracking::complete_chain(&state.dataset, p, &quest_id))
@@ -234,6 +240,21 @@ struct MarkerView {
 fn map_markers(state: State<AppState>, id: String) -> MarkerView {
     let markers = &state.dataset.files.markers;
     MarkerView { categories: markers.categories.clone(), markers: markers.maps.get(&id).cloned().unwrap_or_default() }
+}
+
+/// How many markers of each type every map has, indexed like `categories`, for comparing maps.
+#[tauri::command]
+fn marker_counts(state: State<AppState>) -> BTreeMap<String, Vec<u32>> {
+    let markers = &state.dataset.files.markers;
+    markers.maps.iter().map(|(map, list)| {
+        let mut counts = vec![0u32; markers.categories.len()];
+        for marker in list {
+            if let Some(count) = counts.get_mut(usize::from(marker.0)) {
+                *count += 1;
+            }
+        }
+        (map.clone(), counts)
+    }).collect()
 }
 
 #[tauri::command]
@@ -560,12 +581,12 @@ fn main() {
             overview, list_items, get_item, craft_plan, get_entity, get_profile, set_stash,
             skill_tree, skill_plan_state, save_skill_plan, delete_skill_plan,
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
-            save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, live_events, route_plan,
+            save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,
             home_view, set_found, set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
-            toggle_tracked_bench, complete_quest_chain, open_mini,
+            toggle_tracked_bench, complete_quest_chain, complete_implied_quests, open_mini,
             restart_app, quest_share_code, add_friend, remove_friend, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
             updates::check_app_update, updates::install_app_update
         ])

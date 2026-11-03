@@ -23,9 +23,13 @@
     url: string | null;
     points: MapPoint[];
     selected: MapPoint | null;
+    /** What to fit the view to: every place on the map, so the frame doesn't move with filters. */
+    bounds?: { x: number; y: number }[];
+    /** False until this map's markers have loaded, so the first fit isn't of nothing. */
+    ready?: boolean;
     onselect: (point: MapPoint | null) => void;
   }
-  let { map, url, points, selected, onselect }: Props = $props();
+  let { map, url, points, selected, onselect, bounds, ready = true }: Props = $props();
 
   // Many markers in view draw as small badges, and only a flood of them as dots.
   const SMALL_LIMIT = 1500;
@@ -59,9 +63,13 @@
   const projected = $derived(points.map((p) => project(p)));
 
   function fit() {
-    if (!projected.length || !width) return;
+    if (!width) return;
+    // With nothing to show, frame the map itself instead of leaving the view where it was.
+    const [ty0, tx0, ty1, tx1] = map.image.tile_extent ?? [0, 0, 256, 256];
+    const corners: [number, number][] = [[tx0, ty0], [tx1, ty1]];
     let [x0, x1, y0, y1] = [Infinity, -Infinity, Infinity, -Infinity];
-    for (const [x, y] of projected) {
+    const framed = bounds?.length ? bounds.map((p) => project(p)) : projected;
+    for (const [x, y] of framed.length ? framed : corners) {
       x0 = Math.min(x0, x);
       x1 = Math.max(x1, x);
       y0 = Math.min(y0, y);
@@ -73,7 +81,7 @@
   }
 
   $effect(() => {
-    if (projected.length && width && fitted !== map.id) {
+    if (ready && width && fitted !== map.id) {
       fitted = map.id;
       fit();
     }

@@ -34,9 +34,16 @@ fn add(wanted: &mut BTreeMap<String, (u32, Vec<String>)>, id: &str, qty: u32, re
 /// minus the stash.
 pub fn needed_items(ds: &Dataset, profile: &Profile) -> Vec<Needed> {
     let mut wanted = BTreeMap::new();
+    // Tracking something that can't be crafted means "find me one", so it only matters
+    // when nothing else already wants it. Adding one more would double count.
+    let mut find_one = Vec::new();
     for id in &profile.tracked_item_ids {
         let owned = profile.tracked_from.get(id).map(String::as_str);
         let Some(tree) = craft_tree_from(ds, id, 1, owned) else { continue };
+        if tree.children.is_empty() {
+            find_one.push(id);
+            continue;
+        }
         for (raw, qty) in raw_totals(&tree) {
             add(&mut wanted, &raw, qty, format!("Tracked: {}", ds.item_name(id)));
         }
@@ -54,6 +61,14 @@ pub fn needed_items(ds: &Dataset, profile: &Profile) -> Vec<Needed> {
         for need in &stage.inputs {
             let done = progress.committed.get(&need.item_id).copied().unwrap_or(0);
             add(&mut wanted, &need.item_id, need.qty.saturating_sub(done), format!("Project: {}", project.name));
+        }
+    }
+    for id in find_one {
+        let reason = format!("Tracked: {}", ds.item_name(id));
+        let row = wanted.entry(id.clone()).or_default();
+        row.0 = row.0.max(1);
+        if !row.1.contains(&reason) {
+            row.1.push(reason);
         }
     }
     for bench in ds.files.workbenches.iter().filter(|b| profile.tracked_benches.contains(&b.id)) {
