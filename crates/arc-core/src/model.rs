@@ -409,6 +409,28 @@ pub struct Poi {
     pub quest_id: Option<String>,
 }
 
+/// Every marker on every map, compact, for drawing. Routing uses `Poi` instead.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MapMarkers {
+    pub categories: Vec<MarkerCategory>,
+    pub maps: BTreeMap<String, Vec<MapMarker>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MarkerCategory {
+    /// `containers/locker`, or `quests` for every quest objective.
+    pub id: String,
+    pub name: String,
+    /// `locations`, `containers`, `arc`, `nature`, `events` or `quests`.
+    pub group: String,
+}
+
+/// `[category index, x, y, floors bitmask, label]`. Quest markers carry the quest id as label.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct MapMarker(pub u16, pub f64, pub f64, pub Option<u32>, pub Option<String>);
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct LootArea {

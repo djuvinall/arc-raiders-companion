@@ -1,19 +1,38 @@
+<script lang="ts" module>
+  export interface MapPoint {
+    key: string;
+    x: number;
+    y: number;
+    /** Marker type, such as `containers/locker`. */
+    icon: string;
+    group: string;
+    title: string;
+    label?: string | null;
+    /** Route stop number, drawn large on top. */
+    number?: number;
+  }
+</script>
+
 <script lang="ts">
-  import { iconSrc, type GameMap, type Poi } from "../api";
+  import { iconSrc, type GameMap } from "../api";
+  import { GROUPS, sprite } from "../mapIcons";
 
   interface Props {
     map: GameMap;
     /** Tile template of the floor on show. */
     url: string | null;
-    pois: Poi[];
-    /** POI ids on the active route, drawn large and numbered. */
-    route: string[];
-    selected: Poi | null;
-    onselect: (poi: Poi | null) => void;
+    points: MapPoint[];
+    selected: MapPoint | null;
+    onselect: (point: MapPoint | null) => void;
   }
-  let { map, url, pois, route, selected, onselect }: Props = $props();
+  let { map, url, points, selected, onselect }: Props = $props();
 
-  const COLORS: Record<string, string> = { cache: "#2ab0c6", extract: "#3fcf6b", landmark: "#9aa0a6", "quest-target": "#e26bff" };
+  // Many markers in view draw as small badges, and only a flood of them as dots.
+  const SMALL_LIMIT = 1500;
+  const DOT_LIMIT = 6000;
+  const LABEL_ZOOM = 1.6;
+  // Past the sharpest tiles the picture only blurs.
+  const OVERZOOM = 1.5;
 
   let box = $state<HTMLDivElement>();
   let canvas = $state<HTMLCanvasElement>();
@@ -23,33 +42,38 @@
   let zoom = $state(2);
   let ox = $state(0);
   let oy = $state(0);
+  let fitZoom = 2;
   let drag: { x: number; y: number; moved: boolean } | null = null;
-  let hover = $state<Poi | null>(null);
+  let hover = $state<MapPoint | null>(null);
   let fitted = "";
+  let frame = 0;
+  // Screen positions from the last draw, for hit testing without reprojecting.
+  let drawn: { point: MapPoint; x: number; y: number; r: number }[] = [];
 
   const project = (p: { x: number; y: number }): [number, number] => {
     const [la0, ln0, la1, ln1] = map.image.world_extent!;
     const [ty0, tx0, ty1, tx1] = map.image.tile_extent!;
     return [tx0 + ((p.x - ln0) / (ln1 - ln0)) * (tx1 - tx0), ty0 + ((p.y - la0) / (la1 - la0)) * (ty1 - ty0)];
   };
-  const screen = (p: Poi): [number, number] => {
-    const [x, y] = project(p);
-    return [x * 2 ** zoom + ox, y * 2 ** zoom + oy];
-  };
+  // Projected once per point list, not on every pan.
+  const projected = $derived(points.map((p) => project(p)));
 
   function fit() {
-    const points = pois.map(project);
-    if (!points.length || !width) return;
-    const xs = points.map((p) => p[0]);
-    const ys = points.map((p) => p[1]);
-    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-    zoom = Math.log2(Math.min(width / (x1 - x0), height / (y1 - y0)) * 0.92);
+    if (!projected.length || !width) return;
+    let [x0, x1, y0, y1] = [Infinity, -Infinity, Infinity, -Infinity];
+    for (const [x, y] of projected) {
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y);
+      y1 = Math.max(y1, y);
+    }
+    zoom = fitZoom = Math.log2(Math.min(width / (x1 - x0 || 1), height / (y1 - y0 || 1)) * 0.92);
     ox = width / 2 - ((x0 + x1) / 2) * 2 ** zoom;
     oy = height / 2 - ((y0 + y1) / 2) * 2 ** zoom;
   }
 
   $effect(() => {
-    if (pois.length && width && fitted !== map.id && pois[0].map_id === map.id) {
+    if (projected.length && width && fitted !== map.id) {
       fitted = map.id;
       fit();
     }
@@ -67,7 +91,7 @@
     for (let y = Math.max(0, y0); y <= Math.min(count - 1, y1); y++) {
       for (let x = Math.max(0, x0); x <= Math.min(count - 1, x1); x++) {
         out.push({
-          key: `${z}/${x}/${y}`,
+          key: `${url}|${z}/${x}/${y}`,
           src: iconSrc(url.replace("{z}", `${z}`).replace("{x}", `${x}`).replace("{y}", `${y}`)),
           left: x * span + ox,
           top: y * span + oy,
@@ -78,67 +102,112 @@
     return out;
   });
 
-  $effect(() => {
+  function draw() {
+    frame = 0;
     const ctx = canvas?.getContext("2d");
     if (!ctx || !canvas) return;
-    const ratio = devicePixelRatio;
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
-    ctx.scale(ratio, ratio);
-    ctx.clearRect(0, 0, width, height);
-    const onRoute = new Map(route.map((id, i) => [id, i + 1]));
-    for (const poi of pois) {
-      if (onRoute.has(poi.id)) continue;
-      const [x, y] = screen(poi);
-      if (x < -8 || y < -8 || x > width + 8 || y > height + 8) continue;
-      ctx.beginPath();
-      ctx.arc(x, y, poi === hover || poi === selected ? 6 : 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = COLORS[poi.kind] ?? "#fff";
-      ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "#0b0b0f";
-      ctx.stroke();
+    const ratio = devicePixelRatio || 1;
+    if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
     }
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    const scale = 2 ** zoom;
+    const plain: { point: MapPoint; x: number; y: number }[] = [];
+    const stops: { point: MapPoint; x: number; y: number }[] = [];
+    for (let i = 0; i < points.length; i++) {
+      const [px, py] = projected[i];
+      const x = px * scale + ox;
+      const y = py * scale + oy;
+      if (x < -20 || y < -20 || x > width + 20 || y > height + 20) continue;
+      (points[i].number === undefined ? plain : stops).push({ point: points[i], x, y });
+    }
+    const dots = plain.length > DOT_LIMIT;
+    const size = plain.length > SMALL_LIMIT ? 12 : zoom - fitZoom < 0.8 ? 16 : zoom - fitZoom < 2 ? 20 : 26;
+    drawn = [];
+    for (const v of plain) {
+      const focus = v.point === hover || v.point === selected;
+      if (dots && !focus) {
+        ctx.fillStyle = GROUPS[v.point.group]?.color ?? "#888";
+        ctx.fillRect(v.x - 2, v.y - 2, 4, 4);
+        drawn.push({ ...v, r: 5 });
+      } else {
+        const s = focus ? size + 8 : size;
+        ctx.drawImage(sprite(v.point.icon, v.point.group, s, ratio), v.x - s / 2, v.y - s / 2, s, s);
+        drawn.push({ ...v, r: s / 2 });
+      }
+    }
+    if (size > 12 && zoom - fitZoom >= LABEL_ZOOM) labels(ctx, plain, size);
     ctx.font = "700 13px Barlow, sans-serif";
     ctx.textAlign = "center";
-    for (const poi of pois) {
-      const n = onRoute.get(poi.id);
-      if (!n) continue;
-      const [x, y] = screen(poi);
+    for (const v of stops) {
       ctx.beginPath();
-      ctx.arc(x, y, 12, 0, Math.PI * 2);
-      ctx.fillStyle = "#f5c400";
+      ctx.arc(v.x, v.y, 13, 0, Math.PI * 2);
+      ctx.fillStyle = GROUPS.route.color;
       ctx.fill();
       ctx.strokeStyle = "#0b0b0f";
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.fillStyle = "#15181f";
-      ctx.fillText(String(n), x, y + 5);
+      ctx.fillText(String(v.point.number), v.x, v.y + 5);
+      drawn.push({ ...v, r: 13 });
     }
+  }
+
+  /** Names beside their markers, skipping any that would overlap one already drawn. */
+  function labels(ctx: CanvasRenderingContext2D, list: { point: MapPoint; x: number; y: number }[], size: number) {
+    ctx.font = "600 12px Barlow, sans-serif";
+    ctx.textAlign = "left";
+    ctx.lineJoin = "round";
+    const placed: [number, number, number, number][] = [];
+    for (const v of list) {
+      const text = v.point.label;
+      if (!text) continue;
+      const w = ctx.measureText(text).width;
+      const [x, y] = [v.x + size / 2 + 3, v.y + 4];
+      if (placed.some(([a, b, c, d]) => x < c && x + w > a && y - 11 < d && y + 3 > b)) continue;
+      placed.push([x, y - 11, x + w, y + 3]);
+      ctx.strokeStyle = "rgba(8, 10, 14, 0.9)";
+      ctx.lineWidth = 3;
+      ctx.strokeText(text, x, y);
+      ctx.fillStyle = "#f2efe6";
+      ctx.fillText(text, x, y);
+    }
+  }
+
+  // Changes queue one draw for the next frame, however many arrive in between.
+  $effect(() => {
+    void [points, projected, zoom, ox, oy, width, height, hover, selected, canvas];
+    if (!frame) frame = requestAnimationFrame(draw);
   });
 
-  function nearest(event: MouseEvent): Poi | null {
+  function nearest(event: MouseEvent): MapPoint | null {
     const rect = box!.getBoundingClientRect();
     const [mx, my] = [event.clientX - rect.left, event.clientY - rect.top];
-    let best: Poi | null = null;
-    let distance = 12;
-    for (const poi of pois) {
-      const [x, y] = screen(poi);
-      const d = Math.hypot(x - mx, y - my);
-      if (d < distance) [best, distance] = [poi, d];
+    let best: MapPoint | null = null;
+    let distance = Infinity;
+    // Last drawn is on top, so search backwards.
+    for (let i = drawn.length - 1; i >= 0; i--) {
+      const d = drawn[i];
+      const gap = Math.hypot(d.x - mx, d.y - my);
+      if (gap <= d.r + 3 && gap < distance) [best, distance] = [d.point, gap];
     }
     return best;
+  }
+
+  function zoomAt(mx: number, my: number, next: number) {
+    next = Math.max(fitZoom - 1.5, Math.min((map.image.max_native_zoom ?? 5) + OVERZOOM, next));
+    const k = 2 ** (next - zoom);
+    ox = mx - (mx - ox) * k;
+    oy = my - (my - oy) * k;
+    zoom = next;
   }
 
   function onwheel(event: WheelEvent) {
     event.preventDefault();
     const rect = box!.getBoundingClientRect();
-    const [mx, my] = [event.clientX - rect.left, event.clientY - rect.top];
-    const next = Math.max(-1, Math.min(7, zoom - event.deltaY * 0.002));
-    const k = 2 ** (next - zoom);
-    ox = mx - (mx - ox) * k;
-    oy = my - (my - oy) * k;
-    zoom = next;
+    zoomAt(event.clientX - rect.left, event.clientY - rect.top, zoom - event.deltaY * 0.002);
   }
 
   function onmove(event: MouseEvent) {
@@ -147,7 +216,8 @@
       oy += event.clientY - drag.y;
       drag = { x: event.clientX, y: event.clientY, moved: true };
     } else {
-      hover = nearest(event);
+      const found = nearest(event);
+      if (found !== hover) hover = found;
     }
   }
 
@@ -155,12 +225,18 @@
     if (drag && !drag.moved) onselect(nearest(event));
     drag = null;
   }
+
+  const hoverAt = $derived.by(() => {
+    if (!hover) return null;
+    const [px, py] = project(hover);
+    return [px * 2 ** zoom + ox, py * 2 ** zoom + oy];
+  });
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="map" bind:this={box} bind:clientWidth={width} bind:clientHeight={height}
-  {onwheel} onmousemove={onmove} onmouseup={onup} onmouseleave={() => (drag = null)}
+  {onwheel} onmousemove={onmove} onmouseup={onup} onmouseleave={() => { drag = null; hover = null; }}
   onmousedown={(e) => (drag = { x: e.clientX, y: e.clientY, moved: false })}
 >
   {#each tiles as tile (tile.key)}
@@ -172,11 +248,14 @@
     />
   {/each}
   <canvas bind:this={canvas} style:width="{width}px" style:height="{height}px"></canvas>
-  {#if hover}
-    {@const [x, y] = screen(hover)}
-    <span class="tip" style:left="{x + 10}px" style:top="{y - 12}px">{hover.name}</span>
+  {#if hover && hoverAt}
+    <span class="tip" style:left="{hoverAt[0] + 16}px" style:top="{hoverAt[1] - 12}px">{hover.title}</span>
   {/if}
-  <button class="reset" onclick={fit} onmousedown={(e) => e.stopPropagation()}>Fit</button>
+  <div class="controls" role="toolbar" tabindex="-1" aria-label="Zoom" onmousedown={(e) => e.stopPropagation()}>
+    <button aria-label="Zoom in" onclick={() => zoomAt(width / 2, height / 2, zoom + 0.75)}>+</button>
+    <button aria-label="Zoom out" onclick={() => zoomAt(width / 2, height / 2, zoom - 0.75)}>−</button>
+    <button class="fit" onclick={fit}>Fit</button>
+  </div>
 </div>
 
 <style>
@@ -210,18 +289,28 @@
     pointer-events: none;
     white-space: nowrap;
   }
-  .reset {
+  .controls {
     position: absolute;
     right: 10px;
     top: 10px;
-    padding: 3px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .controls button {
+    min-width: 32px;
+    height: 30px;
     border: 0;
-    border-radius: 999px;
+    border-radius: 6px;
     background: var(--cream);
     color: var(--on-cream);
     font-family: var(--font-head);
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
+  }
+  .controls .fit {
+    font-size: 12px;
     text-transform: uppercase;
   }
 </style>

@@ -28,6 +28,8 @@ pub fn render(files: &DatasetFiles, coverage: &Value) -> Result<BTreeMap<&'stati
         ("arcs.json", pretty(&files.arcs)?),
         ("traders.json", pretty(&files.traders)?),
         ("loot_areas.json", pretty(&files.loot_areas)?),
+        // One line: about 43,000 markers, so indenting would triple the file.
+        ("map_markers.json", serde_json::to_string(&files.markers)? + "\n"),
         ("version.json", pretty(&files.version)?),
         ("coverage.json", pretty(coverage)?),
     ]))

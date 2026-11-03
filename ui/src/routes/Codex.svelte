@@ -1,5 +1,6 @@
 <script lang="ts">
   import { collectionList, toggleFound, type Collection } from "../lib/api";
+  import CodexImport from "../lib/components/CodexImport.svelte";
   import Icon from "../lib/components/Icon.svelte";
 
   let collections = $state<Collection[]>([]);
@@ -7,7 +8,8 @@
   let hideFound = $state(false);
   let search = $state("");
 
-  collectionList().then((c) => (collections = c));
+  const load = () => collectionList().then((c) => (collections = c));
+  load();
 
   const active = $derived(collections.find((c) => c.id === activeId));
   const entries = $derived(
@@ -34,6 +36,10 @@
       </button>
     {/each}
   </div>
+
+  {#if activeId === "blueprints" && active}
+    <CodexImport collection={active} onchange={load} />
+  {/if}
 
   <div class="filters">
     <input class="field" placeholder="Search" bind:value={search} />

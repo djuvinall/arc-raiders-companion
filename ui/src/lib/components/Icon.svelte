@@ -11,6 +11,7 @@
 
 {#if url && !failed}
   <img
+    crossorigin="anonymous"
     src={iconSrc(url)}
     alt=""
     width={size}

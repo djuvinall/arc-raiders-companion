@@ -471,6 +471,58 @@ fn bench_costs_match_the_game() {
 }
 
 #[test]
+fn outpost_levels_unlock_their_benches() {
+    let ds = real();
+    let outpost = ds.files.workbenches.iter().find(|b| b.id == "outpost").unwrap();
+    assert_eq!(outpost.max_level, 4);
+    assert!(outpost.levels.iter().find(|l| l.level == 4).unwrap().upgrade_inputs.iter().any(|q| q.item_id == "sheet-metal" && q.qty == 40));
+
+    let mut profile = Profile::default();
+    profile.workbenches.insert("gunsmith".into(), 3);
+    let gunsmith = |p: &Profile| workbench_views(&ds, p).into_iter().find(|b| b.id == "gunsmith").unwrap();
+    assert!(gunsmith(&profile).requires.is_some());
+    assert!(!arc_core::advice::goals(&ds, &profile).iter().any(|g| g.id == "gunsmith"), "blocked by the Outpost");
+    profile.workbenches.insert("outpost".into(), 4);
+    assert!(gunsmith(&profile).requires.is_none());
+    assert!(arc_core::advice::goals(&ds, &profile).iter().any(|g| g.id == "gunsmith"));
+}
+
+#[test]
+fn home_sorts_goals_by_how_close_they_are() {
+    let ds = real();
+    let mut profile = Profile::default();
+    profile.workbenches.insert("gunsmith".into(), 0);
+    profile.stash.insert("metal-parts".into(), 20);
+    profile.stash.insert("rubber-parts".into(), 30);
+    let home = arc_core::advice::home(&ds, &profile);
+    assert!(home.ready.iter().any(|g| g.kind == "bench" && g.id == "gunsmith"));
+    assert_eq!(home.blueprints_total, 91);
+
+    profile.stash.insert("rubber-parts".into(), 20);
+    let home = arc_core::advice::home(&ds, &profile);
+    let close = home.almost.iter().find(|g| g.id == "gunsmith").unwrap();
+    assert_eq!((close.have, close.need), (40, 50));
+    assert_eq!(close.missing[0].qty, Some(10));
+}
+
+#[test]
+fn every_map_has_its_full_marker_set() {
+    let ds = real();
+    let markers = &ds.files.markers;
+    assert_eq!(markers.maps.len(), 7);
+    assert!(markers.maps.values().all(|m| m.len() > 2000));
+    let total: usize = markers.maps.values().map(Vec::len).sum();
+    assert!(total > 40_000, "{total}");
+    let ids: Vec<&str> = markers.categories.iter().map(|c| c.id.as_str()).collect();
+    for id in ["locations/extraction", "containers/locker", "arc/bastion", "nature/mushroom", "quests"] {
+        assert!(ids.contains(&id), "{id}");
+    }
+    let quests = ids.iter().position(|i| *i == "quests").unwrap() as u16;
+    let pin = markers.maps["dam"].iter().find(|m| m.0 == quests).unwrap();
+    assert!(ds.files.quests.iter().any(|q| Some(&q.id) == pin.4.as_ref()));
+}
+
+#[test]
 fn completing_a_chain_marks_everything_before() {
     let ds = real();
     let (first, middle, last) = chain(&ds);

@@ -28,6 +28,7 @@ pub struct DatasetFiles {
     pub arcs: Vec<Arc>,
     pub traders: Vec<Trader>,
     pub loot_areas: Vec<LootArea>,
+    pub markers: MapMarkers,
     pub version: DatasetVersion,
 }
 
@@ -78,6 +79,7 @@ impl Dataset {
             arcs: parse(read, "arcs.json")?,
             traders: parse(read, "traders.json")?,
             loot_areas: parse(read, "loot_areas.json")?,
+            markers: parse(read, "map_markers.json")?,
             version: parse(read, "version.json")?,
         };
         Self::from_files(files)

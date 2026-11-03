@@ -203,6 +203,12 @@ pub fn complete_chain(ds: &Dataset, profile: &mut Profile, quest_id: &str) {
     }
 }
 
+/// A requirement reads "Outpost level 4"; it's met once the tracked level reaches that.
+pub(crate) fn requirement_met(profile: &Profile, requirement: &str) -> bool {
+    let needed: u8 = requirement.rsplit(' ').next().and_then(|n| n.parse().ok()).unwrap_or(u8::MAX);
+    profile.workbenches.get("outpost").copied().unwrap_or(0) >= needed
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct BenchView {
     pub id: String,
@@ -234,7 +240,7 @@ pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
             max_level: bench.max_level,
             tracked: profile.tracked_benches.contains(&bench.id),
             next,
-            requires: upcoming.and_then(|l| l.requires.clone()),
+            requires: upcoming.and_then(|l| l.requires.clone()).filter(|r| !requirement_met(profile, r)),
         }
     }).collect()
 }

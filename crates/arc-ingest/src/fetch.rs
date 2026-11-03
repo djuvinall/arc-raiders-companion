@@ -182,6 +182,24 @@ pub fn wiki_arcs(client: &Client, metaforge: &Value) -> Result<Value> {
     Ok(json!({ "pages": pages }))
 }
 
+/// Every marker, compact: `[category, subcategory, x, y, floors, name]`, for the map legend.
+pub fn metaforge_markers(client: &Client) -> Result<Value> {
+    let round = |v: &Value| v.as_f64().map(|n| (n * 10.0).round() / 10.0);
+    let mut maps = Map::new();
+    for map in MAP_IDS {
+        let url = format!("{MAP_DATA}?mapID={map}&tableID=arc_map_data");
+        let body = client.get_json(&url)?;
+        let rows: Vec<Value> = body["allData"].as_array().map(Vec::as_slice).unwrap_or(&[]).iter()
+            .filter_map(|m| Some(json!([
+                m["category"], m["subcategory"].as_str().unwrap_or("").trim(),
+                round(&m["lng"])?, round(&m["lat"])?, m["zlayers"], m["instanceName"],
+            ])))
+            .collect();
+        maps.insert((*map).to_string(), Value::Array(rows));
+    }
+    Ok(json!({ "maps": maps }))
+}
+
 pub fn steam(client: &Client) -> Result<Value> {
     client.get_json(STEAM_NEWS)
 }

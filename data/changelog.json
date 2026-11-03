@@ -20,7 +20,8 @@
       "projects: 0 added, 0 removed, 1 changed.",
       "recipes: 1 added, 1 removed, 1 changed.",
       "workbenches: 0 added, 0 removed, 1 changed.",
-      "workbenches: 0 added, 0 removed, 9 changed."
+      "workbenches: 0 added, 0 removed, 9 changed.",
+      "workbenches: 1 added, 0 removed, 1 changed."
     ],
     "files": [
       {
@@ -1290,6 +1291,16 @@
           "Scrappy",
           "Utility Station",
           "Workbench"
+        ]
+      },
+      {
+        "file": "workbenches.json",
+        "added": [
+          "Outpost"
+        ],
+        "removed": [],
+        "changed": [
+          "Research Station"
         ]
       }
     ]

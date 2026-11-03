@@ -552,7 +552,7 @@
             "qty": 5
           }
         ],
-        "requires": null,
+        "requires": "Outpost level 1",
         "unlocks_recipe_ids": [
           "bantam-blueprint-craft",
           "barricade-kit-blueprint-craft",
@@ -586,7 +586,7 @@
             "qty": 5
           }
         ],
-        "requires": null,
+        "requires": "Outpost level 2",
         "unlocks_recipe_ids": [
           "angled-grip-ii-blueprint-craft",
           "anvil-blueprint-craft",
@@ -637,7 +637,7 @@
             "qty": 6
           }
         ],
-        "requires": null,
+        "requires": "Outpost level 3",
         "unlocks_recipe_ids": [
           "bettina-blueprint-craft",
           "combat-mk-3-flanking-blueprint-craft",
@@ -669,7 +669,7 @@
             "qty": 1
           }
         ],
-        "requires": null,
+        "requires": "Outpost level 4",
         "unlocks_recipe_ids": []
       }
     ]
@@ -862,6 +862,76 @@
           "shotgun-ammo-craft",
           "smoke-grenade-trap-craft"
         ]
+      }
+    ]
+  },
+  {
+    "id": "outpost",
+    "name": "Outpost",
+    "max_level": 4,
+    "levels": [
+      {
+        "level": 1,
+        "upgrade_inputs": [],
+        "requires": null,
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 2,
+        "upgrade_inputs": [
+          {
+            "item_id": "steel-cable",
+            "qty": 3
+          },
+          {
+            "item_id": "sheet-metal",
+            "qty": 20
+          },
+          {
+            "item_id": "cable-stripper",
+            "qty": 3
+          }
+        ],
+        "requires": null,
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 3,
+        "upgrade_inputs": [
+          {
+            "item_id": "epoxy-bucket",
+            "qty": 3
+          },
+          {
+            "item_id": "planks",
+            "qty": 35
+          },
+          {
+            "item_id": "hand-drill",
+            "qty": 3
+          }
+        ],
+        "requires": null,
+        "unlocks_recipe_ids": []
+      },
+      {
+        "level": 4,
+        "upgrade_inputs": [
+          {
+            "item_id": "sheet-metal",
+            "qty": 40
+          },
+          {
+            "item_id": "laser-level",
+            "qty": 3
+          },
+          {
+            "item_id": "insulation-roll",
+            "qty": 3
+          }
+        ],
+        "requires": null,
+        "unlocks_recipe_ids": []
       }
     ]
   }

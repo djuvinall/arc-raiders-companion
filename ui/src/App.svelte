@@ -10,6 +10,7 @@
   import Craft from "./routes/Craft.svelte";
   import EntityRef from "./routes/EntityRef.svelte";
   import Arcs from "./routes/Arcs.svelte";
+  import Home from "./routes/Home.svelte";
   import ItemPage from "./routes/ItemPage.svelte";
   import Mini from "./routes/Mini.svelte";
   import Raid from "./routes/Raid.svelte";
@@ -22,8 +23,8 @@
   import Skills from "./routes/Skills.svelte";
   import Weapons from "./routes/Weapons.svelte";
 
-  const TABS = ["raid", "arcs", "skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"];
-  const current = () => (location.hash.replace(/^#\/?/, "") || "items").split("/");
+  const TABS = ["home", "raid", "arcs", "skills", "weapons", "maps", "quests", "projects", "codex", "patches", "profile", "about"];
+  const current = () => (location.hash.replace(/^#\/?/, "") || "home").split("/");
 
   let parts = $state(current());
   let info = $state<Overview | null>(null);
@@ -39,7 +40,7 @@
   }
 
   function onKey(event: KeyboardEvent) {
-    if (event.key === "Escape" && parts[0] !== "items") {
+    if (event.key === "Escape" && parts[0] !== "home") {
       history.back();
     }
   }
@@ -52,6 +53,8 @@
         return { title: "Database", subtitle: "Crafting" };
       case "ref":
         return { title: "Database", subtitle: parts[1].replace("-", " ") };
+      case "home":
+        return { title: "Home", subtitle: "Where you stand" };
       case "raid":
         return { title: "Raid plan", subtitle: "Next run" };
       case "arcs":
@@ -87,7 +90,7 @@
 {:else}
 <QuickSearch />
 <div class="shell">
-  <TopBar {...titles} canGoBack={parts[0] !== "items"} active={TABS.includes(parts[0]) ? parts[0] : "items"} />
+  <TopBar {...titles} canGoBack={parts[0] !== "home"} active={TABS.includes(parts[0]) ? parts[0] : "items"} />
   <div><UpdateBanner /></div>
   <main bind:this={main}>
     {#key parts.join("/")}
@@ -97,6 +100,8 @@
         <Craft id={parts[1]} />
       {:else if parts[0] === "ref"}
         <EntityRef kind={parts[1]} id={parts[2]} />
+      {:else if parts[0] === "home"}
+        <Home {info} />
       {:else if parts[0] === "raid"}
         <Raid mapId={parts[1]} />
       {:else if parts[0] === "arcs"}

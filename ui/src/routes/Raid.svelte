@@ -3,7 +3,7 @@
     liveEvents, linkHref, mapList, mapPois, questList, routePlan,
     type EventsView, type GameMap, type Poi, type QuestRow, type RoutePlan,
   } from "../lib/api";
-  import TileMap from "../lib/components/TileMap.svelte";
+  import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
 
   let { mapId }: { mapId?: string } = $props();
 
@@ -25,7 +25,7 @@
   // svelte-ignore state_referenced_locally
   let chosen = $state<string | null>(mapId ?? null);
   let pois = $state<Poi[]>([]);
-  let selected = $state<Poi | null>(null);
+  let selected = $state<MapPoint | null>(null);
   let floor = $state(0);
 
   Promise.all([mapList(), routePlan(), questList(), liveEvents(region)]).then(([m, p, q, e]) => {
@@ -61,8 +61,16 @@
   const floors = $derived(current?.image.layers ?? []);
   const onFloor = (p: Poi) => !floors.length || p.zlayers === null || (p.zlayers & floors[floor].mask) !== 0;
   const hereIds = $derived(new Set(here.map((q) => q.quest.id)));
-  const shown = $derived(pois.filter((p) =>
-    route.includes(p.id) || (onFloor(p) && (p.kind === "extract" || (!!p.quest_id && hereIds.has(p.quest_id))))));
+  const points = $derived.by((): MapPoint[] => {
+    const out: MapPoint[] = pois.filter((p) => onFloor(p) && (p.kind === "extract" || (!!p.quest_id && hereIds.has(p.quest_id))))
+      .map((p) => p.quest_id
+        ? { key: p.id, x: p.x, y: p.y, icon: "quests", group: "quests", title: `Quest: ${quests.find((q) => q.quest.id === p.quest_id)?.quest.name ?? p.name}` }
+        : { key: p.id, x: p.x, y: p.y, icon: "locations/extraction", group: "locations", title: p.name, label: p.name });
+    cover?.pois.forEach((stop, i) => out.push({
+      key: `s${stop.id}`, x: stop.x, y: stop.y, icon: "route", group: "route", number: i + 1, title: `Stop ${i + 1}: ${stop.name}`,
+    }));
+    return out;
+  });
   const itemName = (id: string) => plan?.needed.find((n) => n.item.id === id)?.item.name ?? id;
 </script>
 
@@ -88,13 +96,13 @@
       </div>
     {/if}
     {#if current}
-      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} pois={shown} {route} {selected} onselect={(p) => (selected = p)} />
+      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)} />
     {/if}
-    <p class="dim small">Yellow numbers are loot stops, pink is quest pins, green is extracts.</p>
+    <p class="dim small">Numbers are loot stops, pink pins are quest objectives, yellow pins are exits.</p>
   </div>
 
   <aside class="panel side">
-    {#if selected}<p class="small"><strong>{selected.name}</strong></p>{/if}
+    {#if selected}<p class="small"><strong>{selected.title}</strong></p>{/if}
     <h3 class="section-title">Quests here</h3>
     {#each here as q (q.quest.id)}
       <a href="#/quests/{q.quest.id}"><strong>{q.quest.name}</strong></a>

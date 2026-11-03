@@ -126,6 +126,28 @@ export interface Verdict {
   gives: Link[];
 }
 
+export interface Goal {
+  kind: "craft" | "quest" | "project" | "bench";
+  id: string;
+  name: string;
+  have: number;
+  need: number;
+  missing: Link[];
+}
+
+export interface Home {
+  ready: Goal[];
+  almost: Goal[];
+  quests_active: number;
+  quests_done: number;
+  quests_total: number;
+  items_needed: number;
+  blueprints_found: number;
+  blueprints_total: number;
+  bench_levels: number;
+  bench_levels_total: number;
+}
+
 export interface ArcView {
   arc: {
     id: string;
@@ -301,6 +323,20 @@ export interface GameMap {
   };
 }
 
+export interface MarkerCategory {
+  id: string;
+  name: string;
+  group: "locations" | "quests" | "containers" | "arc" | "events" | "nature";
+}
+
+/** [category index, x, y, floors bitmask, label]. */
+export type MapMarker = [number, number, number, number | null, string | null];
+
+export interface MarkerSet {
+  categories: MarkerCategory[];
+  markers: MapMarker[];
+}
+
 export interface Poi {
   id: string;
   map_id: string;
@@ -427,6 +463,8 @@ export const craftPlan = (id: string, qty: number, owned: string | null) =>
   invoke<CraftPlan>("craft_plan", { id, qty, owned });
 export const setTrackedFrom = (id: string, owned: string | null) => invoke<void>("set_tracked_from", { id, owned });
 export const itemVerdict = (id: string) => invoke<Verdict | null>("item_verdict", { id });
+export const homeView = () => invoke<Home>("home_view");
+export const setFound = (add: string[], remove: string[]) => invoke<void>("set_found", { add, remove });
 export const arcList = () => invoke<ArcView[]>("arc_list");
 export const workbenchList = () => invoke<BenchView[]>("workbench_list");
 export const setWorkbenchLevel = (id: string, level: number) => invoke<void>("set_workbench_level", { id, level });
@@ -453,6 +491,7 @@ export const deleteWeaponBuild = (name: string) => invoke<void>("delete_weapon_b
 
 export const mapList = () => invoke<GameMap[]>("map_list");
 export const mapPois = (id: string) => invoke<Poi[]>("map_pois", { id });
+export const mapMarkers = (id: string) => invoke<MarkerSet>("map_markers", { id });
 export const liveEvents = (region: string) => invoke<EventsView>("live_events", { region });
 export const routePlan = () => invoke<RoutePlan>("route_plan");
 export const toggleTrackedItem = (id: string) => invoke<boolean>("toggle_tracked_item", { id });

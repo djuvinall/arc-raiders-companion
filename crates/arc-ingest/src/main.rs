@@ -119,6 +119,22 @@ struct BenchesOverlay {
     _note: String,
     fixes: Vec<BenchFix>,
     requires: std::collections::BTreeMap<String, std::collections::BTreeMap<u8, String>>,
+    extra: Vec<ExtraBench>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraBench {
+    id: String,
+    name: String,
+    levels: Vec<ExtraLevel>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraLevel {
+    level: u8,
+    inputs: Vec<m::ItemQty>,
 }
 
 #[derive(serde::Deserialize)]
@@ -131,7 +147,7 @@ struct BenchFix {
 }
 
 /// Moves each listed item to its true level and quantity, adding the level if it's new.
-fn apply_bench_fixes(benches: &mut [m::Workbench]) -> Result<()> {
+fn apply_bench_fixes(benches: &mut Vec<m::Workbench>) -> Result<()> {
     let overlay: BenchesOverlay = serde_json::from_str(BENCHES_OVERLAY).context("benches_overlay.json")?;
     for fix in &overlay.fixes {
         let bench = benches.iter_mut().find(|b| b.id == fix.station).with_context(|| format!("no bench {}", fix.station))?;
@@ -148,12 +164,85 @@ fn apply_bench_fixes(benches: &mut [m::Workbench]) -> Result<()> {
         let level = bench.levels.iter_mut().find(|l| l.level == fix.level).context("level just added")?;
         level.upgrade_inputs.push(m::ItemQty { item_id: fix.item.clone(), qty: fix.qty });
     }
+    for extra in overlay.extra {
+        benches.push(m::Workbench {
+            max_level: extra.levels.iter().map(|l| l.level).max().unwrap_or(0),
+            id: extra.id,
+            name: extra.name,
+            levels: extra.levels.into_iter().map(|l| m::WorkbenchLevel {
+                level: l.level,
+                upgrade_inputs: l.inputs,
+                requires: None,
+                unlocks_recipe_ids: Vec::new(),
+            }).collect(),
+        });
+    }
     for bench in benches {
         for level in &mut bench.levels {
             level.requires = overlay.requires.get(&bench.id).and_then(|r| r.get(&level.level)).cloned();
         }
     }
     Ok(())
+}
+
+const MARKER_GROUPS: &[&str] = &["locations", "quests", "containers", "arc", "events", "nature"];
+/// Labels only where a name says something: every locker is "Locker".
+const LABELLED: &[&str] = &["locations", "events", "quests"];
+
+fn title(sub: &str) -> String {
+    sub.split(['_', '-', ' ']).filter(|w| !w.is_empty())
+        .map(|w| w[..1].to_uppercase() + &w[1..]).collect::<Vec<_>>().join(" ")
+}
+
+fn build_markers(fixture: &Value, arcs: &[m::Arc]) -> Result<m::MapMarkers> {
+    let mut categories: Vec<m::MarkerCategory> = Vec::new();
+    let mut seen: std::collections::BTreeMap<String, ()> = std::collections::BTreeMap::new();
+    let maps = fixture["maps"].as_object().context("markers fixture: no maps")?;
+    let key = |row: &[Value]| -> Option<(String, String)> {
+        let group = row.first()?.as_str()?.to_string();
+        let sub = row.get(1)?.as_str()?.to_string();
+        Some((group, sub))
+    };
+    for rows in maps.values() {
+        for row in rows.as_array().map(Vec::as_slice).unwrap_or(&[]) {
+            let Some((group, sub)) = row.as_array().and_then(|r| key(r)) else { continue };
+            if !MARKER_GROUPS.contains(&group.as_str()) {
+                continue;
+            }
+            let id = if group == "quests" { "quests".to_string() } else { format!("{group}/{sub}") };
+            if seen.insert(id.clone(), ()).is_some() {
+                continue;
+            }
+            let name = match group.as_str() {
+                "quests" => "Quest objective".to_string(),
+                "arc" => arcs.iter().find(|a| a.id == sub).map_or_else(|| title(&sub), |a| a.name.clone()),
+                _ => title(&sub),
+            };
+            categories.push(m::MarkerCategory { id, name, group });
+        }
+    }
+    let rank = |g: &str| MARKER_GROUPS.iter().position(|x| *x == g).unwrap_or(99);
+    categories.sort_by(|a, b| rank(&a.group).cmp(&rank(&b.group)).then_with(|| a.name.cmp(&b.name)));
+    let index: std::collections::BTreeMap<&str, u16> = categories.iter().enumerate().map(|(i, c)| (c.id.as_str(), i as u16)).collect();
+    let mut out = std::collections::BTreeMap::new();
+    for (map, rows) in maps {
+        let markers = rows.as_array().map(Vec::as_slice).unwrap_or(&[]).iter().filter_map(|row| {
+            let row = row.as_array()?;
+            let (group, sub) = key(row)?;
+            let id = if group == "quests" { "quests".to_string() } else { format!("{group}/{sub}") };
+            let label = if group == "quests" {
+                Some(sub)
+            } else if LABELLED.contains(&group.as_str()) {
+                row.get(5)?.as_str().map(str::to_string)
+            } else {
+                None
+            };
+            Some(m::MapMarker(*index.get(id.as_str())?, row.get(2)?.as_f64()?, row.get(3)?.as_f64()?,
+                row.get(4)?.as_u64().and_then(|z| u32::try_from(z).ok()), label))
+        }).collect();
+        out.insert(map.clone(), markers);
+    }
+    Ok(m::MapMarkers { categories, maps: out })
 }
 
 fn newest_fixture(root: &Path, source: &str) -> Result<(String, Value)> {
@@ -183,6 +272,7 @@ fn write_schemas(dir: &Path) -> Result<()> {
         ("arc", schemars::schema_for!(Vec<m::Arc>)),
         ("trader", schemars::schema_for!(Vec<m::Trader>)),
         ("loot_area", schemars::schema_for!(Vec<m::LootArea>)),
+        ("map_markers", schemars::schema_for!(m::MapMarkers)),
         ("version", schemars::schema_for!(m::DatasetVersion)),
         ("changelog", schemars::schema_for!(Vec<m::ChangelogEntry>)),
     ];
@@ -210,6 +300,8 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     apply_bench_fixes(&mut out.files.workbenches)?;
     let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
     arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
+    let (_, marker_fixture) = newest_fixture(root, "metaforge_markers")?;
+    out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

@@ -1,36 +1,51 @@
 <script lang="ts">
   import {
-    iconSrc, liveEvents, mapList, mapPois, questList, routePlan,
-    type EventsView, type GameMap, type MapCover, type Poi, type RoutePlan,
+    iconSrc, liveEvents, mapList, mapMarkers, mapPois, questList, routePlan,
+    type EventsView, type GameMap, type MapCover, type MarkerSet, type Poi, type RoutePlan,
   } from "../lib/api";
-  import TileMap from "../lib/components/TileMap.svelte";
+  import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
+  import { GROUPS, iconUrl } from "../lib/mapIcons";
 
   let { mapId }: { mapId?: string } = $props();
 
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
   const REGIONS = ["europe", "north-america", "oceania"];
   const guess = zone.startsWith("America") ? "north-america" : /^(Australia|Pacific)/.test(zone) ? "oceania" : "europe";
+  // Hidden until switched on: very common, so they bury everything else.
+  const QUIET = ["nature", "events/snow_pile", "events/security_camera", "locations/player_spawn", "containers/base_container"];
+  const HIDDEN_KEY = "map-hidden";
 
   let maps = $state<GameMap[]>([]);
   let current = $state<GameMap | null>(null);
+  let set = $state<MarkerSet | null>(null);
   let pois = $state<Poi[]>([]);
   let events = $state<EventsView | null>(null);
   let plan = $state<RoutePlan | null>(null);
-  let region = $state(remembered() ?? guess);
+  let region = $state(remembered("event-region") ?? guess);
   let now = $state(Date.now());
-  let selected = $state<Poi | null>(null);
-  let kinds = $state<Record<string, boolean>>({ cache: true, extract: true, landmark: false });
-  let area = $state("");
+  let selected = $state<MapPoint | null>(null);
   let search = $state("");
   let floor = $state(0);
+  let questNames = $state(new Map<string, string>());
   let tracked = $state(new Set<string>());
-  let questPins = $state(true);
+  let allQuests = $state(false);
+  let showLabels = $state(true);
+  let hidden = $state(new Set<string>(JSON.parse(remembered(HIDDEN_KEY) ?? "null") ?? QUIET));
+  let collapsed = $state(new Set<string>());
 
-  function remembered() {
+  function remembered(key: string) {
     try {
-      return localStorage.getItem("event-region");
+      return localStorage.getItem(key);
     } catch {
       return null;
+    }
+  }
+
+  function remember(key: string, value: string) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Remembering is only a convenience.
     }
   }
 
@@ -39,14 +54,13 @@
     open(all.find((m) => m.id === mapId) ?? all[0]);
   });
   routePlan().then((p) => (plan = p));
-  questList().then((rows) => (tracked = new Set(rows.filter((r) => r.status === "active" || r.status === "needed").map((r) => r.quest.id))));
+  questList().then((rows) => {
+    questNames = new Map(rows.map((r) => [r.quest.id, r.quest.name]));
+    tracked = new Set(rows.filter((r) => r.status === "active" || r.status === "needed").map((r) => r.quest.id));
+  });
 
   $effect(() => {
-    try {
-      localStorage.setItem("event-region", region);
-    } catch {
-      // Remembering the region is only a convenience.
-    }
+    remember("event-region", region);
     liveEvents(region).then((e) => (events = e));
     const tick = setInterval(() => (now = Date.now()), 30000);
     return () => clearInterval(tick);
@@ -56,24 +70,68 @@
     current = map;
     floor = 0;
     selected = null;
-    pois = await mapPois(map.id);
+    [set, pois] = await Promise.all([mapMarkers(map.id), mapPois(map.id)]);
   }
 
-  const cover = $derived(plan?.covers.find((c) => c.map_id === current?.id) ?? null);
-  const route = $derived(cover?.pois.map((p) => p.id) ?? []);
-  const areas = $derived([...new Set(pois.flatMap((p) => p.loot_areas))].sort());
   const floors = $derived(current?.image.layers ?? []);
-  const onFloor = (p: Poi) => !floors.length || p.zlayers === null || (p.zlayers & floors[floor].mask) !== 0;
-  const shown = $derived(
-    pois.filter((p) =>
-      route.includes(p.id) || (questPins && onFloor(p) && !!p.quest_id && tracked.has(p.quest_id)) || (
-        kinds[p.kind] && onFloor(p) &&
-        (!area || p.loot_areas.includes(area)) &&
-        (!search || p.name.toLowerCase().includes(search.toLowerCase()))
-      ),
-    ),
-  );
+  const onFloor = (z: number | null) => !floors.length || z === null || (z & floors[floor].mask) !== 0;
+  const isHidden = (id: string, group: string) => hidden.has(id) || hidden.has(group);
 
+  function toggle(key: string) {
+    const next = new Set(hidden);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    hidden = next;
+    remember(HIDDEN_KEY, JSON.stringify([...next]));
+  }
+
+  function setAll(show: boolean) {
+    hidden = new Set(show ? [] : Object.keys(GROUPS));
+    remember(HIDDEN_KEY, JSON.stringify([...hidden]));
+  }
+
+  // Quest pins name their quest; the rest are named by their type.
+  const points = $derived.by((): MapPoint[] => {
+    if (!set) return [];
+    const query = search.trim().toLowerCase();
+    const out: MapPoint[] = [];
+    set.markers.forEach(([index, x, y, z, label], i) => {
+      const category = set!.categories[index];
+      if (!category || !onFloor(z)) return;
+      const quest = category.group === "quests";
+      if (quest ? !allQuests && !tracked.has(label ?? "") : isHidden(category.id, category.group)) return;
+      if (quest && hidden.has("quests")) return;
+      const name = quest ? questNames.get(label ?? "") ?? "Quest objective" : label ?? category.name;
+      if (query && !name.toLowerCase().includes(query) && !category.name.toLowerCase().includes(query)) return;
+      out.push({
+        key: `m${i}`, x, y, icon: category.id, group: category.group,
+        title: quest ? `Quest: ${name}` : label ? `${label} (${category.name})` : category.name,
+        label: showLabels && (quest || category.group === "locations" || category.group === "events") ? name : null,
+      });
+    });
+    cover?.pois.forEach((stop, i) => out.push({
+      key: `s${stop.id}`, x: stop.x, y: stop.y, icon: "route", group: "route", number: i + 1,
+      title: `Stop ${i + 1}: ${stop.name}`,
+    }));
+    return out;
+  });
+
+  // Counts on this floor, for the legend.
+  const counts = $derived.by(() => {
+    const out = new Map<number, number>();
+    for (const [index, , , z] of set?.markers ?? []) {
+      if (onFloor(z)) out.set(index, (out.get(index) ?? 0) + 1);
+    }
+    return out;
+  });
+  const legend = $derived(Object.keys(GROUPS).filter((g) => g !== "route").map((group) => ({
+    group,
+    rows: (set?.categories ?? []).map((c, index) => ({ ...c, index, count: counts.get(index) ?? 0 }))
+      .filter((c) => c.group === group && c.count > 0),
+  })).filter((g) => g.rows.length));
+
+  const cover = $derived(plan?.covers.find((c) => c.map_id === current?.id) ?? null);
+  const stopPoi = $derived(selected?.group === "route" ? pois.find((p) => `s${p.id}` === selected?.key) ?? null : null);
   const itemName = (id: string) => plan?.needed.find((n) => n.item.id === id)?.item.name ?? id;
   const when = (ms: number) => {
     const minutes = Math.round((ms - now) / 60000);
@@ -93,67 +151,84 @@
 
 <div class="page">
   <aside class="left">
-    <section class="panel">
-      <div class="region">
-        <h3 class="section-title">Maps and events</h3>
-        <select class="field" aria-label="Event region" bind:value={region}>
+    <div class="tabs">
+      {#each maps as map (map.id)}
+        <button class:on={current?.id === map.id} onclick={() => open(map)} title={map.name}>
+          {map.name.replace("The ", "")}{liveCount(map.id) ? " •" : ""}
+        </button>
+      {/each}
+    </div>
+    {#if current}
+      {@const live = eventsFor(current.id)}
+      <div class="events">
+        {#each live?.current ?? [] as event}
+          <span class="event now">
+            {#if event.icon}<img src={iconSrc(event.icon)} alt="" width="16" height="16" />{/if}
+            {event.name} · ends in {when(event.endTime)}
+          </span>
+        {/each}
+        {#if live?.next}<span class="event">Next: {live.next.name} in {when(live.next.startTime)}</span>{/if}
+        <select class="field region" aria-label="Event region" bind:value={region}>
           {#each REGIONS as r}<option value={r}>{r.replace("-", " ")}</option>{/each}
         </select>
       </div>
-      {#each maps as map (map.id)}
-        {@const live = eventsFor(map.id)}
-        <button class="map-row" class:active={current?.id === map.id} onclick={() => open(map)}>
-          <strong>{map.name}</strong>
-          {#each live?.current ?? [] as event}
-            <span class="event now">
-              {#if event.icon}<img src={iconSrc(event.icon)} alt="" width="16" height="16" />{/if}
-              {event.name} · ends in {when(event.endTime)}
-            </span>
-          {/each}
-          {#if live?.next}
-            <span class="event">Next: {live.next.name} in {when(live.next.startTime)}</span>
+    {/if}
+
+    <input class="field" placeholder="Search places and types" aria-label="Search the map" bind:value={search} />
+    <div class="bulk">
+      <button class="link" onclick={() => setAll(true)}>Show all</button>
+      <button class="link" onclick={() => setAll(false)}>Hide all</button>
+      <label><input type="checkbox" bind:checked={showLabels} /> Labels</label>
+    </div>
+
+    <div class="legend">
+      {#each legend as { group, rows } (group)}
+        <section>
+          <div class="group">
+            <button class="group-name" onclick={() => { const n = new Set(collapsed); if (n.has(group)) n.delete(group); else n.add(group); collapsed = n; }}>
+              {collapsed.has(group) ? "▸" : "▾"} {GROUPS[group].label}
+            </button>
+            <button class="link" class:off={hidden.has(group)} onclick={() => toggle(group)}>{hidden.has(group) ? "Show" : "Hide"}</button>
+          </div>
+          {#if group === "quests"}
+            <label class="row"><input type="checkbox" bind:checked={allQuests} /> All quests, not just tracked</label>
           {/if}
-        </button>
+          {#if !collapsed.has(group)}
+            <div class="rows">
+              {#each rows as row (row.id)}
+                <button class="row" class:off={isHidden(row.id, row.group)} onclick={() => toggle(row.id)} aria-pressed={!isHidden(row.id, row.group)}>
+                  <img src={iconUrl(row.id, row.group)} alt="" width="18" height="18" />
+                  <span class="name">{row.name}</span>
+                  <span class="count">{row.count}</span>
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </section>
       {/each}
-      {#if events && events.fetched_ms === null}
-        <p class="dim small">No event schedule cached yet; connect once to fetch it.</p>
-      {:else if events?.stale}
-        <p class="warning small">Offline: showing the schedule from {new Date(events.fetched_ms ?? 0).toLocaleString()}.</p>
-      {/if}
-    </section>
+    </div>
   </aside>
 
   <div class="center">
-    <div class="filters">
-      {#if floors.length}
-        <div class="floors" role="group" aria-label="Floor">
-          {#each floors as layer, i (layer.name)}
-            <button class:on={i === floor} aria-pressed={i === floor} onclick={() => { floor = i; selected = null; }}>{layer.name}</button>
-          {/each}
-        </div>
-      {/if}
-      {#each Object.keys(kinds) as kind}
-        <label><input type="checkbox" bind:checked={kinds[kind]} /> {kind}</label>
-      {/each}
-      <label><input type="checkbox" bind:checked={questPins} /> Tracked quests</label>
-      <select class="field" aria-label="Loot area" bind:value={area}>
-        <option value="">All loot areas</option>
-        {#each areas as a}<option value={a}>{a.replace("-", " ")}</option>{/each}
-      </select>
-      <input class="field" placeholder="Search places" bind:value={search} />
-      <span class="dim small">{shown.length} shown</span>
-    </div>
-    {#if current}
-      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} pois={shown} {route} {selected} onselect={(p) => (selected = p)} />
+    {#if floors.length}
+      <div class="floors" role="group" aria-label="Floor">
+        {#each floors as layer, i (layer.name)}
+          <button class:on={i === floor} aria-pressed={i === floor} onclick={() => { floor = i; selected = null; }}>{layer.name}</button>
+        {/each}
+      </div>
     {/if}
+    {#if current}
+      <TileMap map={current} url={floors[floor]?.url ?? current.image.url} {points} {selected} onselect={(p) => (selected = p)} />
+    {/if}
+    <span class="dim small">{points.length.toLocaleString()} shown · scroll to zoom, drag to move</span>
   </div>
 
   <aside class="right">
     {#if selected}
       <section class="panel">
-        <h3>{selected.name}</h3>
-        <p class="dim small">{selected.kind}</p>
-        {#if selected.loot_areas.length}<p class="small">Loot: {selected.loot_areas.join(", ")}</p>{/if}
+        <h3>{selected.title}</h3>
+        <p class="dim small">{GROUPS[selected.group]?.label}</p>
+        {#if stopPoi?.loot_areas.length}<p class="small">Loot: {stopPoi.loot_areas.join(", ")}</p>{/if}
       </section>
     {/if}
 
@@ -178,80 +253,173 @@
           {/if}
         {/if}
       {:else}
-        <p class="dim small">
-          Track items, quests or projects and this ranks the maps that cover what you still need.
-        </p>
+        <p class="dim small">Track items, quests or projects and this ranks the maps that cover what you still need.</p>
       {/if}
-      <p class="dim small">Stops are a set of places, not a walking path.</p>
+      <p class="dim small">Stops are a set of places, not a walking path. Markers are community-mapped by MetaForge.</p>
     </section>
   </aside>
 </div>
 
 <style>
-  .live {
-    display: block;
-    color: var(--yellow);
-  }
-  .floors {
-    display: flex;
-    gap: 2px;
-  }
-  .floors button {
-    padding: 4px 14px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--text-dim);
-    cursor: pointer;
-    font: inherit;
-  }
-  .floors .on {
-    border-color: var(--cream);
-    background: var(--cream);
-    color: var(--on-cream);
-  }
   .page {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr) 280px;
-    gap: 12px;
-    padding: 12px 16px;
+    grid-template-columns: 290px minmax(0, 1fr) 270px;
+    gap: 10px;
+    padding: 10px 12px;
     height: 100%;
     min-height: 0;
   }
   aside {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     overflow: auto;
     min-height: 0;
   }
-  .center {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 8px;
-    min-height: 0;
-  }
-  .filters {
+  .tabs {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
+    gap: 4px;
   }
-  .filters label {
-    text-transform: capitalize;
+  .tabs button,
+  .floors button {
+    padding: 4px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
     color: var(--text-dim);
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+  }
+  .tabs .on,
+  .floors .on {
+    border-color: var(--cream);
+    background: var(--cream);
+    color: var(--on-cream);
+  }
+  .events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .event {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  .event.now {
+    color: var(--yellow);
   }
   .region {
+    align-self: flex-start;
+    margin-top: 4px;
+    text-transform: capitalize;
+  }
+  .bulk {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .bulk label {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    color: var(--text-dim);
+  }
+  .link {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--teal);
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+  }
+  .link.off {
+    color: var(--text-dim);
+  }
+  .legend section {
+    margin-bottom: 8px;
+  }
+  .group {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    margin-bottom: 3px;
   }
-  .region .section-title {
-    margin: 0;
+  .group-name {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--text);
+    cursor: pointer;
+    font-family: var(--font-head);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  .map-row,
+  .rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px 6px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    padding: 2px 3px;
+    background: none;
+    border: 0;
+    border-radius: 3px;
+    color: var(--text);
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+  }
+  .row:hover {
+    background: var(--panel-2);
+  }
+  .row.off {
+    opacity: 0.4;
+  }
+  .row .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .row .count {
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+  label.row {
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+  .center {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    min-width: 0;
+  }
+  .center :global(.map) {
+    flex: 1;
+    min-height: 0;
+  }
+  .floors {
+    display: flex;
+    gap: 2px;
+  }
   .cover {
     display: flex;
     flex-direction: column;
@@ -266,34 +434,27 @@
     font: inherit;
     text-align: left;
   }
-  .map-row.active,
   .cover.active {
     background: var(--panel-2);
     border-color: var(--border);
   }
-  .event {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--text-dim);
-    font-size: 13px;
-  }
-  .event.now {
+  .live {
+    display: block;
     color: var(--yellow);
   }
   .small {
     font-size: 13px;
     margin: 4px 0 0;
   }
-  .warning {
-    color: var(--yellow);
-  }
   .stops {
     margin-top: 12px;
   }
   @media (max-width: 1240px) {
     .page {
-      grid-template-columns: 230px minmax(0, 1fr) 220px;
+      grid-template-columns: 250px minmax(0, 1fr) 210px;
+    }
+    .rows {
+      grid-template-columns: 1fr;
     }
   }
 </style>

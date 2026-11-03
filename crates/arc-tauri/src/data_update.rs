@@ -12,7 +12,7 @@ const BASE_URL: &str = "https://raw.githubusercontent.com/djuvinall/arc-raiders-
 pub const FILES: &[&str] = &[
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
-    "loot_areas.json", "version.json", "changelog.json",
+    "loot_areas.json", "map_markers.json", "version.json", "changelog.json",
 ];
 
 fn dataset_version(text: &str) -> Option<String> {
