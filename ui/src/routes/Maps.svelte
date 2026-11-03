@@ -11,9 +11,31 @@
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
   const REGIONS = ["europe", "north-america", "oceania"];
   const guess = zone.startsWith("America") ? "north-america" : /^(Australia|Pacific)/.test(zone) ? "oceania" : "europe";
-  // Hidden until switched on: very common, so they bury everything else.
+  // Hidden until switched on: very common, so they bury everything else. A group name
+  // stands for every type in it.
   const QUIET = ["nature", "events/snow_pile", "events/security_camera", "locations/player_spawn", "containers/base_container"];
-  const HIDDEN_KEY = "map-hidden";
+  const SAVED_KEY = "map-filters";
+
+  interface Saved {
+    hidden: string[];
+    labels: boolean;
+    allQuests: boolean;
+    collapsed: string[];
+    map: string | null;
+    floors: Record<string, number>;
+  }
+
+  // Read once per visit; older saves held only the hidden list.
+  const saved: Partial<Saved> = (() => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      if (raw) return JSON.parse(raw);
+      const old = localStorage.getItem("map-hidden");
+      return old ? { hidden: JSON.parse(old) } : {};
+    } catch {
+      return {};
+    }
+  })();
 
   let maps = $state<GameMap[]>([]);
   let current = $state<GameMap | null>(null);
@@ -28,10 +50,12 @@
   let floor = $state(0);
   let questNames = $state(new Map<string, string>());
   let tracked = $state(new Set<string>());
-  let allQuests = $state(false);
-  let showLabels = $state(true);
-  let hidden = $state(new Set<string>(JSON.parse(remembered(HIDDEN_KEY) ?? "null") ?? QUIET));
-  let collapsed = $state(new Set<string>());
+  let allQuests = $state(saved.allQuests ?? false);
+  let showLabels = $state(saved.labels ?? true);
+  // Holds marker type ids only once the types are known; group names are expanded on load.
+  let hidden = $state(new Set<string>(saved.hidden ?? QUIET));
+  let collapsed = $state(new Set<string>(saved.collapsed ?? []));
+  let savedFloors = $state<Record<string, number>>(saved.floors ?? {});
 
   function remembered(key: string) {
     try {
@@ -51,7 +75,7 @@
 
   mapList().then((all) => {
     maps = all;
-    open(all.find((m) => m.id === mapId) ?? all[0]);
+    open(all.find((m) => m.id === mapId) ?? all.find((m) => m.id === saved.map) ?? all[0]);
   });
   routePlan().then((p) => (plan = p));
   questList().then((rows) => {
@@ -68,26 +92,60 @@
 
   async function open(map: GameMap) {
     current = map;
-    floor = 0;
+    floor = Math.min(savedFloors[map.id] ?? 0, Math.max(0, map.image.layers.length - 1));
     selected = null;
     [set, pois] = await Promise.all([mapMarkers(map.id), mapPois(map.id)]);
+    // A group name in the saved list means all of that group's types.
+    const groups = [...hidden].filter((h) => h in GROUPS && h !== "quests");
+    if (groups.length) {
+      hidden = new Set([...hidden].filter((h) => !groups.includes(h))
+        .concat(set.categories.filter((c) => groups.includes(c.group)).map((c) => c.id)));
+    }
   }
+
+  function save() {
+    const state: Saved = {
+      hidden: [...hidden], labels: showLabels, allQuests, collapsed: [...collapsed],
+      map: current?.id ?? null, floors: savedFloors,
+    };
+    remember(SAVED_KEY, JSON.stringify(state));
+  }
+
+  $effect(() => {
+    void [hidden, showLabels, allQuests, collapsed, current, savedFloors];
+    save();
+  });
 
   const floors = $derived(current?.image.layers ?? []);
   const onFloor = (z: number | null) => !floors.length || z === null || (z & floors[floor].mask) !== 0;
-  const isHidden = (id: string, group: string) => hidden.has(id) || hidden.has(group);
+  const isHidden = (id: string) => hidden.has(id);
+  const idsIn = (group: string) => (set?.categories ?? []).filter((c) => c.group === group).map((c) => c.id);
+  const groupHidden = (group: string) => idsIn(group).every((id) => hidden.has(id));
 
-  function toggle(key: string) {
+  function toggle(id: string) {
     const next = new Set(hidden);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
     hidden = next;
-    remember(HIDDEN_KEY, JSON.stringify([...next]));
+  }
+
+  /** Hides or shows every type in a group, leaving the rest alone. */
+  function setGroup(group: string, show: boolean) {
+    const next = new Set(hidden);
+    for (const id of idsIn(group)) {
+      if (show) next.delete(id);
+      else next.add(id);
+    }
+    hidden = next;
+  }
+
+  /** Just this type, for finding one thing such as ARC Courier spawns. */
+  function only(id: string) {
+    hidden = new Set((set?.categories ?? []).map((c) => c.id).filter((c) => c !== id));
   }
 
   function setAll(show: boolean) {
-    hidden = new Set(show ? [] : Object.keys(GROUPS));
-    remember(HIDDEN_KEY, JSON.stringify([...hidden]));
+    hidden = new Set(show ? [] : (set?.categories ?? []).map((c) => c.id));
   }
 
   // Quest pins name their quest; the rest are named by their type.
@@ -99,8 +157,7 @@
       const category = set!.categories[index];
       if (!category || !onFloor(z)) return;
       const quest = category.group === "quests";
-      if (quest ? !allQuests && !tracked.has(label ?? "") : isHidden(category.id, category.group)) return;
-      if (quest && hidden.has("quests")) return;
+      if (isHidden(category.id) || (quest && !allQuests && !tracked.has(label ?? ""))) return;
       const name = quest ? questNames.get(label ?? "") ?? "Quest objective" : label ?? category.name;
       if (query && !name.toLowerCase().includes(query) && !category.name.toLowerCase().includes(query)) return;
       out.push({
@@ -188,7 +245,7 @@
             <button class="group-name" onclick={() => { const n = new Set(collapsed); if (n.has(group)) n.delete(group); else n.add(group); collapsed = n; }}>
               {collapsed.has(group) ? "▸" : "▾"} {GROUPS[group].label}
             </button>
-            <button class="link" class:off={hidden.has(group)} onclick={() => toggle(group)}>{hidden.has(group) ? "Show" : "Hide"}</button>
+            <button class="link" class:off={groupHidden(group)} onclick={() => setGroup(group, groupHidden(group))}>{groupHidden(group) ? "Show" : "Hide"}</button>
           </div>
           {#if group === "quests"}
             <label class="row"><input type="checkbox" bind:checked={allQuests} /> All quests, not just tracked</label>
@@ -196,11 +253,14 @@
           {#if !collapsed.has(group)}
             <div class="rows">
               {#each rows as row (row.id)}
-                <button class="row" class:off={isHidden(row.id, row.group)} onclick={() => toggle(row.id)} aria-pressed={!isHidden(row.id, row.group)}>
-                  <img src={iconUrl(row.id, row.group)} alt="" width="18" height="18" />
-                  <span class="name">{row.name}</span>
-                  <span class="count">{row.count}</span>
-                </button>
+                <div class="entry">
+                  <button class="row" class:off={isHidden(row.id)} onclick={() => toggle(row.id)} aria-pressed={!isHidden(row.id)} title="Show or hide {row.name}">
+                    <img src={iconUrl(row.id, row.group)} alt="" width="18" height="18" />
+                    <span class="name">{row.name}</span>
+                    <span class="count">{row.count}</span>
+                  </button>
+                  <button class="only" onclick={() => only(row.id)} title="Show only {row.name}" aria-label="Show only {row.name}">only</button>
+                </div>
               {/each}
             </div>
           {/if}
@@ -213,7 +273,7 @@
     {#if floors.length}
       <div class="floors" role="group" aria-label="Floor">
         {#each floors as layer, i (layer.name)}
-          <button class:on={i === floor} aria-pressed={i === floor} onclick={() => { floor = i; selected = null; }}>{layer.name}</button>
+          <button class:on={i === floor} aria-pressed={i === floor} onclick={() => { floor = i; selected = null; if (current) savedFloors = { ...savedFloors, [current.id]: i }; }}>{layer.name}</button>
         {/each}
       </div>
     {/if}
@@ -383,6 +443,31 @@
     font: inherit;
     font-size: 12px;
     text-align: left;
+  }
+  .entry {
+    position: relative;
+    min-width: 0;
+  }
+  .entry .row {
+    width: 100%;
+  }
+  .only {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    display: none;
+    padding: 0 5px;
+    border: 0;
+    border-radius: 3px;
+    background: var(--cream);
+    color: var(--on-cream);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+  }
+  .entry:hover .only,
+  .only:focus-visible {
+    display: block;
   }
   .row:hover {
     background: var(--panel-2);
