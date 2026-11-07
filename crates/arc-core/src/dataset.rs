@@ -31,6 +31,7 @@ pub struct DatasetFiles {
     pub markers: MapMarkers,
     pub version: DatasetVersion,
     pub notes: Notes,
+    pub project_tasks: ProjectTasks,
 }
 
 #[derive(Debug, Default)]
@@ -86,6 +87,10 @@ impl Dataset {
             notes: match read("notes.json") {
                 Ok(_) => parse(read, "notes.json")?,
                 Err(_) => Notes::default(),
+            },
+            project_tasks: match read("project_tasks.json") {
+                Ok(_) => parse(read, "project_tasks.json")?,
+                Err(_) => ProjectTasks::default(),
             },
         };
         Self::from_files(files)
@@ -174,6 +179,25 @@ pub fn integrity_errors(f: &DatasetFiles) -> Vec<String> {
     for id in f.notes.items.keys() {
         if !f.items.iter().any(|i| &i.id == id) {
             errors.push(format!("notes.json: unknown item {id}"));
+        }
+    }
+    for task in &f.project_tasks.stages {
+        let at = format!("project_tasks.json: {} stage {}", task.project_id, task.stage);
+        match f.projects.iter().find(|p| p.id == task.project_id) {
+            None => errors.push(format!("{at}: unknown project")),
+            Some(p) if !p.stages.iter().any(|s| s.n == task.stage) => errors.push(format!("{at}: no such stage")),
+            _ => {}
+        }
+        if let Some(map) = &task.map {
+            if !f.maps.iter().any(|m| &m.id == map) {
+                errors.push(format!("{at}: unknown map {map}"));
+            }
+        }
+        let ids: BTreeSet<&str> = task.objectives.iter().map(|o| o.id.as_str()).collect();
+        let dangling = task.objectives.iter().flat_map(|o| &o.children).chain([&task.objective_root])
+            .any(|c| !ids.contains(c.as_str()));
+        if dangling {
+            errors.push(format!("{at}: an objective points at a step that isn't there"));
         }
     }
     check_unique(&mut errors, "recipe", f.recipes.iter().map(|x| x.id.as_str()));

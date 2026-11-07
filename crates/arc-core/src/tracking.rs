@@ -268,15 +268,15 @@ pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
 /// need every step, `any` needs one of its options, and `optional` steps never hold
 /// anything back.
 pub fn node_done(quest: &Quest, id: &str, done: &[String]) -> bool {
-    node_done_at(quest, id, done, 0)
+    tree_done(&quest.objectives, id, done, 0)
 }
 
-fn node_done_at(quest: &Quest, id: &str, done: &[String], depth: usize) -> bool {
-    let Some(node) = quest.objectives.iter().find(|o| o.id == id) else { return true };
+fn tree_done(objectives: &[Objective], id: &str, done: &[String], depth: usize) -> bool {
+    let Some(node) = objectives.iter().find(|o| o.id == id) else { return true };
     if depth > 16 {
         return false;
     }
-    let kids = || node.children.iter().map(|c| node_done_at(quest, c, done, depth + 1));
+    let kids = || node.children.iter().map(|c| tree_done(objectives, c, done, depth + 1));
     match node.kind.as_str() {
         "atomic" => done.iter().any(|d| d == id),
         "optional" => true,
@@ -287,12 +287,12 @@ fn node_done_at(quest: &Quest, id: &str, done: &[String], depth: usize) -> bool 
 
 /// The steps under a group a player would tick to finish it; `any` groups have no
 /// single answer, so they give none.
-fn steps_under<'a>(quest: &'a Quest, id: &str, out: &mut Vec<&'a str>, depth: usize) {
-    let Some(node) = quest.objectives.iter().find(|o| o.id == id) else { return };
+fn steps_under<'a>(objectives: &'a [Objective], id: &str, out: &mut Vec<&'a str>, depth: usize) {
+    let Some(node) = objectives.iter().find(|o| o.id == id) else { return };
     match node.kind.as_str() {
         "atomic" | "optional" => out.push(node.id.as_str()),
         "any" => {}
-        _ if depth < 16 => node.children.iter().for_each(|c| steps_under(quest, c, out, depth + 1)),
+        _ if depth < 16 => node.children.iter().for_each(|c| steps_under(objectives, c, out, depth + 1)),
         _ => {}
     }
 }
@@ -303,7 +303,7 @@ fn steps_under<'a>(quest: &'a Quest, id: &str, out: &mut Vec<&'a str>, depth: us
 pub fn set_objective(ds: &Dataset, profile: &mut Profile, quest_id: &str, objective_id: &str, done: bool) {
     let Some(quest) = ds.files.quests.iter().find(|q| q.id == quest_id) else { return };
     let mut ids = Vec::new();
-    steps_under(quest, objective_id, &mut ids, 0);
+    steps_under(&quest.objectives, objective_id, &mut ids, 0);
     let progress = profile.quests.entry(quest_id.to_string()).or_default();
     progress.objectives_done.retain(|o| !ids.contains(&o.as_str()));
     if done {
@@ -326,6 +326,41 @@ pub struct StageView {
     pub title: String,
     pub inputs: Vec<StageInput>,
     pub rewards: Vec<Link>,
+    /// For a stage played as a mission: its objectives and which are ticked.
+    pub task: Option<TaskView>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct TaskView {
+    pub map: Option<Link>,
+    pub description: Option<String>,
+    pub objective_root: String,
+    pub objectives: Vec<Objective>,
+    pub done: Vec<String>,
+}
+
+fn stage_task<'a>(ds: &'a Dataset, project_id: &str, stage: u32) -> Option<&'a ProjectTask> {
+    ds.files.project_tasks.stages.iter().find(|t| t.project_id == project_id && t.stage == stage)
+}
+
+fn all_steps(task: &ProjectTask) -> Vec<String> {
+    let mut ids = Vec::new();
+    steps_under(&task.objectives, &task.objective_root, &mut ids, 0);
+    ids.into_iter().map(str::to_string).collect()
+}
+
+/// Every input is in and every objective done.
+fn stage_finished(ds: &Dataset, project_id: &str, stage: &ProjectStage, progress: &ProjectProgress) -> bool {
+    let inputs = stage.inputs.iter().all(|i| progress.committed.get(&i.item_id).copied().unwrap_or(0) >= i.qty);
+    let task = stage_task(ds, project_id, stage.n)
+        .is_none_or(|t| tree_done(&t.objectives, &t.objective_root, &progress.objectives_done, 0));
+    inputs && task
+}
+
+fn next_stage(progress: &mut ProjectProgress) {
+    progress.stage += 1;
+    progress.committed.clear();
+    progress.objectives_done.clear();
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -361,7 +396,19 @@ pub fn project_views(ds: &Dataset, profile: &Profile) -> Vec<ProjectView> {
             stage,
             stages: project.stages.iter().map(|s| StageView {
                 n: s.n,
-                title: s.title.clone(),
+                task: stage_task(ds, &project.id, s.n).map(|t| TaskView {
+                    map: t.map.as_ref().and_then(|m| ds.files.maps.iter().find(|x| &x.id == m))
+                        .map(|m| Link { kind: "map", id: m.id.clone(), name: m.name.clone(), icon: None, qty: None, note: None }),
+                    description: t.description.clone(),
+                    objective_root: t.objective_root.clone(),
+                    objectives: t.objectives.clone(),
+                    done: match s.n.cmp(&stage) {
+                        std::cmp::Ordering::Less => all_steps(t),
+                        std::cmp::Ordering::Equal => progress.map(|p| p.objectives_done.clone()).unwrap_or_default(),
+                        std::cmp::Ordering::Greater => Vec::new(),
+                    },
+                }),
+                title: stage_task(ds, &project.id, s.n).map_or_else(|| s.title.clone(), |t| t.title.clone()),
                 rewards: lines(ds, &s.rewards),
                 inputs: s.inputs.iter().map(|q| StageInput {
                     item: item_link(ds, &q.item_id, Some(q.qty)),
@@ -447,14 +494,32 @@ pub fn commit(ds: &Dataset, profile: &mut Profile, project_id: &str, item_id: &s
             *progress.from_stash.entry(format!("{}/{item_id}", progress.stage)).or_insert(0) += spent;
         }
     }
-    // A stage whose inputs are all in moves on, including one reopened with nothing taken back.
-    let complete = stage.inputs.iter()
-        .all(|i| progress.committed.get(&i.item_id).copied().unwrap_or(0) >= i.qty);
-    if complete {
-        progress.stage += 1;
-        progress.committed.clear();
+    // A finished stage moves on, including one reopened with nothing taken back.
+    if stage_finished(ds, project_id, stage, progress) {
+        next_stage(progress);
     }
     taken
+}
+
+/// Ticks a step (or every step in a group) of the current stage's objectives, tracking
+/// the project if it wasn't. The stage moves on once it's finished. Returns the stage
+/// now in progress.
+pub fn set_project_objective(ds: &Dataset, profile: &mut Profile, project_id: &str, objective_id: &str, done: bool) -> u32 {
+    let Some(project) = ds.files.projects.iter().find(|p| p.id == project_id) else { return 0 };
+    let progress = profile.projects.entry(project_id.to_string())
+        .or_insert_with(|| ProjectProgress { stage: 1, ..Default::default() });
+    let Some(stage) = project.stages.iter().find(|s| s.n == progress.stage) else { return progress.stage };
+    let Some(task) = stage_task(ds, project_id, stage.n) else { return progress.stage };
+    let mut ids = Vec::new();
+    steps_under(&task.objectives, objective_id, &mut ids, 0);
+    progress.objectives_done.retain(|o| !ids.contains(&o.as_str()));
+    if done {
+        progress.objectives_done.extend(ids.iter().map(|s| s.to_string()));
+    }
+    if done && stage_finished(ds, project_id, stage, progress) {
+        next_stage(progress);
+    }
+    progress.stage
 }
 
 /// Takes back up to `qty` of an item committed to the current stage. What came out of the
@@ -502,6 +567,7 @@ pub fn reopen_stage(ds: &Dataset, profile: &mut Profile, project_id: &str) -> u3
     progress.committed = project.stages.iter().find(|s| s.n == stage - 1)
         .map(|s| s.inputs.iter().map(|i| (i.item_id.clone(), i.qty)).collect())
         .unwrap_or_default();
+    progress.objectives_done = stage_task(ds, project_id, stage - 1).map(all_steps).unwrap_or_default();
     progress.stage
 }
 

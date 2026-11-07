@@ -34,7 +34,7 @@
   {#if o}
     <label class="step" class:small class:finished={done.includes(o.id)}>
       <input type="checkbox" checked={done.includes(o.id)} onchange={(e) => ontick(o.id, e.currentTarget.checked)} />
-      <span>{#if o.kind === "optional"}<span class="dim">(Optional)&nbsp;</span>{/if}{o.description}</span>
+      <span>{#if o.kind === "optional"}<span class="dim">(Optional)&nbsp;</span>{/if}{o.description}{#if o.amount && o.amount > 1}<span class="dim">&nbsp;· {o.amount}</span>{/if}</span>
     </label>
   {/if}
 {/snippet}

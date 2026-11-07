@@ -28,6 +28,7 @@ const SKILLS_OVERLAY: &str = include_str!("../../../dataset/overlays/skills_over
 const MAPS_OVERLAY: &str = include_str!("../../../dataset/overlays/maps_overlay.json");
 const BENCHES_OVERLAY: &str = include_str!("../../../dataset/overlays/benches_overlay.json");
 const PROJECTS_OVERLAY: &str = include_str!("../../../dataset/overlays/projects_overlay.json");
+const PROJECT_TASKS_OVERLAY: &str = include_str!("../../../dataset/overlays/project_tasks_overlay.json");
 const NOTES_OVERLAY: &str = include_str!("../../../dataset/overlays/notes_overlay.json");
 const QUESTS_OVERLAY: &str = include_str!("../../../dataset/overlays/quests_overlay.json");
 const STENCILS_OVERLAY: &str = include_str!("../../../dataset/overlays/stencils_overlay.json");
@@ -252,6 +253,57 @@ fn apply_notes(files: &mut arc_core::dataset::DatasetFiles) -> Result<()> {
         list.push(m::MapMarker(room, door.x, door.y, door.floors, Some(door.label)));
     }
     files.notes.items = overlay.items;
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ProjectTasksOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    stages: Vec<HandTask>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct HandTask {
+    project: String,
+    stage: u32,
+    title: String,
+    map: Option<String>,
+    description: Option<String>,
+    steps: Vec<HandStep>,
+    #[allow(dead_code)]
+    source: String,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct HandStep {
+    text: String,
+    amount: Option<u32>,
+}
+
+/// Mission stages from project_tasks_overlay.json, as a sequence of steps per stage.
+fn apply_project_tasks(files: &mut arc_core::dataset::DatasetFiles) -> Result<()> {
+    let overlay: ProjectTasksOverlay = serde_json::from_str(PROJECT_TASKS_OVERLAY).context("project_tasks_overlay.json")?;
+    files.project_tasks.stages = overlay.stages.into_iter().map(|t| {
+        let base = format!("{}-s{}", t.project, t.stage);
+        let maps: Vec<String> = t.map.iter().cloned().collect();
+        let step = |id: String, kind: &str, children: Vec<String>, amount: Option<u32>, text: Option<String>| m::Objective {
+            id, kind: kind.into(), children, round_constraint: None, action: None, amount, description: text,
+            maps: maps.clone(), poi_ids: Vec::new(), item_ids: Vec::new(), maps_provenance: None,
+        };
+        let mut objectives: Vec<m::Objective> = t.steps.into_iter().enumerate()
+            .map(|(i, s)| step(format!("{base}-o{}", i + 1), "atomic", Vec::new(), s.amount, Some(s.text)))
+            .collect();
+        let children = objectives.iter().map(|o| o.id.clone()).collect();
+        objectives.insert(0, step(format!("{base}-root"), "sequence", children, None, None));
+        m::ProjectTask {
+            project_id: t.project, stage: t.stage, title: t.title, map: t.map, description: t.description,
+            objective_root: format!("{base}-root"), objectives,
+        }
+    }).collect();
     Ok(())
 }
 
@@ -490,6 +542,7 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     let (_, marker_fixture) = newest_fixture(root, "metaforge_markers")?;
     out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
     apply_notes(&mut out.files)?;
+    apply_project_tasks(&mut out.files)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

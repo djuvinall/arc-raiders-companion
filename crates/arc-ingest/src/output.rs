@@ -32,6 +32,7 @@ pub fn render(files: &DatasetFiles, coverage: &Value) -> Result<BTreeMap<&'stati
         ("map_markers.json", serde_json::to_string(&files.markers)? + "\n"),
         ("version.json", pretty(&files.version)?),
         ("notes.json", pretty(&files.notes)?),
+        ("project_tasks.json", pretty(&files.project_tasks)?),
         ("coverage.json", pretty(coverage)?),
     ]))
 }

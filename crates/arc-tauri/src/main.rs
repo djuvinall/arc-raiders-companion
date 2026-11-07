@@ -40,6 +40,7 @@ embedded!(
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
     "loot_areas.json", "map_markers.json", "version.json", "changelog.json", "notes.json",
+    "project_tasks.json",
 );
 
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
@@ -389,6 +390,11 @@ fn reopen_project_stage(state: State<AppState>, project_id: String) -> CommandRe
 }
 
 #[tauri::command]
+fn set_project_objective(state: State<AppState>, project_id: String, objective_id: String, done: bool) -> CommandResult<u32> {
+    with_profile(&state, |p| tracking::set_project_objective(&state.dataset, p, &project_id, &objective_id, done))
+}
+
+#[tauri::command]
 fn set_project_tracked(state: State<AppState>, project_id: String, tracked: bool) -> CommandResult<()> {
     with_profile(&state, |p| {
         if tracked {
@@ -595,7 +601,7 @@ fn main() {
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
             save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
-            commit_resource, uncommit_resource, reopen_project_stage, set_project_tracked, collection_list, toggle_found, patch_notes,
+            commit_resource, uncommit_resource, reopen_project_stage, set_project_objective, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,
             home_view, set_found, set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
             toggle_tracked_bench, complete_quest_chain, complete_implied_quests, open_mini,

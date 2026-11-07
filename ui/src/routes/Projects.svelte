@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { commitResource, linkHref, projectList, reopenProjectStage, setProjectTracked, uncommitResource, type ProjectView } from "../lib/api";
+  import { commitResource, linkHref, projectList, reopenProjectStage, setProjectObjective, setProjectTracked, uncommitResource, type ProjectView } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
+  import QuestTree from "../lib/components/QuestTree.svelte";
 
   let { id }: { id?: string } = $props();
   let projects = $state<ProjectView[]>([]);
@@ -61,7 +62,7 @@
   const input = $derived(stage?.inputs.find((i) => i.item.id === inputId) ?? stage?.inputs[0] ?? null);
   const left = $derived(input ? input.need - input.committed : 0);
   const stageFull = $derived(!!stage?.inputs.length && stage.inputs.every((i) => i.committed >= i.need));
-  const hasProgress = $derived(!!project && (project.stage > 1 || !!stage?.inputs.some((i) => i.committed > 0)));
+  const hasProgress = $derived(!!project && (project.stage > 1 || !!stage?.inputs.some((i) => i.committed > 0) || !!stage?.task?.done.length));
 
   function select(id: string) {
     selectedId = id;
@@ -116,6 +117,15 @@
     message = `Stage ${stage.n} done.`;
     last = null;
     await load();
+  });
+
+  const tick = (objectiveId: string, done: boolean) => run(async () => {
+    if (!project || !stage) return;
+    const n = stage.n;
+    const now = await setProjectObjective(project.id, objectiveId, done);
+    last = null;
+    await load();
+    message = now > n ? (finished(project) ? "Project complete." : `Stage ${n} done.`) : "";
   });
 
   async function track(on: boolean) {
@@ -191,6 +201,14 @@
         </div>
         {#if stageFull && !closed(project)}
           <p class="full-note">Everything for this stage is in. <button class="button small primary" disabled={busy} onclick={finishStage}>Finish stage {stage.n}</button></p>
+        {/if}
+        {#if stage.task}
+          <div class="task">
+            {#if stage.task.map}<a class="map" href="#/maps/{stage.task.map.id}">{stage.task.map.name}</a>{/if}
+            {#if stage.task.description}<p>{stage.task.description}</p>{/if}
+            <QuestTree quest={stage.task} done={stage.task.done} ontick={closed(project) ? () => load() : tick} />
+            {#if closed(project)}<p class="dim">Shown for reference.</p>{/if}
+          </div>
         {/if}
         <div class="inputs">
           {#each stage.inputs as row (row.item.id)}
@@ -320,6 +338,25 @@
   .stage {
     font-size: 20px;
     margin: 8px 0;
+  }
+  .task {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .task p {
+    margin: 0;
+  }
+  .task .map {
+    color: var(--text-dim);
+    font-family: var(--font-head);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
   .inputs {
     display: flex;

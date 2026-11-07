@@ -724,3 +724,30 @@ fn upgrading_a_bench_takes_its_materials_and_lowering_it_gives_them_back() {
     assert_eq!(p.stash[&first.item_id], first.qty + 3);
     assert!(set_bench_level(&ds, &mut p, &bench.id, 0, true).items.is_empty());
 }
+
+#[test]
+fn mission_stages_finish_when_their_steps_do() {
+    let ds = real();
+    let task = ds.files.project_tasks.stages.iter().find(|t| t.project_id == "souls-offering" && t.stage == 4).unwrap();
+    assert_eq!(task.title, "Honor The Fallen");
+    let mut p = Profile::default();
+    p.projects.insert("souls-offering".into(), ProjectProgress { stage: 4, ..Default::default() });
+    let view = project_views(&ds, &p).into_iter().find(|v| v.id == "souls-offering").unwrap();
+    let stage = &view.stages[3];
+    assert_eq!(stage.title, "Honor The Fallen");
+    assert!(stage.task.as_ref().unwrap().done.is_empty());
+    assert!(view.stages[2].task.is_none());
+
+    let steps: Vec<String> = task.objectives.iter().filter(|o| o.kind == "atomic").map(|o| o.id.clone()).collect();
+    assert_eq!(set_project_objective(&ds, &mut p, "souls-offering", &steps[0], true), 4, "one step left");
+    assert_eq!(set_project_objective(&ds, &mut p, "souls-offering", &steps[1], true), 5, "last step finishes the stage");
+    assert!(p.projects["souls-offering"].objectives_done.is_empty());
+    let view = project_views(&ds, &p).into_iter().find(|v| v.id == "souls-offering").unwrap();
+    assert_eq!(view.stages[3].task.as_ref().unwrap().done.len(), 2, "finished stages read as done");
+
+    // Reopening brings the steps back ticked, ready to untick.
+    assert_eq!(reopen_stage(&ds, &mut p, "souls-offering"), 4);
+    assert_eq!(p.projects["souls-offering"].objectives_done.len(), 2);
+    assert_eq!(set_project_objective(&ds, &mut p, "souls-offering", &task.objective_root, false), 4);
+    assert!(p.projects["souls-offering"].objectives_done.is_empty(), "the root unticks every step");
+}

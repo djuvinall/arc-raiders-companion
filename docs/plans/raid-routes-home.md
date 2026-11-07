@@ -1,13 +1,15 @@
 # Plan: raid planner, farming finder, Home revamp, Nomadic Envoy
 
-Branch: `raid-routes-home`. Written 2026-11-07 from Devon's brief. Nothing here is built yet.
+Branch: `raid-routes-home`. Written 2026-11-07 from Devon's brief, revised the same day with
+Devon's answers (see the end). Nothing here is built yet.
 
 ## Goals
 
 1. **Raid owns routes.** The Maps screen stops planning; the Raid screen is where you plan a
    raid you have in mind, write it down and track it.
-2. **Auto routes that respect spawn uncertainty**, with categories and single items you can
-   switch off, and parameters you can adjust.
+2. **Auto plans that respect spawn uncertainty**: since you don't know where you'll load in,
+   a plan picks **target areas** worth heading to, not a route from a fixed start. Categories
+   and single items can be switched off, and the settings can be adjusted.
 3. **Custom routes** you draw yourself, or start from an auto route and edit.
 4. **Farm finder:** the best places on any map to farm one or more resources.
 5. **Home shows the most important thing from each tab** and links straight into it.
@@ -24,7 +26,8 @@ Branch: `raid-routes-home`. Written 2026-11-07 from Devon's brief. Nothing here 
 - **Loot types:** 13 loot areas (Mechanical, Electrical, Medical, Residential, Industrial, ARC,
   Old World, Exodus, Nature, Technological, Commercial and others) list which items they can
   drop. The in-game map legend shows the same types as zones (your Pendola Pass screenshot).
-- **Player spawns:** 160 markers, so a route can start from the spawn you got.
+- **Player spawns:** 160 markers, but you don't know which one you got until you're in, so
+  plans can't start from a spawn.
 - **Extractions:** every map's exits are markers, so a route can end at the nearest one.
 - **No walkable paths.** Distances are straight lines. Good for ordering stops and comparing
   areas; it won't route around cliffs. The app says so.
@@ -60,7 +63,12 @@ A **raid plan** is saved in the profile: name, map, start spawn (optional), stop
 notes, the settings that made it, and a status (planned, in raid, done). The Raid screen
 lists your plans and opens one on its map.
 
-**Auto route**
+**Auto plan: target areas, not a route from spawn**
+
+You don't know your spawn, so the plan's core is a ranked list of **target areas** (tight
+clusters of good containers and quest stops). Inside each area the stops get a short loop
+order. Once you're in and know roughly where you are, you head for the nearest good area; the
+plan shows each area's nearest exits.
 
 - **What it's for, as switches by category:**
   - quest objectives on this map;
@@ -72,15 +80,18 @@ lists your plans and opens one on its map.
 
   Inside each category, every item and stop has its own switch. Switched-off things stay
   listed, dimmed, so you can switch them back.
-- **Settings:** stops limit, confidence (chances per item), stay in one area vs spread out,
-  start from spawn, end at the nearest exit, floors.
-- **Building the route:** pick containers by best chance per metre, cluster them, order with
-  nearest-neighbour plus 2-opt, add the exit. Quest objectives are fixed stops; loot fills
-  around them.
+- **Settings:** how many areas, area radius, confidence (chances per item), floors.
+- **Building the plan:** score every container for what you want, cluster them into areas,
+  rank areas by combined chance per metre, order the stops inside each area with
+  nearest-neighbour plus 2-opt, and list its nearest exits. Quest objectives are fixed stops
+  and pull their area up the list.
+- **Container types:** all on by default, since you open everything at some point. Each
+  type's weight comes from the loot it can drop, so a medical run leans on med bags without
+  you switching anything. You can still switch a type off for one plan.
 
 **Custom route**
 
-- Click any marker or any spot on the map to add a stop. Drag in the list to reorder, add a
+- Click any marker or any spot on the map to add a stop, or draw an area to target. Drag in the list to reorder, add a
   note to a stop, delete a stop.
 - **Edit an auto route:** turn it into a custom one and keep changing it. The auto settings
   stay saved, so you can regenerate.
@@ -91,6 +102,9 @@ lists your plans and opens one on its map.
   checklist next to the quests.
 - **Finish** asks what you came back with, which ticks quest steps and adds to the stash.
   This is a later hook for the screenshot import we discussed.
+- **Raid log: not in v1.** A finished plan goes back to "planned" so you can reuse it. A log
+  of finished raids with notes can come later, filled in automatically if the screenshot
+  import lands.
 
 **Maps screen changes**
 
@@ -131,8 +145,9 @@ say hide, so a new player sees a short page.
 - No feed exists, so the week's stock is **entered by you**:
   - **Read it from a screenshot** of his shop, using the same reader as the Codex import (best).
   - **Or type it in:** pick items and their trade prices.
-- Stored in the profile with the week it belongs to. It's marked out of date after the weekly
-  reset, so you know to refresh it.
+- Stored in the profile with the date you entered it. The reset time isn't known yet, so the
+  card says how old the entry is ("entered 3 days ago") rather than guessing when it expires.
+  Once the reset day is confirmed in game, the card can mark it out of date automatically.
 - The card flags what you need (tracked, quests, projects, benches) using the existing
   keep/sell advice.
 - Later, optional: a community `envoy.json` in arc-raiders-data, so one person's entry reaches
@@ -151,11 +166,19 @@ say hide, so a new player sees a short page.
 Each step ships on this branch with tests and a headless screenshot check, and is merged to
 `main` for a release when it's whole.
 
-## Questions for Devon
+## Devon's answers (2026-11-07)
 
-1. **Envoy reset:** what day and time does his stock change (your time zone)?
-2. **Spawns:** when you load in, do you know which spawn you got? If not, "start from spawn"
-   is less useful and routes should start from the stop nearest the map edge you choose.
-3. **Raid history:** should finished raids stay listed with notes (a raid log), or disappear?
-4. **Containers:** are there types you never bother opening (for example cars)? Those make good
-   defaults to switch off.
+1. **Envoy reset:** not known yet. The card shows how old the entry is; find the reset in
+   game when convenient.
+2. **Spawns:** you don't know which spawn you got, so plans target areas rather than routes
+   from a spawn (section 2).
+3. **Raid log:** nice to have, not v1.
+4. **Containers:** everything gets opened at some point, depending on what you're after. No
+   type is off by default; the loot pools weight them per target.
+
+## Done on this branch already
+
+- **Project stages played as missions.** Soul's Offering stage 4 ("Honor The Fallen") has
+  objectives instead of materials, so it showed an empty page. Stages can now carry
+  objectives, nested like quests, from a new `project_tasks.json` (its own file, so apps from
+  before it keep taking data updates). Ticking the last step finishes the stage.

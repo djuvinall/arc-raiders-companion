@@ -421,6 +421,7 @@ export interface Objective {
   kind: string;
   children: string[];
   description: string | null;
+  amount?: number | null;
   maps: string[];
 }
 
@@ -497,6 +498,14 @@ export interface StageView {
   title: string;
   inputs: { item: Link; need: number; committed: number; in_stash: number }[];
   rewards: Link[];
+  /** A stage played as a mission: its steps and which are ticked. */
+  task: {
+    map: Link | null;
+    description: string | null;
+    objective_root: string;
+    objectives: Objective[];
+    done: string[];
+  } | null;
 }
 
 export interface ProjectView {
@@ -600,6 +609,8 @@ export const commitResource = (projectId: string, itemId: string, qty: number) =
 export const uncommitResource = (projectId: string, itemId: string, qty: number) =>
   invoke<number>("uncommit_resource", { projectId, itemId, qty });
 export const reopenProjectStage = (projectId: string) => invoke<number>("reopen_project_stage", { projectId });
+export const setProjectObjective = (projectId: string, objectiveId: string, done: boolean) =>
+  invoke<number>("set_project_objective", { projectId, objectiveId, done });
 export const setProjectTracked = (projectId: string, tracked: boolean) =>
   invoke<void>("set_project_tracked", { projectId, tracked });
 

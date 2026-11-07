@@ -930,7 +930,7 @@ pub fn normalize(src: &Sources, prec: &Precedence, overlay: &crate::skills::Over
 
     let files = DatasetFiles {
         items, recipes, workbenches, weapon_mods, maps, pois, quests, projects, skills, arcs,
-        traders, loot_areas, markers: MapMarkers::default(), version, notes: Default::default(),
+        traders, loot_areas, markers: MapMarkers::default(), version, notes: Default::default(), project_tasks: Default::default(),
     };
     Ok(Output { files, unresolved: res.unresolved.into_iter().collect() })
 }
