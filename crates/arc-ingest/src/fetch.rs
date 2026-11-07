@@ -182,6 +182,38 @@ pub fn wiki_arcs(client: &Client, metaforge: &Value) -> Result<Value> {
     Ok(json!({ "pages": pages }))
 }
 
+/// The name a weapon's wiki page goes by: levels share one page.
+pub fn weapon_family(name: &str) -> &str {
+    [" IV", " III", " II", " I"].iter().find_map(|s| name.strip_suffix(s)).unwrap_or(name)
+}
+
+/// Weapon and shield pages by page name (Rattler I-IV share "Rattler"), for the
+/// infoboxes' fire rate in RPM, headshot multiplier, reload time and shield charge.
+/// Amplified versions have no pages.
+pub fn wiki_gear(client: &Client, metaforge: &Value) -> Result<Value> {
+    let items = metaforge["items"]["data"].as_array().or(metaforge["items"].as_array()).map(Vec::as_slice).unwrap_or(&[]);
+    let mut families: Vec<&str> = items.iter()
+        .filter(|i| matches!(i["item_type"].as_str(), Some("Weapon" | "Shield")))
+        .filter_map(|i| i["name"].as_str())
+        .filter(|n| !n.starts_with("Amplified"))
+        .map(weapon_family)
+        .collect();
+    families.sort();
+    families.dedup();
+    let mut pages = serde_json::Map::new();
+    for family in families {
+        for title in [family, family.trim_end_matches(" Rifle")] {
+            let url = format!("{WIKI_API}?action=parse&redirects=1&page={}&prop=wikitext&format=json", title.replace(' ', "_"));
+            let text = client.get_json(&url).ok().and_then(|d| d["parse"]["wikitext"]["*"].as_str().map(str::to_string));
+            if let Some(text) = text.filter(|t| t.contains("Infobox weapon") || t.contains("Infobox shield")) {
+                pages.insert(family.to_string(), Value::String(text));
+                break;
+            }
+        }
+    }
+    Ok(json!({ "pages": pages }))
+}
+
 /// Every marker, compact: `[category, subcategory, x, y, floors, name]`, for the map legend.
 pub fn metaforge_markers(client: &Client) -> Result<Value> {
     let round = |v: &Value| v.as_f64().map(|n| (n * 10.0).round() / 10.0);

@@ -47,6 +47,7 @@ pub fn run(root: &Path) -> Result<()> {
     load_or_fetch(root, "steam", &date, || fetch::steam(&polite))?;
     load_or_fetch(root, "wiki_skills", &date, || fetch::wiki_skills(&polite))?;
     load_or_fetch(root, "wiki_arcs", &date, || fetch::wiki_arcs(&polite, &mf))?;
+    load_or_fetch(root, "wiki_gear", &date, || fetch::wiki_gear(&polite, &mf))?;
     load_or_fetch(root, "metaforge_markers", &date, || fetch::metaforge_markers(&polite))?;
 
     report(&mf, &wiki, &rt);

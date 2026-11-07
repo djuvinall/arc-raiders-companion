@@ -62,6 +62,7 @@ fn plan(ranks: &[(&str, u32)]) -> SkillPlan {
         tree_version: "2.0".into(),
         expedition_bonus: 0,
         ranks: ranks.iter().map(|(id, r)| (id.to_string(), *r)).collect(),
+        auto_save: false,
     }
 }
 
@@ -225,7 +226,7 @@ fn real_tree_accepts_a_legal_build() {
     ] {
         ranks.insert(id.to_string(), rank);
     }
-    let p = SkillPlan { name: "x".into(), tree_version: "2.0".into(), expedition_bonus: 0, ranks };
+    let p = SkillPlan { name: "x".into(), tree_version: "2.0".into(), expedition_bonus: 0, ranks, auto_save: false };
     let report = validate(&t, &p);
     assert!(report.ok, "{:?}", report.errors);
     assert_eq!(report.branch_points["conditioning"], 16);
@@ -263,7 +264,7 @@ fn real_tree_reproduces_the_screenshot_build() {
     ] {
         ranks.insert(id.to_string(), rank);
     }
-    let p = SkillPlan { name: "x".into(), tree_version: "2.0".into(), expedition_bonus: 0, ranks };
+    let p = SkillPlan { name: "x".into(), tree_version: "2.0".into(), expedition_bonus: 0, ranks, auto_save: false };
     let report = validate(&t, &p);
     assert!(report.ok, "{:?}", report.errors);
     assert_eq!(report.branch_points["mobility"], 41);

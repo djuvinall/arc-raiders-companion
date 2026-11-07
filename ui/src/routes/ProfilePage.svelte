@@ -31,8 +31,33 @@
     await load();
   }
 
+  let benchNote = $state("");
+  // Off while entering levels reached earlier, so setting up doesn't empty the stash.
+  const SPEND_KEY = "bench-use-stash";
+  let spend = $state((() => {
+    try {
+      return localStorage.getItem(SPEND_KEY) !== "off";
+    } catch {
+      return true;
+    }
+  })());
+  function setSpend(on: boolean) {
+    spend = on;
+    try {
+      localStorage.setItem(SPEND_KEY, on ? "on" : "off");
+    } catch {
+      // Remembering the choice is only a convenience.
+    }
+  }
+
   async function level(bench: BenchView, value: number) {
-    await setWorkbenchLevel(bench.id, Math.min(bench.max_level, Math.max(0, value)));
+    const moved = await setWorkbenchLevel(bench.id, Math.min(bench.max_level, Math.max(0, value)), spend);
+    const list = (sign: number) => moved.items.filter(([, q]) => Math.sign(q) === sign)
+      .map(([id, q]) => `${Math.abs(q)}× ${summary(id)?.name ?? id}`).join(", ");
+    const took = list(1);
+    const back = list(-1);
+    benchNote = took ? `Took ${took} from your stash for ${bench.name}. Lower it again to put them back.`
+      : back ? `Put ${back} back in your stash.` : "";
     await load();
   }
 
@@ -98,6 +123,16 @@
   <section class="panel wide">
     <h3 class="section-title">Workbenches</h3>
     <p class="dim small">Set your levels so items show what you can craft and what to save. Track one to add its next level to what's needed.</p>
+    <label class="small spend">
+      <input type="checkbox" checked={spend} onchange={(e) => setSpend(e.currentTarget.checked)} />
+      Use materials from my stash when raising a level
+    </label>
+    <p class="dim small">
+      {spend
+        ? "On: raising a level takes its materials from your stash, as upgrading does in game. Lowering it puts back what it took."
+        : "Off: raising only records the level, for benches you upgraded before using this app. Nothing leaves your stash."}
+    </p>
+    {#if benchNote}<p class="small" role="status">{benchNote}</p>{/if}
     <div class="benches">
       {#each benches as bench (bench.id)}
         <div class="bench">
@@ -148,6 +183,12 @@
   .have {
     width: 64px;
     padding: 2px 6px;
+  }
+  .spend {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 6px;
   }
   .benches {
     display: grid;

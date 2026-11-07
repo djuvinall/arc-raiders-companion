@@ -177,15 +177,22 @@
         title: `${p.name}: ${areas.join(", ")}`, label: showLabels ? p.name : null,
       };
     });
+    const doors = new Set(doorsHere?.markers ?? []);
     set.markers.forEach(([index, x, y, z, label], i) => {
       const category = set!.categories[index];
-      if (category?.id === "locations/extraction" && onFloor(z)) {
+      if (doors.has(i) && category && onFloor(z)) {
+        const name = label?.trim() || category.name;
+        out.push({ key: `d${i}`, x, y, icon: category.id, group: category.group, title: `Opens: ${name}`, label: showLabels ? name : null });
+      } else if (category?.id === "locations/extraction" && onFloor(z)) {
         out.push({ key: `x${i}`, x, y, icon: category.id, group: "locations", title: label ?? "Extraction", label: showLabels ? label ?? "Extraction" : null });
       }
     });
     return out;
   });
-  const spotCount = (mapId: string) => finding?.found_in.reduce((sum, f) => sum + (f.maps.find((m) => m.map.id === mapId)?.poi_count ?? 0), 0) ?? 0;
+  // Keys: the doors they open, beside any loot spots.
+  const doorsHere = $derived(finding?.opens.find((o) => o.map.id === current?.id) ?? null);
+  const doorCount = (mapId: string) => finding?.opens.find((o) => o.map.id === mapId)?.markers.length ?? 0;
+  const spotCount = (mapId: string) => (finding?.found_in.reduce((sum, f) => sum + (f.maps.find((m) => m.map.id === mapId)?.poi_count ?? 0), 0) ?? 0) + doorCount(mapId);
   const areaCounts = $derived(findAreas.map((a) => ({ name: areaName(a), count: spots.filter((p) => p.loot_areas.includes(a)).length })).filter((a) => a.count));
 
   // Quest pins name their quest; the rest are named by their type.
@@ -294,12 +301,22 @@
               <h3>{finding.item.name}</h3>
             </div>
           </div>
+          {#if finding.opens.length}
+            {#if doorsHere}
+              <p class="small">Opens <strong>{doorsHere.markers.length}</strong> {doorsHere.markers.length === 1 ? "door" : "doors"} on {current?.name ?? "this map"}: {doorsHere.places.join(", ")}.</p>
+            {:else}
+              <p class="small">Opens doors on {finding.opens.map((o) => o.map.name).join(", ")}, not here.</p>
+            {/if}
+          {/if}
           {#if findAreas.length}
             <p class="small">Found in {findAreas.map(areaName).join(", ")} areas.</p>
             <p class="small"><strong>{spots.length}</strong> {spots.length === 1 ? "spot" : "spots"} on {current?.name ?? "this map"}{floors.length ? ` (${findPoints.filter((p) => p.group === "containers").length} on this floor)` : ""}.</p>
             {#each areaCounts as area (area.name)}<p class="small dim">{area.name}: {area.count}</p>{/each}
             <p class="small dim">The numbers on the map buttons count spots on each map. Exits are shown for planning the way out.</p>
-          {:else}
+          {:else if finding.note}
+            <p class="small">{finding.note.where}</p>
+            <p class="small dim">{finding.note.source}</p>
+          {:else if !finding.opens.length}
             <p class="small">No source maps this item to a loot area, so there's nowhere to point to.</p>
           {/if}
           <label class="small"><input type="checkbox" bind:checked={showLabels} /> Labels</label>

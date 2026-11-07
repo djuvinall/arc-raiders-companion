@@ -30,6 +30,7 @@ pub struct DatasetFiles {
     pub loot_areas: Vec<LootArea>,
     pub markers: MapMarkers,
     pub version: DatasetVersion,
+    pub notes: Notes,
 }
 
 #[derive(Debug, Default)]
@@ -81,6 +82,11 @@ impl Dataset {
             loot_areas: parse(read, "loot_areas.json")?,
             markers: parse(read, "map_markers.json")?,
             version: parse(read, "version.json")?,
+            // Newer than the other files, so older data has none.
+            notes: match read("notes.json") {
+                Ok(_) => parse(read, "notes.json")?,
+                Err(_) => Notes::default(),
+            },
         };
         Self::from_files(files)
     }
@@ -165,6 +171,11 @@ fn check_unique<'a>(errors: &mut Vec<String>, what: &str, ids: impl Iterator<Ite
 pub fn integrity_errors(f: &DatasetFiles) -> Vec<String> {
     let mut errors = Vec::new();
     check_unique(&mut errors, "item", f.items.iter().map(|x| x.id.as_str()));
+    for id in f.notes.items.keys() {
+        if !f.items.iter().any(|i| &i.id == id) {
+            errors.push(format!("notes.json: unknown item {id}"));
+        }
+    }
     check_unique(&mut errors, "recipe", f.recipes.iter().map(|x| x.id.as_str()));
     check_unique(&mut errors, "poi", f.pois.iter().map(|x| x.id.as_str()));
     check_unique(&mut errors, "quest", f.quests.iter().map(|x| x.id.as_str()));

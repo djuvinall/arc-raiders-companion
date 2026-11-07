@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    liveEvents, linkHref, mapList, mapPois, questList, routePlan,
+    liveEvents, linkHref, mapList, mapPois, questList, routePlan, STEP_KINDS,
     type EventsView, type GameMap, type Poi, type QuestRow, type RoutePlan,
   } from "../lib/api";
   import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
@@ -49,7 +49,7 @@
 
   const working = $derived(quests.filter((q) => q.status === "active" || (q.status === "needed" && q.open)));
   const open = (q: QuestRow, map: string) =>
-    q.quest.objectives.filter((o) => o.kind === "atomic" && o.maps.includes(map) && !q.done_objectives.includes(o.id));
+    q.quest.objectives.filter((o) => STEP_KINDS.includes(o.kind) && o.maps.includes(map) && !q.done_objectives.includes(o.id));
   const live = (id: string) => events?.maps.find((m) => m.map_id === id);
   // Quests come first: an objective only happens on its own map, loot is usually in several.
   const rows = $derived(

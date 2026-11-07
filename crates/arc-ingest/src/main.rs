@@ -7,6 +7,7 @@
 
 mod arcs;
 mod fetch;
+mod guns;
 mod http;
 mod normalize;
 mod output;
@@ -27,6 +28,8 @@ const SKILLS_OVERLAY: &str = include_str!("../../../dataset/overlays/skills_over
 const MAPS_OVERLAY: &str = include_str!("../../../dataset/overlays/maps_overlay.json");
 const BENCHES_OVERLAY: &str = include_str!("../../../dataset/overlays/benches_overlay.json");
 const PROJECTS_OVERLAY: &str = include_str!("../../../dataset/overlays/projects_overlay.json");
+const NOTES_OVERLAY: &str = include_str!("../../../dataset/overlays/notes_overlay.json");
+const QUESTS_OVERLAY: &str = include_str!("../../../dataset/overlays/quests_overlay.json");
 const STENCILS_OVERLAY: &str = include_str!("../../../dataset/overlays/stencils_overlay.json");
 const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
 
@@ -101,6 +104,155 @@ struct ProjectsOverlay {
     _note: String,
     permanent: Vec<String>,
     paused: Vec<String>,
+}
+
+#[derive(serde::Deserialize)]
+struct QuestsOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    quests: std::collections::BTreeMap<String, QuestNesting>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct QuestNesting {
+    #[serde(rename = "_seen")]
+    _seen: String,
+    #[serde(default)]
+    optional: Vec<String>,
+    /// See the overlay's note for the shape.
+    tree: Option<Value>,
+}
+
+const OPTIONAL_PREFIX: &str = "(Optional)";
+
+fn group_node(id: String, kind: &str, children: Vec<String>, title: Option<String>) -> m::Objective {
+    m::Objective {
+        id,
+        kind: kind.into(),
+        children,
+        round_constraint: None,
+        action: None,
+        amount: None,
+        description: title,
+        maps: Vec::new(),
+        poi_ids: Vec::new(),
+        item_ids: Vec::new(),
+        maps_provenance: None,
+    }
+}
+
+/// Turns one tree entry into a node id, adding group nodes as it goes.
+fn tree_node(quest: &str, value: &Value, steps: &mut Vec<String>, groups: &mut Vec<m::Objective>) -> Result<String> {
+    match value {
+        Value::String(id) => {
+            steps.push(id.clone());
+            Ok(id.clone())
+        }
+        Value::Array(list) => {
+            let children = list.iter().map(|v| tree_node(quest, v, steps, groups)).collect::<Result<Vec<_>>>()?;
+            let id = format!("g{}", groups.len() + 1);
+            groups.push(group_node(id.clone(), "sequence", children, None));
+            Ok(id)
+        }
+        Value::Object(map) => {
+            let title = map.get("title").and_then(Value::as_str).map(str::to_string);
+            let (kind, list) = match (map.get("all"), map.get("any")) {
+                (Some(Value::Array(l)), None) => ("all", l),
+                (None, Some(Value::Array(l))) => ("any", l),
+                _ => bail!("quests_overlay.json: {quest} has a group without exactly one of all/any"),
+            };
+            if map.keys().any(|k| !matches!(k.as_str(), "all" | "any" | "title")) {
+                bail!("quests_overlay.json: {quest} has a group with an unknown key");
+            }
+            let children = list.iter().map(|v| tree_node(quest, v, steps, groups)).collect::<Result<Vec<_>>>()?;
+            let id = format!("g{}", groups.len() + 1);
+            groups.push(group_node(id.clone(), kind, children, title));
+            Ok(id)
+        }
+        _ => bail!("quests_overlay.json: {quest} has a step that isn't an id, list or group"),
+    }
+}
+
+/// Nests steps the way the in-game quest log does, and marks optional steps. Steps keep
+/// their ids; the root sequence's children become the tree's top level.
+fn apply_quest_nesting(quests: &mut [m::Quest]) -> Result<()> {
+    for quest in quests.iter_mut() {
+        for o in quest.objectives.iter_mut().filter(|o| o.kind == "atomic") {
+            let text = o.description.as_deref().unwrap_or("");
+            if let Some(rest) = text.strip_prefix(OPTIONAL_PREFIX) {
+                o.description = Some(rest.trim().to_string());
+                o.kind = "optional".into();
+            }
+        }
+    }
+    let overlay: QuestsOverlay = serde_json::from_str(QUESTS_OVERLAY).context("quests_overlay.json")?;
+    for (id, nesting) in &overlay.quests {
+        let quest = quests.iter_mut().find(|q| &q.id == id)
+            .with_context(|| format!("quests_overlay.json names unknown quest {id}"))?;
+        let leaves: Vec<String> = quest.objectives.iter()
+            .filter(|o| o.kind == "atomic" || o.kind == "optional").map(|o| o.id.clone()).collect();
+        for o in &nesting.optional {
+            if !leaves.contains(o) {
+                bail!("quests_overlay.json: {id} has no step {o}");
+            }
+        }
+        for o in quest.objectives.iter_mut().filter(|o| nesting.optional.contains(&o.id)) {
+            o.kind = "optional".into();
+        }
+        let Some(tree) = &nesting.tree else { continue };
+        let Value::Array(top) = tree else { bail!("quests_overlay.json: {id}'s tree must be a list") };
+        let (mut steps, mut groups) = (Vec::new(), Vec::new());
+        let children = top.iter().map(|v| tree_node(id, v, &mut steps, &mut groups)).collect::<Result<Vec<_>>>()?;
+        let mut sorted = steps.clone();
+        sorted.sort();
+        sorted.dedup();
+        let mut want = leaves.clone();
+        want.sort();
+        if sorted.len() != steps.len() || sorted != want {
+            bail!("quests_overlay.json: {id}'s tree must list each of its steps once");
+        }
+        let root_id = quest.objective_root.clone();
+        let root = quest.objectives.iter_mut().find(|o| o.id == root_id).context("no root")?;
+        root.children = children;
+        quest.objectives.extend(groups);
+    }
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct NotesOverlay {
+    #[serde(rename = "_note")]
+    _note: String,
+    doors: Vec<HandDoor>,
+    items: std::collections::BTreeMap<String, m::ItemNote>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct HandDoor {
+    map: String,
+    x: f64,
+    y: f64,
+    floors: Option<u32>,
+    label: String,
+    #[allow(dead_code)]
+    source: String,
+}
+
+/// Hand-entered doors become locked-room markers; item notes go to notes.json.
+fn apply_notes(files: &mut arc_core::dataset::DatasetFiles) -> Result<()> {
+    let overlay: NotesOverlay = serde_json::from_str(NOTES_OVERLAY).context("notes_overlay.json")?;
+    let room = files.markers.categories.iter().position(|c| c.id == "locations/locked_room")
+        .context("no locked-room marker type")? as u16;
+    for door in overlay.doors {
+        let list = files.markers.maps.get_mut(&door.map)
+            .with_context(|| format!("notes_overlay.json: unknown map {}", door.map))?;
+        list.push(m::MapMarker(room, door.x, door.y, door.floors, Some(door.label)));
+    }
+    files.notes.items = overlay.items;
+    Ok(())
 }
 
 fn apply_project_status(projects: &mut [m::Project]) -> Result<()> {
@@ -303,6 +455,7 @@ fn write_schemas(dir: &Path) -> Result<()> {
         ("map_markers", schemars::schema_for!(m::MapMarkers)),
         ("version", schemars::schema_for!(m::DatasetVersion)),
         ("changelog", schemars::schema_for!(Vec<m::ChangelogEntry>)),
+        ("notes", schemars::schema_for!(m::Notes)),
     ];
     for (name, schema) in schemas {
         let text = serde_json::to_string_pretty(&schema)? + "\n";
@@ -325,12 +478,18 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     apply_map_tiles(&mut out.files.maps)?;
     apply_stencils(&mut out.files.items)?;
     apply_project_status(&mut out.files.projects)?;
+    apply_quest_nesting(&mut out.files.quests)?;
     apply_bench_fixes(&mut out.files.workbenches)?;
     tidy(&mut out.files);
     let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
     arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
+    // Older snapshots predate these pages, so a missing one leaves the API's values.
+    if let Ok((_, gun_pages)) = newest_fixture(root, "wiki_gear") {
+        guns::apply(&mut out.files.items, &gun_pages["pages"]);
+    }
     let (_, marker_fixture) = newest_fixture(root, "metaforge_markers")?;
     out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
+    apply_notes(&mut out.files)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

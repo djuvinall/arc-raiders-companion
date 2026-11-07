@@ -31,6 +31,7 @@ pub fn render(files: &DatasetFiles, coverage: &Value) -> Result<BTreeMap<&'stati
         // One line: about 43,000 markers, so indenting would triple the file.
         ("map_markers.json", serde_json::to_string(&files.markers)? + "\n"),
         ("version.json", pretty(&files.version)?),
+        ("notes.json", pretty(&files.notes)?),
         ("coverage.json", pretty(coverage)?),
     ]))
 }
@@ -205,13 +206,59 @@ pub fn update_changelog(data: &Path, rendered: &BTreeMap<&str, String>, files: &
             files.items.len(), files.recipes.len(), files.quests.len(), files.projects.len(), files.skills.nodes.len(),
         ));
     }
-    for change in changes {
-        entry.summary.push(format!(
-            "{}: {} added, {} removed, {} changed.",
-            change.file.trim_end_matches(".json"), change.added.len(), change.removed.len(), change.changed.len(),
-        ));
-        entry.files.push(change);
+    entry.files.extend(changes);
+    // Entries are newest first, so the one after each says which patch came before it.
+    for i in 0..log.len() {
+        let earlier = log.get(i + 1).and_then(|e| e.game_patch.clone());
+        tidy_entry(&mut log[i], earlier.as_deref());
     }
     fs::write(path, serde_json::to_string_pretty(&log)? + "\n")?;
     Ok(())
+}
+
+/// Folds a later write for the same file into one. Names repeat (many pois are called
+/// "Locker"), so each name is kept as many times as either write listed it.
+fn merge_change(files: &mut Vec<FileChange>, change: FileChange) {
+    let Some(old) = files.iter_mut().find(|f| f.file == change.file) else {
+        files.push(change);
+        return;
+    };
+    for (into, from) in [(&mut old.added, change.added), (&mut old.removed, change.removed), (&mut old.changed, change.changed)] {
+        let mut seen: BTreeMap<String, usize> = BTreeMap::new();
+        for name in from {
+            let n = seen.entry(name.clone()).or_default();
+            *n += 1;
+            if into.iter().filter(|x| **x == name).count() < *n {
+                into.push(name);
+            }
+        }
+    }
+}
+
+/// Rebuilds an entry's lines from its files, so a re-sync on the same dataset version
+/// leaves one line per file rather than stacking duplicates. A count at the name cap
+/// gets "+", since names past it aren't kept.
+fn tidy_entry(entry: &mut ChangelogEntry, earlier_patch: Option<&str>) {
+    let mut merged: Vec<FileChange> = Vec::new();
+    for change in std::mem::take(&mut entry.files) {
+        merge_change(&mut merged, change);
+    }
+    entry.files = merged;
+    let count = |v: &[String]| if v.len() >= NAMES_KEPT { format!("{}+", v.len()) } else { v.len().to_string() };
+    let mut summary: Vec<String> = entry.summary.iter().filter(|l| l.starts_with("First dataset")).cloned().collect();
+    if let (Some(was), Some(now)) = (earlier_patch, entry.game_patch.as_deref()) {
+        if was != now {
+            summary.push(format!("Checked against game patch {now} (was {was})."));
+        }
+    }
+    for f in &entry.files {
+        summary.push(format!(
+            "{}: {} added, {} removed, {} changed.",
+            f.file.trim_end_matches(".json"), count(&f.added), count(&f.removed), count(&f.changed),
+        ));
+    }
+    if entry.files.is_empty() {
+        summary.push("No data changes.".into());
+    }
+    entry.summary = summary;
 }

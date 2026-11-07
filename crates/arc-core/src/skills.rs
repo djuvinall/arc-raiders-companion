@@ -228,7 +228,7 @@ pub fn decode(code: &str) -> Result<SkillPlan, String> {
         let (id, rank) = entry.split_once('=').ok_or_else(bad)?;
         Ok((id.to_string(), rank.parse().map_err(|_| bad())?))
     }).collect::<Result<BTreeMap<String, u32>, String>>()?;
-    Ok(SkillPlan { name: name.to_string(), tree_version, expedition_bonus, ranks })
+    Ok(SkillPlan { name: name.to_string(), tree_version, expedition_bonus, ranks, auto_save: false })
 }
 
 /// Every id a plan references, for callers that report them.

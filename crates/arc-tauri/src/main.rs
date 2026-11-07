@@ -39,7 +39,7 @@ macro_rules! embedded {
 embedded!(
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
-    "loot_areas.json", "map_markers.json", "version.json", "changelog.json",
+    "loot_areas.json", "map_markers.json", "version.json", "changelog.json", "notes.json",
 );
 
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
@@ -119,8 +119,8 @@ fn workbench_list(state: State<AppState>) -> Vec<BenchView> {
 }
 
 #[tauri::command]
-fn set_workbench_level(state: State<AppState>, id: String, level: u8) -> CommandResult<()> {
-    with_profile(&state, |p| { p.workbenches.insert(id, level); })
+fn set_workbench_level(state: State<AppState>, id: String, level: u8, use_stash: bool) -> CommandResult<tracking::StashMove> {
+    with_profile(&state, |p| tracking::set_bench_level(&state.dataset, p, &id, level, use_stash))
 }
 
 #[tauri::command]
@@ -521,6 +521,17 @@ fn save_skill_plan(state: State<AppState>, plan: SkillPlan) -> CommandResult<()>
 fn delete_skill_plan(state: State<AppState>, name: String) -> CommandResult<()> {
     let mut profile = state.profile.lock().expect("profile lock");
     profile.skill_plans.retain(|p| p.name != name);
+    if profile.default_skill_plan.as_deref() == Some(name.as_str()) {
+        profile.default_skill_plan = None;
+    }
+    save_profile(&state.profile_path, &profile).map_err(|e| e.to_string())
+}
+
+/// The plan the Skills page opens with, or none for a blank tree.
+#[tauri::command]
+fn set_default_skill_plan(state: State<AppState>, name: Option<String>) -> CommandResult<()> {
+    let mut profile = state.profile.lock().expect("profile lock");
+    profile.default_skill_plan = name.filter(|n| profile.skill_plans.iter().any(|p| &p.name == n));
     save_profile(&state.profile_path, &profile).map_err(|e| e.to_string())
 }
 
@@ -580,7 +591,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             overview, list_items, get_item, craft_plan, get_entity, get_profile, set_stash,
-            skill_tree, skill_plan_state, save_skill_plan, delete_skill_plan,
+            skill_tree, skill_plan_state, save_skill_plan, delete_skill_plan, set_default_skill_plan,
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
             save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,

@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    iconSrc, decodeSkillPlan, deleteSkillPlan, encodeSkillPlan, getProfile, saveSkillPlan, skillPlanState,
+    iconSrc, decodeSkillPlan, deleteSkillPlan, encodeSkillPlan, getProfile, saveSkillPlan, setDefaultSkillPlan, skillPlanState,
     skillTree, type PlanState, type SkillGroup, type SkillNode, type SkillPlan, type SkillTree,
   } from "../lib/api";
 
@@ -22,11 +22,38 @@
   let code = $state("");
   let message = $state("");
 
-  skillTree().then((t) => {
+  let defaultName = $state<string | null>(null);
+
+  // Opens on the default plan when there is one, else a blank tree.
+  Promise.all([skillTree(), getProfile()]).then(([t, p]) => {
     tree = t;
-    plan.tree_version = t.tree_version;
+    saved = p.skill_plans;
+    defaultName = p.default_skill_plan;
+    const start = saved.find((s) => s.name === defaultName);
+    if (start) plan = structuredClone($state.snapshot(start));
+    else plan.tree_version = t.tree_version;
   });
-  getProfile().then((p) => (saved = p.skill_plans));
+
+  // Plans set to save automatically are saved when you leave the page.
+  $effect(() => () => {
+    if (plan.auto_save && plan.tree_version && unsaved()) {
+      const snapshot = $state.snapshot(plan);
+      snapshot.expedition_bonus = Math.max(0, Math.floor(Number(snapshot.expedition_bonus)) || 0);
+      saveSkillPlan(snapshot);
+    }
+  });
+
+  async function makeDefault(name: string | null) {
+    await setDefaultSkillPlan(name);
+    defaultName = (await getProfile()).default_skill_plan;
+    message = name ? `"${name}" opens whenever you come to Skills.` : "Skills opens on a blank tree.";
+  }
+
+  /** The flag is part of the saved plan, so turning it on or off saves the plan. */
+  async function toggleAutoSave() {
+    plan.auto_save = !plan.auto_save;
+    if (saved.some((s) => s.name === plan.name)) await save();
+  }
 
   // Only the newest answer counts, so a slow one can't overwrite a later plan.
   let asked = 0;
@@ -91,8 +118,8 @@
 
   // A plan with points that matches no saved plan would be lost, so New asks twice.
   let confirmNew = $state(false);
-  const unsaved = () => Object.keys(plan.ranks).length > 0 &&
-    !saved.some((p) => JSON.stringify(p) === JSON.stringify($state.snapshot(plan)));
+  const unsaved = () => (Object.keys(plan.ranks).length > 0 || saved.some((p) => p.name === plan.name)) &&
+    !saved.some((p) => JSON.stringify({ ...p, auto_save: !!p.auto_save }) === JSON.stringify({ ...$state.snapshot(plan), auto_save: !!plan.auto_save }));
 
   function fresh() {
     if (!confirmNew && unsaved()) {
@@ -274,6 +301,10 @@
           <button class="button" onclick={share}>Share</button>
           <button class="button" class:danger={confirmNew} onclick={fresh}>{confirmNew ? "Discard and start new" : "New"}</button>
         </div>
+        <label class="check">
+          <input type="checkbox" checked={!!plan.auto_save} onchange={toggleAutoSave} />
+          Save changes when I leave this page
+        </label>
         {#if message}<p class="message" role="status">{message}</p>{/if}
         {#each view.report.errors as error}<p class="error">{error}</p>{/each}
         {#each view.report.warnings as warning}<p class="warning">{warning}</p>{/each}
@@ -319,9 +350,16 @@
       {#if saved.length}
         <section class="panel">
           <h3 class="section-title">Saved plans</h3>
+          <p class="meta">★ opens whenever you come to Skills.</p>
           {#each saved as item (item.name)}
+            {@const isDefault = defaultName === item.name}
             <div class="saved">
-              <button class="link" onclick={() => open(item)}>{item.name}</button>
+              <button
+                class="link star" class:on={isDefault} aria-pressed={isDefault}
+                title={isDefault ? "Open a blank tree instead" : "Open this plan whenever you come to Skills"}
+                onclick={() => makeDefault(isDefault ? null : item.name)}
+              >{isDefault ? "★" : "☆"}</button>
+              <button class="link" onclick={() => open(item)}>{item.name}{item.auto_save ? " · auto-saves" : ""}</button>
               <button class="link dim" class:confirm={confirmDrop === item.name} aria-label="Delete {item.name}" onclick={() => (confirmDrop === item.name ? (confirmDrop = null, drop(item.name)) : (confirmDrop = item.name))}>{confirmDrop === item.name ? "Click again to delete" : "Delete"}</button>
             </div>
           {/each}
@@ -332,6 +370,21 @@
 {/if}
 
 <style>
+  .check {
+    display: flex;
+    justify-content: flex-start;
+    gap: 6px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .star {
+    flex: none;
+    color: var(--text-dim);
+  }
+  .star.on {
+    color: var(--yellow);
+  }
   .page {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
@@ -501,7 +554,11 @@
   }
   .saved {
     display: flex;
-    justify-content: space-between;
+    gap: 6px;
+    align-items: baseline;
+  }
+  .saved .link:last-child {
+    margin-left: auto;
   }
   .link {
     background: none;

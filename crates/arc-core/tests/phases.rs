@@ -144,7 +144,8 @@ fn percent_mods_become_effects_and_bad_mods_warn() {
 #[test]
 fn ttk_needs_measured_rpm() {
     let mut ds = real();
-    assert!(apply_mods(&ds, "rattler-iv", &[], 100.0).unwrap().ttk.is_none());
+    // The Osprey's wiki page gives no RPM, so it has no time to kill.
+    assert!(apply_mods(&ds, "osprey-i", &[], 100.0).unwrap().ttk.is_none());
     let t = ttk_flat(100.0, 9.0, 600.0).unwrap();
     assert_eq!(t.shots, 12);
     assert!((t.seconds - 1.2).abs() < 1e-9);
@@ -267,7 +268,9 @@ fn two_floor_maps_list_both_floors() {
 #[test]
 fn dataset_records_the_patch_and_map_tiles() {
     let ds = real();
-    assert_eq!(ds.files.version.game_patch.as_deref(), Some("2.3.0"));
+    // Moves with every patch, so check its shape rather than a number.
+    let patch = ds.files.version.game_patch.as_deref().expect("a game patch");
+    assert!(patch.split('.').count() >= 2 && patch.split('.').all(|p| p.parse::<u32>().is_ok()), "{patch}");
     assert!(ds.files.maps.iter().all(|m| m.image.url.is_some() && m.image.world_extent.is_some()));
 }
 
@@ -668,4 +671,56 @@ fn profile_round_trips_through_json() {
     p.quests.insert("q".into(), QuestProgress::default());
     let text = serde_json::to_string(&p).unwrap();
     assert_eq!(serde_json::from_str::<Profile>(&text).unwrap(), p);
+}
+
+#[test]
+fn shields_soak_part_of_each_hit_until_their_charge_runs_out() {
+    // 40 damage into a 70-charge, 42.5% shield: 17 blocked per hit, so 23, 23, 23, 23
+    // to health and the 5th shot finishes 100 HP.
+    assert_eq!(shots_to_kill(100.0, 70.0, 0.425, 40.0), Some(5));
+    assert_eq!(shots_to_kill(100.0, 0.0, 0.0, 40.0), Some(3));
+    assert_eq!(shots_to_kill(100.0, 70.0, 0.425, 0.0), None);
+}
+
+#[test]
+fn the_sheet_counts_kills_through_every_shield() {
+    let ds = real();
+    let sheet = apply_mods(&ds, "rattler-iii", &[], 100.0).unwrap();
+    let names: Vec<&str> = sheet.vs_shields.iter().map(|s| s.shield.as_str()).collect();
+    assert_eq!(names, ["none", "light-shield", "medium-shield", "heavy-shield"]);
+    assert_eq!(sheet.vs_shields[0].body.as_ref().unwrap().shots, 12, "9 damage into 100 HP");
+    assert!(sheet.rpm.is_some(), "the wiki gives the Rattler's RPM");
+    let heavy = &sheet.vs_shields[3];
+    assert_eq!(heavy.charge, 90.0, "the wiki's post-2.3 charge, not MetaForge's 80");
+    assert!(heavy.head.as_ref().unwrap().shots < heavy.body.as_ref().unwrap().shots);
+}
+
+#[test]
+fn upgrading_a_bench_takes_its_materials_and_lowering_it_gives_them_back() {
+    let ds = real();
+    let bench = ds.files.workbenches.iter().find(|b| b.levels.iter().any(|l| l.level == 1 && !l.upgrade_inputs.is_empty())).unwrap();
+    let inputs = &bench.levels.iter().find(|l| l.level == 1).unwrap().upgrade_inputs;
+    let mut p = Profile::default();
+    let (first, second) = (&inputs[0], inputs.get(1));
+    p.stash.insert(first.item_id.clone(), first.qty + 3);
+    if let Some(s) = second {
+        p.stash.insert(s.item_id.clone(), 1.min(s.qty));
+    }
+    let moved = set_bench_level(&ds, &mut p, &bench.id, 1, true);
+    assert_eq!(p.workbenches[&bench.id], 1);
+    assert_eq!(p.stash[&first.item_id], 3, "takes only what the level needs");
+    if let Some(s) = second {
+        assert!(!p.stash.contains_key(&s.item_id), "takes what there is when short");
+    }
+    assert!(moved.items.iter().all(|(_, q)| *q > 0));
+    set_bench_level(&ds, &mut p, &bench.id, 0, true);
+    assert_eq!(p.stash[&first.item_id], first.qty + 3, "lowering puts it back");
+    assert!(p.bench_from_stash.is_empty());
+
+    // Entering a level reached earlier leaves the stash alone, and lowering it back
+    // has nothing recorded to return.
+    let moved = set_bench_level(&ds, &mut p, &bench.id, 1, false);
+    assert!(moved.items.is_empty());
+    assert_eq!(p.stash[&first.item_id], first.qty + 3);
+    assert!(set_bench_level(&ds, &mut p, &bench.id, 0, true).items.is_empty());
 }

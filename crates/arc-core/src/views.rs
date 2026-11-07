@@ -153,6 +153,144 @@ fn found_in(ds: &Dataset, item: &Item) -> Vec<FoundIn> {
     }).collect()
 }
 
+/// Where a key's door is on one map: marker indexes into that map's marker list.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct DoorPresence {
+    pub map: Link,
+    pub markers: Vec<usize>,
+    pub places: Vec<String>,
+}
+
+/// Words that say nothing about which door it is.
+const DOOR_NOISE: &[&str] = &["key", "keys", "keycard", "room", "keyroom", "no", "the", "locked", "door", "of"];
+/// A door marked with one of these needs something else, such as a fuel cell, not a key.
+const OTHER_LOCKS: &[&str] = &["fuel", "cell", "puzzle", "capacitor", "power", "printer", "code"];
+
+fn door_words(text: &str, drop: &[String]) -> Vec<String> {
+    text.to_lowercase().replace(['\'', '\u{2019}'], "")
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty() && !DOOR_NOISE.contains(w) && !drop.iter().any(|d| d == w))
+        .map(str::to_string)
+        .collect()
+}
+
+/// The doors a key opens, matched by name against the map's locked-room markers. Marker
+/// labels are hand-typed upstream (with typos), so a door matches when every word that
+/// names the key's room is in the label. Keys for a kind of thing (every Raider Hatch)
+/// point at that marker type instead.
+fn key_doors(ds: &Dataset, item: &Item) -> Vec<DoorPresence> {
+    if item.category != Category::Key {
+        return Vec::new();
+    }
+    let markers = &ds.files.markers;
+    let category = |id: &str| markers.categories.iter().position(|c| c.id == id);
+    let lower = item.name.to_lowercase();
+    let whole_type = if lower.contains("hatch") {
+        category("locations/hatch")
+    } else if lower.contains("bunker") {
+        category("events/bunker")
+    } else {
+        None
+    };
+    // Security codes open the locked gates, which are named after their place.
+    let code = lower.contains("security code");
+    let doors = if code { [category("events/locked_gate_key")] } else { [category("locations/locked_room")] };
+    let home = ds.files.maps.iter().find(|m| {
+        let name = m.name.to_lowercase();
+        let short = name.split_whitespace().take(2).collect::<Vec<_>>().join(" ");
+        lower.starts_with(&short) || lower.starts_with(&m.id.replace('-', " "))
+    });
+    let map_words: Vec<String> = ds.files.maps.iter()
+        .flat_map(|m| door_words(&format!("{} {}", m.name, m.id), &[]))
+        .collect();
+    let mut wanted = door_words(&item.name, &map_words);
+    if code {
+        wanted.retain(|w| w != "security" && w != "code");
+    }
+    if wanted.is_empty() && whole_type.is_none() {
+        return Vec::new();
+    }
+    markers.maps.iter()
+        .filter(|(map_id, _)| whole_type.is_some() || code || home.is_none_or(|h| &h.id == *map_id))
+        .filter_map(|(map_id, list)| {
+            let mut hits = Vec::new();
+            let mut places = Vec::new();
+            for (i, MapMarker(index, _, _, _, label)) in list.iter().enumerate() {
+                let index = Some(*index as usize);
+                let matched = if whole_type.is_some() {
+                    index == whole_type
+                } else if doors.contains(&index) {
+                    let Some(label) = label else { continue };
+                    let words = door_words(label, &[]);
+                    wanted.iter().all(|w| words.contains(w))
+                        && !words.iter().any(|w| OTHER_LOCKS.contains(&w.as_str()) && !wanted.contains(w))
+                } else {
+                    false
+                };
+                if matched {
+                    hits.push(i);
+                    if let Some(label) = label.as_deref().filter(|l| !l.trim().is_empty()) {
+                        places.push(label.trim().to_string());
+                    }
+                }
+            }
+            if hits.is_empty() {
+                return None;
+            }
+            places.sort();
+            places.dedup();
+            let name = ds.files.maps.iter().find(|m| &m.id == map_id).map_or(map_id.as_str(), |m| m.name.as_str());
+            Some(DoorPresence { map: entity_link("map", map_id, name, None), markers: hits, places })
+        })
+        .collect()
+}
+
+/// What a weapon mod does and which guns take it, worded like the in-game tooltip.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct ModInfo {
+    pub slot: String,
+    /// Gun families, by display name ("Il Toro"), whose slot takes this mod's tier.
+    pub compatible: Vec<String>,
+    /// "40% Reduced Per-Shot Dispersion", "+4 Magazine Size".
+    pub effects: Vec<String>,
+}
+
+fn title_words(snake: &str) -> String {
+    snake.split('_').map(|w| {
+        let mut c = w.chars();
+        c.next().map_or(String::new(), |f| f.to_uppercase().collect::<String>() + c.as_str())
+    }).collect::<Vec<_>>().join(" ")
+}
+
+fn mod_info(ds: &Dataset, item: &Item) -> Option<ModInfo> {
+    let m = ds.files.weapon_mods.iter().find(|m| m.id == item.id)?;
+    let mut compatible: Vec<String> = Vec::new();
+    for gun in ds.files.items.iter().filter(|i| i.category == Category::Weapon && i.variant_of.is_none()) {
+        let Some(Stats::Weapon(stats)) = &gun.stats else { continue };
+        if stats.mod_slots.iter().any(|slot| weapons::fits(ds, &gun.id, slot, m)) {
+            let family = weapons::weapon_family_name(ds, &gun.id);
+            if !compatible.contains(&family) {
+                compatible.push(family);
+            }
+        }
+    }
+    compatible.sort();
+    let mut effects: Vec<String> = m.modifiers.iter().map(|x| {
+        let key = serde_json::to_value(x.stat).ok().and_then(|v| v.as_str().map(str::to_string)).unwrap_or_default();
+        // The game's own wording where it differs from the stat's name.
+        let stat = match key.as_str() {
+            "per_shot_dispersion" => "Per-Shot Dispersion".to_string(),
+            "falloff_distance" => "Distance Until Damage Falloff".to_string(),
+            _ => title_words(&key),
+        };
+        format!("{}% {} {stat}", x.pct.abs(), if x.pct < 0.0 { "Reduced" } else { "Increased" })
+    }).collect();
+    if m.flat.magazine_size != 0 {
+        effects.push(format!("{:+} Magazine Size", m.flat.magazine_size));
+    }
+    Some(ModInfo { slot: title_words(&m.slot), compatible, effects })
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ItemDetail {
     pub item: Item,
@@ -160,6 +298,12 @@ pub struct ItemDetail {
     pub breakdown: Vec<RecipeView>,
     pub used_in: UsedIn,
     pub found_in: Vec<FoundIn>,
+    /// Keys only: the doors it opens.
+    pub opens: Vec<DoorPresence>,
+    /// Weapon mods only.
+    pub mod_info: Option<ModInfo>,
+    /// Hand-entered where-to-find note, for items no source places.
+    pub note: Option<ItemNote>,
     pub sold_by: Vec<Link>,
     pub dropped_by: Vec<Link>,
     pub base: Option<Link>,
@@ -197,6 +341,9 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         breakdown: recipes(&item.recycle_ids),
         used_in: calc::used_in(ds, id),
         found_in: found_in(ds, &item),
+        opens: key_doors(ds, &item),
+        mod_info: mod_info(ds, &item),
+        note: ds.files.notes.items.get(id).cloned(),
         base: item.variant_of.as_ref().map(|b| item_link(ds, b, None)),
         family: weapons::weapon_family_view(ds, id),
         gun_stencils: weapons::gun_stencils(ds, id),

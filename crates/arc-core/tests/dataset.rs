@@ -54,6 +54,7 @@ fn every_file_matches_its_json_schema() {
         ("weapon_mod", "weapon_mods"), ("map", "maps"), ("poi", "pois"), ("quest", "quests"),
         ("project", "projects"), ("skill_tree", "skills"), ("arc", "arcs"),
         ("trader", "traders"), ("loot_area", "loot_areas"), ("version", "version"),
+        ("notes", "notes"),
     ];
     for (schema, file) in pairs {
         let schema = read(&format!("schema/{schema}.schema.json"));
@@ -231,7 +232,9 @@ fn zeroes_outside_a_category_do_not_become_stats() {
         Stats::Weapon(w) => {
             assert_eq!(w.magazine_size, Some(12));
             assert!(w.mod_slots.iter().any(|s| s.slot == "muzzle"));
-            assert_eq!(w.measured, MeasuredStats::default());
+            // Measured values come only from the wiki's infobox, never from API zeroes.
+            assert_eq!(w.measured.measured_provenance, Some(Provenance::Wiki));
+            assert_eq!(w.measured.falloff_start_m, None);
         }
         other => panic!("{other:?}"),
     }
@@ -255,4 +258,75 @@ fn profile_defaults_for_missing_keys() {
     let p: Profile = serde_json::from_str(r#"{"stash":{"metal-parts":3}}"#).unwrap();
     assert_eq!(p.schema_version, 1);
     assert_eq!(p.stash["metal-parts"], 3);
+}
+
+#[test]
+fn keys_point_at_their_doors() {
+    let ds = dataset();
+    let doors = |id: &str| arc_core::views::item_detail(&ds, id).unwrap().opens;
+    let hatches = doors("raider-hatch-key");
+    assert!(hatches.len() > 3, "the hatch key opens hatches on every map");
+    let cellar = doors("blue-gate-cellar-key");
+    assert_eq!(cellar.len(), 1);
+    assert!(cellar[0].places.iter().all(|p| !p.contains("Fuel")));
+    let room = doors("riven-tides-hotel-keycard-no-205");
+    assert_eq!(room.len(), 1);
+    assert_eq!(room[0].markers.len(), 1);
+}
+
+#[test]
+fn nested_quest_steps_keep_their_ids_and_optional_steps_dont_block() {
+    let ds = dataset();
+    let quest = ds.files.quests.iter().find(|q| q.id == "belly-of-the-beast").unwrap();
+    let root = quest.objectives.iter().find(|o| o.id == quest.objective_root).unwrap();
+    assert_eq!(root.children, ["o1", "o2", "g1"]);
+    let group = quest.objectives.iter().find(|o| o.id == "g1").unwrap();
+    assert_eq!(group.kind, "all");
+    assert_eq!(group.children, ["o3", "o4", "o5", "o6", "o7"]);
+
+    let mut profile = Profile::default();
+    for o in ["o2", "o3", "o4", "o5", "o6", "o7"] {
+        arc_core::tracking::set_objective(&ds, &mut profile, &quest.id, o, true);
+    }
+    assert!(profile.quests[&quest.id].done, "the optional conduit step isn't needed");
+}
+
+#[test]
+fn one_option_of_an_either_or_group_finishes_the_quest() {
+    let ds = dataset();
+    let quest = ds.files.quests.iter().find(|q| q.id == "to-the-skies").unwrap();
+    let mut profile = Profile::default();
+    let tick = |p: &mut Profile, id: &str| arc_core::tracking::set_objective(&ds, p, &quest.id, id, true);
+    // Ticking the scan group ticks both scans.
+    let scans = quest.objectives.iter().find(|o| o.kind == "all" && o.children == ["o1", "o2"]).unwrap();
+    tick(&mut profile, &scans.id);
+    assert!(["o1", "o2"].iter().all(|o| profile.quests[&quest.id].objectives_done.iter().any(|d| d == o)));
+    for o in ["o3", "o4", "o5", "o6", "o7"] {
+        tick(&mut profile, o);
+    }
+    assert!(!profile.quests[&quest.id].done, "still has to activate the prototype");
+    tick(&mut profile, "o8");
+    assert!(profile.quests[&quest.id].done, "the Red Lakes option is enough");
+    arc_core::tracking::set_objective(&ds, &mut profile, &quest.id, "o8", false);
+    assert!(!profile.quests[&quest.id].done);
+}
+
+#[test]
+fn mod_cards_say_what_fits_and_what_they_do() {
+    let ds = dataset();
+    let info = arc_core::views::item_detail(&ds, "compensator-ii").unwrap().mod_info.unwrap();
+    assert!(info.compatible.iter().any(|g| g == "Rattler"));
+    assert!(info.effects.contains(&"40% Reduced Per-Shot Dispersion".to_string()), "{:?}", info.effects);
+    assert!(arc_core::views::item_detail(&ds, "rattler-iii").unwrap().mod_info.is_none());
+}
+
+#[test]
+fn hand_entered_doors_and_notes_reach_the_item_page() {
+    let ds = dataset();
+    let conduit = arc_core::views::item_detail(&ds, "emperor-gateway-conduit").unwrap();
+    assert_eq!(conduit.opens.len(), 1);
+    assert_eq!(conduit.opens[0].map.id, "pendola-pass");
+    assert_eq!(conduit.opens[0].places, ["Emperor Gateway Conduit Door"]);
+    let roll = arc_core::views::item_detail(&ds, "insulation-roll").unwrap();
+    assert!(roll.note.unwrap().where_to_find.contains("Pendola Pass"));
 }

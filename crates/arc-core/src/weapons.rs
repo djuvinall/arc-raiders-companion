@@ -38,6 +38,27 @@ pub struct Ttk {
     pub seconds: f64,
 }
 
+/// Shots and time to down a target wearing one kind of shield.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct KillTime {
+    pub shots: u32,
+    /// Null without a measured fire rate.
+    pub seconds: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct ShieldTtk {
+    /// `none`, or the shield's item id.
+    pub shield: String,
+    pub name: String,
+    pub charge: f64,
+    /// Percent of each hit the shield takes while it has charge.
+    pub reduction_pct: f64,
+    pub body: Option<KillTime>,
+    /// Every shot to the head; null without a headshot multiplier.
+    pub head: Option<KillTime>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Sheet {
     pub weapon: Link,
@@ -50,6 +71,12 @@ pub struct Sheet {
     pub measured: Vec<StatRow>,
     /// Null until `measured.rounds_per_minute` exists.
     pub ttk: Option<Ttk>,
+    /// Damage per shot, rounds per minute (level and mods included) and headshot
+    /// multiplier, for charts.
+    pub damage: Option<f64>,
+    pub rpm: Option<f64>,
+    pub headshot_mult: Option<f64>,
+    pub vs_shields: Vec<ShieldTtk>,
     pub warnings: Vec<String>,
 }
 
@@ -206,6 +233,46 @@ pub fn ttk_flat(target_hp: f64, damage: f64, rounds_per_minute: f64) -> Option<T
     Some(Ttk { target_hp, shots: shots as u32, seconds: shots * (60.0 / rounds_per_minute) })
 }
 
+/// Shots to take `hp` down through a shield. While the shield has charge it takes
+/// `reduction` of each hit and health takes the rest; once it's empty, health takes all
+/// of it. That's the community's reading of the game's shield text, not a published rule.
+pub fn shots_to_kill(hp: f64, charge: f64, reduction: f64, damage: f64) -> Option<u32> {
+    if damage <= 0.0 || hp <= 0.0 {
+        return None;
+    }
+    let (mut hp, mut charge) = (hp, charge.max(0.0));
+    for shot in 1..=10_000 {
+        let blocked = (damage * reduction.clamp(0.0, 1.0)).min(charge);
+        charge -= blocked;
+        hp -= damage - blocked;
+        if hp <= 1e-9 {
+            return Some(shot);
+        }
+    }
+    None
+}
+
+/// Kill times against no shield and each shield in the data, lightest first.
+pub fn vs_shields(ds: &Dataset, hp: f64, damage: Option<f64>, rpm: Option<f64>, head: Option<f64>) -> Vec<ShieldTtk> {
+    let mut shields: Vec<(String, String, f64, f64)> = vec![("none".into(), "No shield".into(), 0.0, 0.0)];
+    let mut worn: Vec<(String, String, f64, f64)> = ds.files.items.iter().filter_map(|i| match &i.stats {
+        Some(Stats::Shield(s)) => Some((i.id.clone(), i.name.clone(), s.charge?, s.damage_mitigation?)),
+        _ => None,
+    }).collect();
+    worn.sort_by(|a, b| a.2.total_cmp(&b.2));
+    shields.extend(worn);
+    let time = |shots: u32| rpm.filter(|r| *r > 0.0).map(|r| f64::from(shots) * 60.0 / r);
+    shields.into_iter().map(|(shield, name, charge, pct)| {
+        let kill = |d: Option<f64>| d.and_then(|d| shots_to_kill(hp, charge, pct / 100.0, d))
+            .map(|shots| KillTime { shots, seconds: time(shots) });
+        ShieldTtk {
+            body: kill(damage),
+            head: kill(damage.zip(head).map(|(d, m)| d * m)),
+            shield, name, charge, reduction_pct: pct,
+        }
+    }).collect()
+}
+
 pub fn apply_mods(ds: &Dataset, item_id: &str, mod_ids: &[String], target_hp: f64) -> Option<Sheet> {
     let item = ds.item(item_id)?;
     let stats = weapon_stats(item)?;
@@ -252,9 +319,11 @@ pub fn apply_mods(ds: &Dataset, item_id: &str, mod_ids: &[String], target_hp: f6
 
     let m = &stats.measured;
     let scale = |v: Option<f64>, stat| v.map(|x| x * multiplier(&mods, stat));
-    let rpm = scale(m.rounds_per_minute, ModStat::FireRate);
+    // The wiki's RPM is the gun's base, so the level's fire rate bonus applies here too.
+    let level_rpm = m.rounds_per_minute.map(|r| r * (1.0 + bonus / 100.0));
+    let rpm = scale(level_rpm, ModStat::FireRate);
     let measured = vec![
-        row("rounds_per_minute", "Rounds per minute", m.rounds_per_minute, rpm),
+        row("rounds_per_minute", "Rounds per minute", level_rpm, rpm),
         row("bullet_velocity_ms", "Bullet velocity m/s", m.bullet_velocity_ms, scale(m.bullet_velocity_ms, ModStat::BulletVelocity)),
         row("falloff_start_m", "Falloff start m", m.falloff_start_m, scale(m.falloff_start_m, ModStat::FalloffDistance)),
         row("falloff_end_m", "Falloff end m", m.falloff_end_m, scale(m.falloff_end_m, ModStat::FalloffDistance)),
@@ -270,6 +339,10 @@ pub fn apply_mods(ds: &Dataset, item_id: &str, mod_ids: &[String], target_hp: f6
         effects,
         measured,
         ttk: stats.damage.zip(rpm).and_then(|(d, r)| ttk_flat(target_hp, d, r)),
+        damage: stats.damage,
+        rpm,
+        headshot_mult: m.headshot_mult,
+        vs_shields: vs_shields(ds, target_hp, stats.damage, rpm, m.headshot_mult),
         warnings,
     })
 }

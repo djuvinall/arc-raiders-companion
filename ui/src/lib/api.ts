@@ -81,6 +81,12 @@ export interface ItemDetail {
   breakdown: RecipeView[];
   used_in: UsedIn;
   found_in: FoundIn[];
+  /** Keys only: the doors it opens, as indexes into each map's markers. */
+  opens: { map: Link; markers: number[]; places: string[] }[];
+  /** Weapon mods only: guns that take it and its effects in the game's wording. */
+  mod_info: { slot: string; compatible: string[]; effects: string[] } | null;
+  /** Hand-entered where-to-find note for items no source places. */
+  note: { where: string; source: string } | null;
   sold_by: Link[];
   dropped_by: Link[];
   base: Link | null;
@@ -226,6 +232,8 @@ export interface SkillPlan {
   tree_version: string;
   expedition_bonus: number;
   ranks: Record<string, number>;
+  /** Save changes on leaving the Skills page. */
+  auto_save?: boolean;
 }
 
 export interface PlanState {
@@ -257,6 +265,7 @@ export interface Profile {
   friends: { name: string; done: string[]; active: string[] }[];
   workbenches: Record<string, number>;
   tracked_from: Record<string, string>;
+  default_skill_plan: string | null;
 }
 
 export interface PartyQuest {
@@ -296,6 +305,20 @@ export interface StatRow {
   value: number | null;
 }
 
+export interface KillTime {
+  shots: number;
+  seconds: number | null;
+}
+
+export interface ShieldTtk {
+  shield: string;
+  name: string;
+  charge: number;
+  reduction_pct: number;
+  body: KillTime | null;
+  head: KillTime | null;
+}
+
 export interface Sheet {
   weapon: Link;
   firing_mode: string | null;
@@ -306,6 +329,11 @@ export interface Sheet {
   effects: { stat: string; pct: number }[];
   measured: StatRow[];
   ttk: { target_hp: number; shots: number; seconds: number } | null;
+  damage: number | null;
+  /** Level and mods included; null when the wiki gives no RPM. */
+  rpm: number | null;
+  headshot_mult: number | null;
+  vs_shields: ShieldTtk[];
   warnings: string[];
 }
 
@@ -391,8 +419,56 @@ export interface RoutePlan {
 export interface Objective {
   id: string;
   kind: string;
+  children: string[];
   description: string | null;
   maps: string[];
+}
+
+/** Kinds a player ticks off; "optional" ones don't hold the quest back. */
+export const STEP_KINDS = ["atomic", "optional"];
+
+type QuestTree = { objectives: Objective[]; objective_root: string };
+
+const nodeOf = (quest: QuestTree, id: string) => quest.objectives.find((o) => o.id === id);
+
+/** Mirrors tracking::node_done: groups follow their steps, `any` needs one option. */
+export function nodeDone(quest: QuestTree, id: string, done: string[], depth = 0): boolean {
+  const node = nodeOf(quest, id);
+  if (!node || depth > 16) return !node;
+  const kids = node.children.map((c) => nodeDone(quest, c, done, depth + 1));
+  switch (node.kind) {
+    case "atomic": return done.includes(id);
+    case "optional": return true;
+    case "any": return kids.length === 0 || kids.some(Boolean);
+    default: return kids.every(Boolean);
+  }
+}
+
+/** Whether any step under a node is ticked, to tell which either-or option was picked. */
+export function nodeStarted(quest: QuestTree, id: string, done: string[], depth = 0): boolean {
+  const node = nodeOf(quest, id);
+  if (!node || depth > 16) return false;
+  if (STEP_KINDS.includes(node.kind)) return done.includes(id);
+  return node.children.some((c) => nodeStarted(quest, c, done, depth + 1));
+}
+
+/** Steps done out of steps needed. An either-or group counts the option picked, or the
+ * one furthest along. */
+export function questProgress(quest: QuestTree, done: string[]): { done: number; total: number } {
+  const walk = (id: string, depth: number): [number, number] => {
+    const node = nodeOf(quest, id);
+    if (!node || depth > 16) return [0, 0];
+    if (node.kind === "atomic") return [done.includes(id) ? 1 : 0, 1];
+    if (node.kind === "optional") return [0, 0];
+    const parts = node.children.map((c) => walk(c, depth + 1));
+    if (node.kind === "any") {
+      if (!parts.length) return [0, 0];
+      return parts.reduce((best, p) => (p[1] && p[0] / p[1] > (best[1] ? best[0] / best[1] : -1) ? p : best));
+    }
+    return parts.reduce((sum, p) => [sum[0] + p[0], sum[1] + p[1]], [0, 0]);
+  };
+  const [d, t] = walk(quest.objective_root, 0);
+  return { done: d, total: t };
 }
 
 export interface QuestRow {
@@ -401,6 +477,7 @@ export interface QuestRow {
     name: string;
     trader: string | null;
     objectives: Objective[];
+    objective_root: string;
     prerequisites: { quest_id: string }[];
     xp: number | null;
     graph_position: { x: number; y: number } | null;
@@ -471,7 +548,10 @@ export const homeView = () => invoke<Home>("home_view");
 export const setFound = (add: string[], remove: string[]) => invoke<void>("set_found", { add, remove });
 export const arcList = () => invoke<ArcView[]>("arc_list");
 export const workbenchList = () => invoke<BenchView[]>("workbench_list");
-export const setWorkbenchLevel = (id: string, level: number) => invoke<void>("set_workbench_level", { id, level });
+/** Raising takes each new level's materials from the stash; lowering puts them back.
+ * Positive quantities left the stash, negative ones returned to it. */
+export const setWorkbenchLevel = (id: string, level: number, useStash: boolean) =>
+  invoke<{ items: [string, number][] }>("set_workbench_level", { id, level, useStash });
 export const toggleTrackedBench = (id: string) => invoke<void>("toggle_tracked_bench", { id });
 export const completeImpliedQuests = () => invoke<number>("complete_implied_quests");
 export const completeQuestChain = (questId: string) => invoke<void>("complete_quest_chain", { questId });
@@ -505,6 +585,7 @@ export const toggleTrackedItem = (id: string) => invoke<boolean>("toggle_tracked
 export const questList = () => invoke<QuestRow[]>("quest_list");
 export const setQuestObjective = (questId: string, objectiveId: string, done: boolean) =>
   invoke<void>("set_quest_objective", { questId, objectiveId, done });
+export const setDefaultSkillPlan = (name: string | null) => invoke<void>("set_default_skill_plan", { name });
 export const setQuestState = (questId: string, tracked: boolean, done: boolean) =>
   invoke<void>("set_quest_state", { questId, tracked, done });
 

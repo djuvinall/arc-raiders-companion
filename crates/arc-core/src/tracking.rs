@@ -24,6 +24,7 @@ pub struct QuestRow {
     pub done_objectives: Vec<String>,
 }
 
+/// The objectives a quest needs done to complete; `optional` steps don't count.
 pub fn atomic_ids(quest: &Quest) -> Vec<&str> {
     quest.objectives.iter().filter(|o| o.kind == "atomic").map(|o| o.id.as_str()).collect()
 }
@@ -263,17 +264,52 @@ pub fn workbench_views(ds: &Dataset, profile: &Profile) -> Vec<BenchView> {
     }).collect()
 }
 
-/// Ticking the last objective completes the quest; unticking one reopens it.
+/// Whether a step or group is done. Groups follow their steps: `sequence` and `all`
+/// need every step, `any` needs one of its options, and `optional` steps never hold
+/// anything back.
+pub fn node_done(quest: &Quest, id: &str, done: &[String]) -> bool {
+    node_done_at(quest, id, done, 0)
+}
+
+fn node_done_at(quest: &Quest, id: &str, done: &[String], depth: usize) -> bool {
+    let Some(node) = quest.objectives.iter().find(|o| o.id == id) else { return true };
+    if depth > 16 {
+        return false;
+    }
+    let kids = || node.children.iter().map(|c| node_done_at(quest, c, done, depth + 1));
+    match node.kind.as_str() {
+        "atomic" => done.iter().any(|d| d == id),
+        "optional" => true,
+        "any" => node.children.is_empty() || kids().any(|d| d),
+        _ => kids().all(|d| d),
+    }
+}
+
+/// The steps under a group a player would tick to finish it; `any` groups have no
+/// single answer, so they give none.
+fn steps_under<'a>(quest: &'a Quest, id: &str, out: &mut Vec<&'a str>, depth: usize) {
+    let Some(node) = quest.objectives.iter().find(|o| o.id == id) else { return };
+    match node.kind.as_str() {
+        "atomic" | "optional" => out.push(node.id.as_str()),
+        "any" => {}
+        _ if depth < 16 => node.children.iter().for_each(|c| steps_under(quest, c, out, depth + 1)),
+        _ => {}
+    }
+}
+
+/// Ticking a step, or a group to tick everything in it. The quest completes once its
+/// root is done, so finishing one option of an either-or group is enough; unticking
+/// reopens it.
 pub fn set_objective(ds: &Dataset, profile: &mut Profile, quest_id: &str, objective_id: &str, done: bool) {
     let Some(quest) = ds.files.quests.iter().find(|q| q.id == quest_id) else { return };
+    let mut ids = Vec::new();
+    steps_under(quest, objective_id, &mut ids, 0);
     let progress = profile.quests.entry(quest_id.to_string()).or_default();
-    progress.objectives_done.retain(|o| o != objective_id);
+    progress.objectives_done.retain(|o| !ids.contains(&o.as_str()));
     if done {
-        progress.objectives_done.push(objective_id.to_string());
+        progress.objectives_done.extend(ids.iter().map(|s| s.to_string()));
     }
-    let atomics = atomic_ids(quest);
-    progress.done = !atomics.is_empty()
-        && atomics.iter().all(|a| progress.objectives_done.iter().any(|d| d == a));
+    progress.done = !atomic_ids(quest).is_empty() && node_done(quest, &quest.objective_root, &progress.objectives_done);
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -342,6 +378,52 @@ pub fn project_views(ds: &Dataset, profile: &Profile) -> Vec<ProjectView> {
             }).collect(),
         }
     }).collect()
+}
+
+/// What a bench level change moved: positive quantities left the stash, negative ones
+/// went back into it.
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
+pub struct StashMove {
+    pub items: Vec<(String, i64)>,
+}
+
+/// Sets a bench's level. With `use_stash`, each level gained takes its upgrade materials
+/// from the stash, as much as the stash has, like upgrading in game; without it (entering
+/// levels reached earlier) nothing is taken. Each level lost puts back what its upgrade
+/// took. Returns what moved.
+pub fn set_bench_level(ds: &Dataset, profile: &mut Profile, bench_id: &str, level: u8, use_stash: bool) -> StashMove {
+    let mut moved: BTreeMap<String, i64> = BTreeMap::new();
+    let from = profile.workbenches.get(bench_id).copied().unwrap_or(0);
+    let bench = ds.files.workbenches.iter().find(|b| b.id == bench_id);
+    let level = bench.map_or(level, |b| level.min(b.max_level));
+    let gained_levels = if use_stash { (from + 1)..=level } else { 1..=0 };
+    for gained in gained_levels {
+        let inputs = bench.and_then(|b| b.levels.iter().find(|l| l.level == gained)).map_or(&[][..], |l| &l.upgrade_inputs[..]);
+        let mut took = BTreeMap::new();
+        for input in inputs {
+            let Some(have) = profile.stash.get_mut(&input.item_id) else { continue };
+            let spent = input.qty.min(*have);
+            *have -= spent;
+            if *have == 0 {
+                profile.stash.remove(&input.item_id);
+            }
+            if spent > 0 {
+                took.insert(input.item_id.clone(), spent);
+                *moved.entry(input.item_id.clone()).or_default() += i64::from(spent);
+            }
+        }
+        if !took.is_empty() {
+            profile.bench_from_stash.insert(format!("{bench_id}/{gained}"), took);
+        }
+    }
+    for lost in ((level + 1)..=from).rev() {
+        for (item, qty) in profile.bench_from_stash.remove(&format!("{bench_id}/{lost}")).unwrap_or_default() {
+            *profile.stash.entry(item.clone()).or_insert(0) += qty;
+            *moved.entry(item).or_default() -= i64::from(qty);
+        }
+    }
+    profile.workbenches.insert(bench_id.to_string(), level);
+    StashMove { items: moved.into_iter().filter(|(_, q)| *q != 0).collect() }
 }
 
 /// Commits up to what the stage still needs, taking it from the stash like the game

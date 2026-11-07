@@ -4,6 +4,26 @@
     type CompareTable, type ItemSummary, type Sheet, type SlotOptions, type WeaponBuild,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
+  import WeaponCharts from "../lib/components/WeaponCharts.svelte";
+
+  type Tab = "compare" | "saved";
+  const TAB_KEY = "weapons-tab";
+  let tab = $state<Tab>(readTab());
+  function readTab(): Tab {
+    try {
+      return localStorage.getItem(TAB_KEY) === "saved" ? "saved" : "compare";
+    } catch {
+      return "compare";
+    }
+  }
+  function show(next: Tab) {
+    tab = next;
+    try {
+      localStorage.setItem(TAB_KEY, next);
+    } catch {
+      // Remembering the tab is only a convenience.
+    }
+  }
 
   interface Column {
     build: WeaponBuild;
@@ -29,6 +49,30 @@
     if (start) addColumn({ name: start.name, item_id: start.id, mod_ids: [] });
   });
   getProfile().then((p) => (saved = p.weapon_builds));
+
+  // Saved builds' sheets, for the cards; refetched when the list or target changes.
+  let savedSheets = $state<Record<string, Sheet>>({});
+  let modNames = $state<Record<string, string>>({});
+  $effect(() => {
+    const builds = $state.snapshot(saved);
+    const target = hp();
+    Promise.all(builds.map((b) => weaponSheet(b, target).then((s) => [b.name, s] as const).catch(() => null)))
+      .then((rows) => (savedSheets = Object.fromEntries(rows.filter((r) => r !== null))));
+    Promise.all([...new Set(builds.map((b) => b.item_id))].map((id) => weaponSlots(id).catch(() => [])))
+      .then((all) => (modNames = Object.fromEntries(all.flat().flatMap((slot) => slot.mods.map((m) => [m.id, m.name])))));
+  });
+
+  function compareSaved(build: WeaponBuild) {
+    show("compare");
+    if (columns.length >= MAX) {
+      note = `Compare holds ${MAX} builds; remove one first.`;
+      return;
+    }
+    addColumn(structuredClone($state.snapshot(build)));
+  }
+
+  const charted = $derived(columns.filter((c) => c.sheet).map((c) => ({ name: c.build.name, sheet: c.sheet! })));
+  const shots = (sheet: Sheet, shield: string) => sheet.vs_shields.find((s) => s.shield === shield)?.body?.shots;
 
   async function refresh(i: number) {
     const column = columns[i];
@@ -110,6 +154,46 @@
 </script>
 
 <div class="page-pad page">
+  <div class="tabs" role="tablist">
+    <button role="tab" class:on={tab === "compare"} aria-selected={tab === "compare"} onclick={() => show("compare")}>Compare</button>
+    <button role="tab" class:on={tab === "saved"} aria-selected={tab === "saved"} onclick={() => show("saved")}>Saved builds ({saved.length})</button>
+  </div>
+
+  {#if tab === "saved"}
+    {#if saved.length}
+      <div class="cards">
+        {#each saved as build (build.name)}
+          {@const sheet = savedSheets[build.name]}
+          <section class="panel card">
+            <div class="head">
+              {#if sheet}<Icon url={sheet.weapon.icon} name={sheet.weapon.name} size={48} />{/if}
+              <div class="title">
+                <strong>{build.name}</strong>
+                <span class="dim small">{sheet?.weapon.name ?? build.item_id}</span>
+              </div>
+            </div>
+            <p class="small mods">{build.mod_ids.length ? build.mod_ids.map((id) => modNames[id] ?? id).join(" · ") : "No mods"}</p>
+            {#if sheet}
+              <dl>
+                <dt>Damage</dt><dd>{num(sheet.damage)}</dd>
+                <dt>Fire rate</dt><dd>{sheet.rpm ? `${Math.round(sheet.rpm)} RPM` : "—"}</dd>
+                <dt>Headshot</dt><dd>{sheet.headshot_mult ? `${sheet.headshot_mult}×` : "—"}</dd>
+                <dt>Shots, no shield</dt><dd>{shots(sheet, "none") ?? "—"}</dd>
+                <dt>Shots, heavy shield</dt><dd>{shots(sheet, "heavy-shield") ?? "—"}</dd>
+              </dl>
+            {/if}
+            <div class="card-actions">
+              <button class="button dark" onclick={() => compareSaved(build)}>Compare</button>
+              <button class="link dim" class:confirm={confirmDrop === build.name} aria-label="Delete {build.name}" onclick={() => drop(build.name)}>{confirmDrop === build.name ? "Click again to delete" : "Delete"}</button>
+            </div>
+          </section>
+        {/each}
+      </div>
+    {:else}
+      <section class="panel"><p class="dim small">No saved builds yet. Make one under Compare and press Save build.</p></section>
+    {/if}
+    {#if note}<p class="dim small" role="status">{note}</p>{/if}
+  {:else}
   <div class="columns">
     {#each columns as column, i}
       <section class="panel build">
@@ -190,12 +274,27 @@
     {/each}
 
     {#if columns.length < MAX}
-      <button
-        class="add panel"
-        onclick={() => addColumn({ ...$state.snapshot(columns.at(-1)?.build ?? { name: "", item_id: weapons[0].id, mod_ids: [] }), mod_ids: [] })}
-      >+ Add build to compare</button>
+      <div class="add panel">
+        <button
+          class="button dark"
+          onclick={() => addColumn({ ...$state.snapshot(columns.at(-1)?.build ?? { name: "", item_id: weapons[0].id, mod_ids: [] }), mod_ids: [] })}
+        >+ New build</button>
+        {#if saved.length}
+          <select
+            class="field" aria-label="Add a saved build" value=""
+            onchange={(e) => { const b = saved.find((x) => x.name === e.currentTarget.value); e.currentTarget.value = ""; if (b) compareSaved(b); }}
+          >
+            <option value="">+ From saved builds…</option>
+            {#each saved as b (b.name)}<option value={b.name}>{b.name}</option>{/each}
+          </select>
+        {/if}
+      </div>
     {/if}
   </div>
+
+  {#if charted.length}
+    <WeaponCharts builds={charted} hp={hp()} />
+  {/if}
 
   {#if table}
     <section class="panel">
@@ -228,16 +327,8 @@
       <input class="field" type="number" min="1" bind:value={targetHp} />
     </label>
     {#if note}<p class="dim small" role="status">{note}</p>{/if}
-    {#if saved.length}
-      <h3 class="section-title">Saved builds</h3>
-      {#each saved as build (build.name)}
-        <div class="saved">
-          <button class="link" onclick={() => addColumn(structuredClone($state.snapshot(build)))}>{build.name}</button>
-          <button class="link dim" class:confirm={confirmDrop === build.name} aria-label="Delete {build.name}" onclick={() => drop(build.name)}>{confirmDrop === build.name ? "Click again to delete" : "Delete"}</button>
-        </div>
-      {/each}
-    {/if}
   </section>
+  {/if}
 </div>
 
 <style>
@@ -311,11 +402,53 @@
     margin: 6px 0 0;
   }
   .add {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
     min-height: 120px;
-    color: var(--text-dim);
-    cursor: pointer;
-    font: inherit;
     border-style: dashed;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+  }
+  .tabs button {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text-dim);
+    font: inherit;
+    cursor: pointer;
+  }
+  .tabs button.on {
+    background: var(--cream);
+    color: var(--on-cream);
+    font-weight: 600;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+  }
+  .mods {
+    color: var(--text-dim);
+  }
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
   }
   table {
     width: 100%;
@@ -347,11 +480,6 @@
   }
   .hp input {
     width: 90px;
-  }
-  .saved {
-    display: flex;
-    justify-content: space-between;
-    max-width: 420px;
   }
   .link {
     background: none;

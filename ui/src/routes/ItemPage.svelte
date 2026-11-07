@@ -67,19 +67,19 @@
     stability: "Stability",
     agility: "Agility",
     stealth: "Stealth",
-    magazine_size: "Magazine",
-    firing_mode: "Firing mode",
-    arc_armor_penetration: "ARC armor pen.",
+    magazine_size: "Magazine Size",
+    firing_mode: "Firing Mode",
+    arc_armor_penetration: "ARC Armor Penetration",
     shield_hp: "Shield HP",
     charge: "Charge",
     type: "Type",
     movement_penalty: "Movement penalty",
-    damage_mitigation: "Damage mitigation",
+    damage_mitigation: "Damage Reduction",
     backpack_slots: "Backpack slots",
-    weight_limit_kg: "Weight limit (kg)",
+    weight_limit_kg: "Max Loadout Weight",
     safe_pocket_slots: "Safe pockets",
     quick_use_slots: "Quick use slots",
-    shield_compatibility: "Shield",
+    shield_compatibility: "Shield Compatibility",
     trinket_slots: "Trinket slots",
     healing: "Healing",
     healing_per_second: "Healing / s",
@@ -123,6 +123,48 @@
     ];
   });
 
+  // The in-game tooltip's layout: rows of facts, bars for 0-100 weapon stats, slot tiles
+  // for augments, and lines for effects that have no number column.
+  const BAR_KEYS = ["damage", "fire_rate", "range", "stability", "agility", "stealth"];
+  const SLOT_KEYS: [string, string][] = [
+    ["backpack_slots", "Backpack"], ["quick_use_slots", "Quick use"], ["safe_pocket_slots", "Safe pocket"], ["trinket_slots", "Trinket"],
+  ];
+  const LINE_KEYS = ["movement_penalty"];
+  const isWeapon = $derived(detail?.item.category === "weapon");
+  const bars = $derived(isWeapon ? stats.filter(([k, v]) => BAR_KEYS.includes(k) && typeof v === "number") as [string, number][] : []);
+  const slotTiles = $derived(SLOT_KEYS.map(([k, label]) => [label, detail?.item.stats?.[k]] as [string, unknown])
+    .filter(([, v]) => typeof v === "number" && v > 0) as [string, number][]);
+  const infoRows = $derived(stats.filter(([k]) =>
+    !(isWeapon && BAR_KEYS.includes(k)) && !SLOT_KEYS.some(([s]) => s === k) && !LINE_KEYS.includes(k) && k !== "type"));
+  const lines = $derived(stats.filter(([k, v]) => LINE_KEYS.includes(k) && Number(v) > 0)
+    .map(([, v]) => `${v}% Reduced Movement Speed`));
+  const PERCENT_KEYS = ["damage_mitigation"];
+  const shown = (key: string, value: string | number) =>
+    PERCENT_KEYS.includes(key) ? `${value}%` : key === "arc_armor_penetration" && typeof value === "string" ? value[0].toUpperCase() + value.slice(1) : value;
+
+  const recycle = $derived(detail?.breakdown.find((r) => r.kind !== "salvage") ?? detail?.breakdown[0] ?? null);
+  const recyclesInto = $derived(recycle?.outputs ?? []);
+  const recycleLabel = $derived(recycle?.kind === "salvage" ? "Salvages into" : "Recycles into");
+
+  const RARITY: Record<string, [string, string]> = {
+    common: ["#7d828d", "#ffffff"],
+    uncommon: ["#2fcf5a", "#0f1a12"],
+    rare: ["#1cb8f0", "#0c1a24"],
+    epic: ["#e23fb0", "#ffffff"],
+    legendary: ["#f5c400", "#1d1700"],
+  };
+  const rarityColor = (r: string | null) => RARITY[r ?? ""]?.[0] ?? "#7d828d";
+  const rarityInk = (r: string | null) => RARITY[r ?? ""]?.[1] ?? "#ffffff";
+  const TYPE_NAMES: Record<string, string> = { weapon_mod: "Modification", "weapon-mod": "Modification" };
+  const typeLabel = (i: { category: string; subcategory: string | null }) =>
+    (i.category === "weapon" && i.subcategory) || TYPE_NAMES[i.category] || i.category.replace(/[-_]/g, " ");
+  // Simple stand-ins for the game's category glyphs.
+  const glyphPath = (category: string) => ({
+    shield: "M8 1l6 2.2v4.3c0 3.6-2.6 6.4-6 7.5-3.4-1.1-6-3.9-6-7.5V3.2z",
+    weapon: "M1 6h11l3-1v3l-3 .5V10H8l-1 3H4l1-3H1z",
+    augment: "M3 3h4v4H3zm6 0h4v4H9zM3 9h4v4H3zm6 0h4v4H9z",
+  } as Record<string, string>)[category] ?? (category.includes("mod") ? "M1 6h14v4H1z" : "M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2z");
+
   const canCraft = $derived(detail?.crafting.some((r) => r.kind === "craft") ?? false);
   const kindLabel = (r: RecipeView) => (r.kind === "salvage" ? "Salvage" : "Recycle");
 </script>
@@ -132,16 +174,100 @@
 {:else if detail}
   {@const item = detail.item}
   <div class="page">
-    <aside class="detail">
-      <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={112} /></div>
-      <div class="chips">
-        <span class="chip category">{item.category.replace("-", " ")}</span>
-        {#if item.rarity}
-          <span class="chip" style:color="var(--on-cream)">{item.rarity}</span>
+    <aside class="side">
+      <div class="tooltip">
+        <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={112} /></div>
+        <div class="tags" style:--tag={rarityColor(item.rarity)} style:--tag-ink={rarityInk(item.rarity)}>
+          <span class="tag glyph" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14"><path d={glyphPath(item.category)} fill="currentColor" /></svg>
+          </span>
+          <span class="tag">{typeLabel(item)}</span>
+          {#if item.rarity}<span class="tag">{item.rarity}</span>{/if}
+          {#if item.tier}<span class="tag">Tier {ROMAN[item.tier]}</span>{/if}
+        </div>
+        <h2>{item.name}</h2>
+        {#if item.description}<p class="description">{item.description}</p>{/if}
+        {#if detail.mod_info?.compatible.length}
+          <p class="compat">Compatible with: {detail.mod_info.compatible.join(", ")}</p>
         {/if}
-        {#if item.tier}<span class="chip">Tier {ROMAN[item.tier]}</span>{/if}
+        <!-- Mods' flavor text repeats an effect listed below. -->
+        {#if item.flavor_text && !detail.mod_info}<p class="flavor" class:callout={item.category === "augment"}>{item.flavor_text}</p>{/if}
+
+        <div class="rows">
+          {#if item.ammo_type}<div class="row"><span>Ammo Type</span><b>{item.ammo_type.replace(/ ammo$/i, "")} Ammo</b></div>{/if}
+          {#each infoRows as [key, value]}
+            {@const d = delta(key, value)}
+            <div class="row">
+              <span>{STAT_LABELS[key]}</span>
+              <b>{shown(key, value)}{#if d}<span class="delta" class:down={d < 0}>{d > 0 ? "+" : ""}{d}</span>{/if}</b>
+            </div>
+          {/each}
+          {#each lines as line}<div class="row"><span>{line}</span></div>{/each}
+          {#each detail.mod_info?.effects ?? [] as effect}<div class="row"><span>{effect}</span></div>{/each}
+          {#if item.stack_size !== null && item.stack_size > 1}<div class="row"><span>Stack size</span><b>{item.stack_size}</b></div>{/if}
+          {#if item.stencil}
+            <div class="row"><span>Source</span><b>{item.stencil.source}</b></div>
+            <div class="row"><span>Stencil Parts</span><b>{item.stencil.parts} per weapon</b></div>
+          {/if}
+        </div>
+
+        {#if slotTiles.length}
+          <div class="slots">
+            {#each slotTiles as [label, count]}<span class="slot"><b>×{count}</b>{label}</span>{/each}
+          </div>
+        {/if}
+
+        {#if bars.length}
+          <div class="bars">
+            {#each bars as [key, value]}
+              {@const before = baseline?.item.stats?.[key]}
+              {@const base = typeof before === "number" ? Math.min(before, value) : value}
+              <div class="stat-bar">
+                <span>{STAT_LABELS[key]}</span>
+                <span class="track" title="{STAT_LABELS[key]}: {value}{typeof before === 'number' && before !== value ? ` (was ${before})` : ''}">
+                  <span class="fill" style:width="{Math.min(100, base)}%"></span>
+                  {#if value > base}<span class="gain" style:width="{Math.min(100, value) - Math.min(100, base)}%"></span>{/if}
+                </span>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if upgrades.length}
+          <p class="heading muted">Upgrade modifiers</p>
+          {#each upgrades as upgrade}<div class="row"><span>{upgrade.pct}% {upgrade.label}</span></div>{/each}
+        {/if}
+
+        {#if recyclesInto.length}
+          <p class="heading">{recycleLabel}</p>
+          <div class="recycles">
+            {#each recyclesInto as out (out.id)}
+              <a href={linkHref(out)} title="{out.qty ?? 1}× {out.name}"><Icon url={out.icon} name={out.name} size={36} />{#if (out.qty ?? 1) > 1}<span>{out.qty}</span>{/if}</a>
+            {/each}
+          </div>
+        {/if}
+
+        <div class="footer">
+          <label class="cell" title="How many you have in your stash">
+            <span class="sr">In your stash</span>
+            <input class="stash" type="number" min="0" aria-label="In your stash" value={inStash} onchange={(e) => { const n = Math.max(0, Math.floor(e.currentTarget.valueAsNumber) || 0); e.currentTarget.value = String(n); saveStash(n); }} />
+            <small>in stash</small>
+          </label>
+          {#if item.weight_kg !== null}
+            <span class="cell" title="Weight">
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M6 3a2 2 0 0 1 4 0v1h2.2l2.3 10H1.5L3.8 4H6zm1 0v1h2V3a1 1 0 0 0-2 0z" fill="currentColor" /></svg>
+              {item.weight_kg.toFixed(1)}
+            </span>
+          {/if}
+          {#if item.value !== null}
+            <span class="cell" title="Value">
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M8 2v12" stroke="currentColor" stroke-width="1.6" /></svg>
+              {item.value.toLocaleString()}
+            </span>
+          {/if}
+        </div>
       </div>
-      <h2>{item.name}</h2>
+
       {#if verdict}
         <div class="verdict {verdict.action}">
           <strong>{verdict.headline}</strong>
@@ -150,50 +276,26 @@
         </div>
       {/if}
       {#if detail.family && (detail.family.levels.length > 1 || detail.family.amplified.length)}
-        <WeaponPicker family={detail.family} {item} baseId={detail.base?.id ?? null} />
-      {/if}
-      {#if item.description}<p class="description">{item.description}</p>{/if}
-      {#if item.flavor_text}<p class="flavor">{item.flavor_text}</p>{/if}
-      <hr />
-      <dl>
-        <dt>In your stash</dt>
-        <dd><input class="stash" type="number" min="0" aria-label="In your stash" value={inStash} onchange={(e) => { const n = Math.max(0, Math.floor(e.currentTarget.valueAsNumber) || 0); e.currentTarget.value = String(n); saveStash(n); }} /></dd>
-        {#if item.value !== null}<dt>Value</dt><dd>{item.value.toLocaleString()}</dd>{/if}
-        {#if item.weight_kg !== null}<dt>Weight</dt><dd>{item.weight_kg} kg</dd>{/if}
-        {#if item.stack_size !== null}<dt>Stack</dt><dd>{item.stack_size}</dd>{/if}
-        {#if item.ammo_type}<dt>Ammo</dt><dd>{item.ammo_type}</dd>{/if}
-        {#each stats as [key, value]}
-          {@const d = delta(key, value)}
-          <dt>{STAT_LABELS[key]}</dt>
-          <dd>{value}{#if d}<span class="delta" class:down={d < 0}>{d > 0 ? "+" : ""}{d}</span>{/if}</dd>
-        {/each}
-        {#if item.stencil}
-          <dt>Source</dt><dd>{item.stencil.source}</dd>
-          <dt>Stencil Parts</dt><dd>{item.stencil.parts} per weapon</dd>
-        {/if}
-      </dl>
-      {#if upgrades.length}
-        <p class="heading">Upgrade modifiers</p>
-        <ul class="upgrades">
-          {#each upgrades as upgrade}<li>{upgrade.pct}% {upgrade.label}</li>{/each}
-        </ul>
+        <div class="picker"><WeaponPicker family={detail.family} {item} baseId={detail.base?.id ?? null} /></div>
       {/if}
       {#if baseline}
         <p class="compared">
-          {anyDelta ? `Changes compared with ${baseline.item.name}.` : `Same stats as ${baseline.item.name} in the source data.`}
+          {anyDelta ? `Blue on the bars and the numbers beside stats are changes from ${baseline.item.name}.` : `Same stats as ${baseline.item.name} in the source data.`}
         </p>
       {/if}
-      {#if canCraft}
-        <a class="button primary" href="#/craft/{item.id}">Crafting tree</a>
-      {/if}
-      <button class="button dark" onclick={async () => (tracked = await toggleTrackedItem(item.id))}>
-        {tracked ? "Tracked" : "Track resources"}
-      </button>
-      {#if collectable}
-        <button class="button dark" onclick={async () => (found = await toggleFound(item.id))}>
-          {found ? "Found ✓" : "Mark found"}
+      <div class="actions">
+        {#if canCraft}
+          <a class="button primary" href="#/craft/{item.id}">Crafting tree</a>
+        {/if}
+        <button class="button dark" onclick={async () => (tracked = await toggleTrackedItem(item.id))}>
+          {tracked ? "Tracked" : "Track resources"}
         </button>
-      {/if}
+        {#if collectable}
+          <button class="button dark" onclick={async () => (found = await toggleFound(item.id))}>
+            {found ? "Found ✓" : "Mark found"}
+          </button>
+        {/if}
+      </div>
     </aside>
 
     <div class="sections">
@@ -263,6 +365,28 @@
         </section>
       {/if}
 
+      {#if detail.note}
+        <section class="panel">
+          <h3 class="section-title">Where to find</h3>
+          <p class="note">{detail.note.where}</p>
+          <p class="sub">{detail.note.source}</p>
+        </section>
+      {/if}
+
+      {#if detail.opens.length}
+        <section class="panel">
+          <h3 class="section-title">Opens</h3>
+          {#each detail.opens as door}
+            <p>
+              <a href="#/maps/{door.map.id}/find/{item.id}" title="Show the door on the map">{door.map.name}</a>
+              <span class="sub">
+                {door.markers.length} {door.markers.length === 1 ? "door" : "doors"}{door.places.length ? `: ${door.places.slice(0, 5).join(", ")}${door.places.length > 5 ? "…" : ""}` : ""}
+              </span>
+            </p>
+          {/each}
+        </section>
+      {/if}
+
       {#if detail.found_in.length}
         <section class="panel">
           <h3 class="section-title">Found in</h3>
@@ -317,17 +441,232 @@
     padding: 18px 20px;
     align-items: start;
   }
-  .detail {
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* Modelled on the in-game item tooltip: cream card, rarity tags, ruled rows, footer band. */
+  .tooltip {
     background: var(--cream);
     color: var(--on-cream);
     border-radius: 6px;
-    padding: 18px;
+    overflow: hidden;
+    padding: 16px 16px 0;
+  }
+  .art {
+    display: grid;
+    place-items: center;
+    padding: 0 0 10px;
+  }
+  .art.blueprint {
+    margin-bottom: 14px;
+    padding: 14px 0;
+    background: var(--blueprint-bg);
+    border-radius: 4px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 6px;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    background: var(--tag);
+    color: var(--tag-ink);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .tag.glyph {
+    padding: 2px 4px;
+  }
+  h2 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .description {
+    color: var(--on-cream-dim);
+    margin: 8px 0 0;
+    font-size: 15px;
+  }
+  .compat {
+    margin: 6px 0 0;
+    color: #6b7488;
+  }
+  .flavor {
+    color: var(--on-cream-dim);
+    font-style: italic;
+    margin: 6px 0 0;
+  }
+  /* Augments' ability text sits in its own box in game. */
+  .flavor.callout {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--on-cream);
+    font-style: normal;
+    font-size: 15px;
+  }
+  .rows {
+    margin-top: 10px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .row b {
+    font-weight: 500;
+    text-align: right;
+    text-transform: capitalize;
+  }
+  .delta {
+    margin-left: 6px;
+    color: #1f8f4d;
+    font-size: 12px;
+  }
+  .delta.down {
+    color: #c0392b;
+  }
+  .slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 6px;
+    margin: 8px 0;
+  }
+  .slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--on-cream-dim);
+  }
+  .slot b {
+    font-size: 16px;
+    color: var(--on-cream);
+  }
+  .bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 22px;
+    padding: 10px 10px 4px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .stat-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 15px;
+  }
+  .track {
+    display: flex;
+    flex: none;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #b3b5bc;
+  }
+  .fill {
+    background: #1b1f2e;
+  }
+  .gain {
+    background: #3aa0c8;
+  }
+  .heading {
+    margin: 12px 0 4px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .heading.muted {
+    color: #6b7488;
+  }
+  .recycles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 12px;
+  }
+  .recycles a {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    background: #1b1f2e;
+    border: 1px solid #2fcf5a55;
+    border-radius: 4px;
+  }
+  .recycles span {
+    position: absolute;
+    right: 3px;
+    bottom: 1px;
+    color: #fff;
+    font-size: 11px;
+  }
+  .footer {
+    display: flex;
+    margin: 0 -16px;
+    background: #d9cfbd;
+  }
+  .cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 6px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .cell + .cell {
+    border-left: 2px solid var(--cream);
+  }
+  .cell small {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--on-cream-dim);
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .stash {
+    width: 56px;
+    padding: 1px 4px;
+    border: 1px solid var(--on-cream-dim);
+    border-radius: 3px;
+    background: none;
+    color: var(--on-cream);
+    font: inherit;
+    text-align: right;
   }
   .verdict {
     display: flex;
     flex-direction: column;
     gap: 1px;
-    margin-top: 10px;
     padding: 8px 10px;
     border-radius: 4px;
     background: #2a7a4b;
@@ -343,97 +682,28 @@
   .verdict.recycle {
     background: #1d6f86;
   }
-  .stash {
-    width: 72px;
-    padding: 1px 4px;
-    border: 1px solid var(--on-cream-dim);
-    border-radius: 3px;
-    background: none;
+  .picker {
+    padding: 10px;
+    background: var(--cream);
     color: var(--on-cream);
-    font: inherit;
-    text-align: right;
+    border-radius: 6px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .short {
     color: var(--yellow);
   }
-  .art {
-    display: grid;
-    place-items: center;
-    padding: 0 0 10px;
-  }
-  .art.blueprint {
-    margin-bottom: 14px;
-    padding: 14px 0;
-    background: var(--blueprint-bg);
-    border-radius: 4px;
-  }
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .category {
-    background: #1f8f4d;
-    border-color: #1f8f4d;
-    color: #fff;
-  }
-  h2 {
-    font-size: 30px;
-    line-height: 1.05;
-  }
-  .description {
-    color: var(--on-cream-dim);
-    margin: 8px 0 0;
-  }
-  .flavor {
-    color: var(--on-cream-dim);
-    font-style: italic;
-    margin: 6px 0 0;
-  }
-  hr {
-    border: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.15);
-    margin: 14px 0;
-  }
-  dl {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 3px 12px;
-    margin: 0 0 14px;
-  }
-  dt {
-    color: var(--on-cream-dim);
-  }
-  dd {
-    margin: 0;
-    font-weight: 600;
-    text-align: right;
-  }
-  .delta {
-    margin-left: 6px;
-    color: #1f8f4d;
-    font-size: 12px;
-  }
-  .delta.down {
-    color: #c0392b;
-  }
-  .heading {
-    margin: 0 0 2px;
-    color: var(--on-cream-dim);
-    font-family: var(--font-head);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .upgrades {
-    margin: 0 0 12px;
-    padding: 0;
-    list-style: none;
-  }
   .compared {
-    margin: -8px 0 12px;
-    color: var(--on-cream-dim);
+    margin: 0;
+    color: var(--text-dim);
     font-size: 13px;
+  }
+  .note {
+    margin: 0 0 6px;
+    line-height: 1.45;
   }
   .stencils {
     display: grid;

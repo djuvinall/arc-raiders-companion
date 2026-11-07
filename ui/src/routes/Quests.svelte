@@ -1,6 +1,7 @@
 <script lang="ts">
   import QuestParty from "../lib/components/QuestParty.svelte";
-  import { completeImpliedQuests, completeQuestChain, exportProfile, importProfile, linkHref, mapList, questList, setQuestObjective, setQuestState, type GameMap, type QuestRow } from "../lib/api";
+  import QuestTree from "../lib/components/QuestTree.svelte";
+  import { completeImpliedQuests, completeQuestChain, exportProfile, importProfile, linkHref, mapList, questList, questProgress, setQuestObjective, STEP_KINDS, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
@@ -51,7 +52,7 @@
 
   const selected = $derived(quests.find((q) => q.quest.id === selectedId) ?? null);
   const traders = $derived([...new Set(quests.map((q) => q.quest.trader).filter(Boolean))].sort() as string[]);
-  const atomics = (q: QuestRow) => q.quest.objectives.filter((o) => o.kind === "atomic");
+  const atomics = (q: QuestRow) => q.quest.objectives.filter((o) => STEP_KINDS.includes(o.kind));
   // With a map chosen, only what's still to do there counts.
   const openOnMap = (q: QuestRow) =>
     atomics(q).filter((o) => o.maps.includes(map) && !q.done_objectives.includes(o.id));
@@ -63,7 +64,10 @@
       (!search || q.quest.name.toLowerCase().includes(search.toLowerCase())),
     ),
   );
-  const objectives = $derived(selected ? (map ? openOnMap(selected) : atomics(selected)) : []);
+  // In quest-log order with the game's nesting; a map filter keeps only what's left there.
+  // With a map chosen, a flat list of what's left there; otherwise the quest log's tree.
+  const openHere = $derived(selected && map ? openOnMap(selected) : []);
+  const progress = (q: QuestRow) => questProgress(q.quest, q.done_objectives);
   const mapName = (id: string) => maps.find((m) => m.id === id)?.name ?? id;
 
   const graph = $derived.by(() => {
@@ -155,7 +159,7 @@
             <i style:background={COLORS[q.status]}></i>
             <strong>{q.quest.name}</strong>
             <span class="dim">{q.quest.trader?.replace("-", " ") ?? ""}</span>
-            <span class="dim">{q.done_objectives.length}/{atomics(q).length}</span>
+            <span class="dim">{progress(q).done}/{progress(q).total}</span>
           </button>
         {/each}
       </div>
@@ -193,17 +197,20 @@
       {#if selected.maps.length}<p class="dim small">{selected.maps.map(mapName).join(", ")}</p>{/if}
 
       <h3 class="section-title">Objectives</h3>
-      {#each objectives as o (o.id)}
-        <label class="objective">
-          <input
-            type="checkbox" checked={selected.done_objectives.includes(o.id)}
-            onchange={(e) => tick(o.id, e.currentTarget.checked)}
-          />
-          <span>{o.description}</span>
-        </label>
+      {#if map}
+        {#each openHere as o (o.id)}
+          <label class="objective">
+            <input type="checkbox" checked={false} onchange={(e) => tick(o.id, e.currentTarget.checked)} />
+            <span>{o.description}</span>
+          </label>
+        {:else}
+          <p class="dim small">Nothing left to do on this map.</p>
+        {/each}
+      {:else if selected.quest.objectives.length > 1}
+        <QuestTree quest={selected.quest} done={selected.done_objectives} ontick={tick} />
       {:else}
-        <p class="dim small">{map ? "Nothing left to do on this map." : "No objectives listed."}</p>
-      {/each}
+        <p class="dim small">No objectives listed.</p>
+      {/if}
 
       {#if selected.needed_for.length}
         <h3 class="section-title">Needed for</h3>
