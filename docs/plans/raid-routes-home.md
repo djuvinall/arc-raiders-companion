@@ -178,6 +178,26 @@ Each step ships on this branch with tests and a headless screenshot check, and i
 
 ## Done on this branch already
 
+- **Item card polish.** Names and tags in the game's plain heavy font, larger description,
+  mod slot tiles for weapons (greyed icons of the lowest mod that fits), the ammo icon on
+  Ammo Type, and no tier tag or weapon flavor line, matching the in-game tooltip.
+- **Spawn model and raid plans** (`arc-core/src/raid.rs`). Every container, plant and ARC on
+  a map is scored per wanted item from a container-type table (`POOLS`), its zone (loot-area
+  tags of spots within 200 units) and rarity. Plans rank target areas by how much of what you
+  want has enough chances, then by depth; each area has a short loop (nearest-neighbour plus
+  2-opt, ending near an exit) and its nearest exits. Plans are saved in the profile with
+  switches per category, source, item and container type, settings, your own stops, notes,
+  and in-raid ticks.
+- **Raid page** rebuilt around plans: auto areas or your own stops (click the map or copy an
+  area), and a **Farm** tab that ranks areas across every map for the items you pick. Item
+  pages link to it.
+- **Maps** no longer plans routes; it has "Plan a raid here" and lists that map's plans.
+- **Home** is one card per tab: raid, live events, quests with their next step, projects,
+  ready now, still needed, workbenches, skills, Codex and patches.
+- **Compact Window** shows the in-raid plan's stops as a checklist.
+
+Not done yet: the Nomadic Envoy card (on hold), a raid log, and tuning `POOLS` against the game.
+
 - **Project stages played as missions.** Soul's Offering stage 4 ("Honor The Fallen") has
   objectives instead of materials, so it showed an empty page. Stages can now carry
   objectives, nested like quests, from a new `project_tasks.json` (its own file, so apps from

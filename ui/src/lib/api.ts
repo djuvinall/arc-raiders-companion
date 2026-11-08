@@ -85,6 +85,9 @@ export interface ItemDetail {
   opens: { map: Link; markers: number[]; places: string[] }[];
   /** Weapon mods only: guns that take it and its effects in the game's wording. */
   mod_info: { slot: string; compatible: string[]; effects: string[] } | null;
+  /** Weapons: the ammo it takes and one tile per mod slot (note is the slot id). */
+  ammo: Link | null;
+  mod_slots: Link[];
   /** Hand-entered where-to-find note for items no source places. */
   note: { where: string; source: string } | null;
   sold_by: Link[];
@@ -152,6 +155,8 @@ export interface Home {
   blueprints_total: number;
   bench_levels: number;
   bench_levels_total: number;
+  quest_next: { id: string; name: string; trader: string | null; step: string | null; maps: string[]; done: number; total: number }[];
+  needed_top: { item: Link; qty: number; have: number; reasons: string[] }[];
 }
 
 export interface ArcView {
@@ -266,6 +271,9 @@ export interface Profile {
   workbenches: Record<string, number>;
   tracked_from: Record<string, string>;
   default_skill_plan: string | null;
+  raid_plans?: RaidPlan[];
+  quests: Record<string, { objectives_done: string[]; done: boolean }>;
+  projects: Record<string, { stage: number }>;
 }
 
 export interface PartyQuest {
@@ -547,6 +555,84 @@ export interface ChangelogEntry {
 }
 
 export const overview = () => invoke<Overview>("overview");
+export interface RaidSettings {
+  areas: number;
+  radius: number;
+  stops: number;
+  confidence: number;
+}
+
+export interface PlanStop {
+  key: string;
+  x: number;
+  y: number;
+  name: string;
+  note: string;
+}
+
+/** A raid you have in mind: target areas from the auto plan, or your own stops. */
+export interface RaidPlan {
+  id: string;
+  name: string;
+  map_id: string;
+  status: "planned" | "in_raid";
+  settings: RaidSettings;
+  /** Switched off: cat:quest, quest:<id>, craft:<id>, project:<id>, bench:<id>, extra:<id>, item:<id>, box:<marker type>. */
+  off: string[];
+  extra_items: string[];
+  /** The auto area picked, by label. */
+  area: string;
+  custom: boolean;
+  stops: PlanStop[];
+  checked: string[];
+  notes: string;
+}
+
+export interface RaidStop {
+  key: string;
+  kind: "container" | "plant" | "arc" | "quest" | "custom";
+  name: string;
+  x: number;
+  y: number;
+  floors: number | null;
+  items: string[];
+}
+
+export interface TargetArea {
+  label: string;
+  name: string;
+  map_id: string;
+  map_name: string;
+  x: number;
+  y: number;
+  radius: number;
+  value: number;
+  /** Chances against what's wanted, uncapped: 2 is twice the chances asked for. */
+  depth: number;
+  stops: RaidStop[];
+  covers: { item_id: string; name: string; likely: number; possible: number; enough: boolean }[];
+  exits: { name: string; x: number; y: number; distance: number }[];
+  walk: number;
+}
+
+export interface RaidAuto {
+  sources: { key: string; kind: "quest" | "craft" | "project" | "bench" | "extra"; name: string; items: Link[]; on: boolean }[];
+  wants: { item: Link; qty: number; on: boolean; placeable: boolean }[];
+  boxes: { key: string; name: string; count: number; on: boolean }[];
+  areas: TargetArea[];
+  quest_stops: RaidStop[];
+}
+
+export const RAID_DEFAULTS: RaidSettings = { areas: 3, radius: 250, stops: 8, confidence: 2 };
+export const newRaidPlan = (mapId: string, name: string): RaidPlan => ({
+  id: "", name, map_id: mapId, status: "planned", settings: { ...RAID_DEFAULTS },
+  off: [], extra_items: [], area: "", custom: false, stops: [], checked: [], notes: "",
+});
+export const raidAuto = (plan: RaidPlan) => invoke<RaidAuto>("raid_auto", { plan });
+export const farmSpots = (itemIds: string[], settings: RaidSettings) => invoke<TargetArea[]>("farm_spots", { itemIds, settings });
+export const saveRaidPlan = (plan: RaidPlan) => invoke<RaidPlan>("save_raid_plan", { plan });
+export const deleteRaidPlan = (id: string) => invoke<void>("delete_raid_plan", { id });
+
 export const listItems = () => invoke<ItemSummary[]>("list_items");
 export const getItem = (id: string) => invoke<ItemDetail>("get_item", { id });
 export const craftPlan = (id: string, qty: number, owned: string | null) =>

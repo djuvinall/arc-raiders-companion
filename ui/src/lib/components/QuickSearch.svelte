@@ -29,7 +29,7 @@
       return true;
     });
     all = [
-      ...maps.map((m) => ({ key: `m${m.id}`, name: m.name, kind: "Map", icon: null, href: `#/raid/${m.id}` })),
+      ...maps.map((m) => ({ key: `m${m.id}`, name: m.name, kind: "Map", icon: null, href: `#/maps/${m.id}` })),
       ...arcs.map(({ arc }) => ({ key: `a${arc.id}`, name: arc.name, kind: "ARC", icon: arc.icon, href: `#/arcs/${arc.id}` })),
       ...guns.map((i) => ({ key: `i${i.id}`, name: i.family_name ?? i.name, kind: i.category.replace("-", " "), icon: i.icon, href: `#/item/${i.id}` })),
       ...quests.map((q) => ({ key: `q${q.quest.id}`, name: q.quest.name, kind: "Quest", icon: null, href: `#/quests/${q.quest.id}` })),

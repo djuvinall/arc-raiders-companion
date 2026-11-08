@@ -443,7 +443,8 @@ pub fn set_bench_level(ds: &Dataset, profile: &mut Profile, bench_id: &str, leve
     let from = profile.workbenches.get(bench_id).copied().unwrap_or(0);
     let bench = ds.files.workbenches.iter().find(|b| b.id == bench_id);
     let level = bench.map_or(level, |b| level.min(b.max_level));
-    let gained_levels = if use_stash { (from + 1)..=level } else { 1..=0 };
+    // Without the stash nothing is taken, so no levels count as gained.
+    let gained_levels = (from + 1)..=(if use_stash { level } else { from });
     for gained in gained_levels {
         let inputs = bench.and_then(|b| b.levels.iter().find(|l| l.level == gained)).map_or(&[][..], |l| &l.upgrade_inputs[..]);
         let mut took = BTreeMap::new();

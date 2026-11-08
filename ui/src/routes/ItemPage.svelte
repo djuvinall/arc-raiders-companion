@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    getItem, getProfile, itemVerdict, linkHref, ROMAN, setStash, toggleFound, toggleTrackedItem,
+    getItem, getProfile, itemVerdict, linkHref, setStash, toggleFound, toggleTrackedItem,
     type ItemDetail, type Link, type RecipeView, type Verdict,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
@@ -183,18 +183,24 @@
           </span>
           <span class="tag">{typeLabel(item)}</span>
           {#if item.rarity}<span class="tag">{item.rarity}</span>{/if}
-          {#if item.tier}<span class="tag">Tier {ROMAN[item.tier]}</span>{/if}
         </div>
         <h2>{item.name}</h2>
         {#if item.description}<p class="description">{item.description}</p>{/if}
+        {#if detail.mod_slots.length}
+          <div class="mod-slots">
+            {#each detail.mod_slots as slot (slot.note)}
+              <span class="mod-slot" title="{slot.name} slot">{#if slot.icon}<Icon url={slot.icon} name={slot.name} size={38} />{:else}{slot.name}{/if}</span>
+            {/each}
+          </div>
+        {/if}
         {#if detail.mod_info?.compatible.length}
           <p class="compat">Compatible with: {detail.mod_info.compatible.join(", ")}</p>
         {/if}
-        <!-- Mods' flavor text repeats an effect listed below. -->
-        {#if item.flavor_text && !detail.mod_info}<p class="flavor" class:callout={item.category === "augment"}>{item.flavor_text}</p>{/if}
+        <!-- Mods' flavor text repeats an effect listed below, and weapons' the armor penetration row. -->
+        {#if item.flavor_text && !detail.mod_info && !isWeapon}<p class="flavor" class:callout={item.category === "augment"}>{item.flavor_text}</p>{/if}
 
         <div class="rows">
-          {#if item.ammo_type}<div class="row"><span>Ammo Type</span><b>{item.ammo_type.replace(/ ammo$/i, "")} Ammo</b></div>{/if}
+          {#if item.ammo_type}<div class="row"><span>Ammo Type</span><b class="ammo">{#if detail.ammo?.icon}<Icon url={detail.ammo.icon} name={detail.ammo.name} size={20} />{/if}{item.ammo_type.replace(/ ammo$/i, "")} Ammo</b></div>{/if}
           {#each infoRows as [key, value]}
             {@const d = delta(key, value)}
             <div class="row">
@@ -242,7 +248,7 @@
           <p class="heading">{recycleLabel}</p>
           <div class="recycles">
             {#each recyclesInto as out (out.id)}
-              <a href={linkHref(out)} title="{out.qty ?? 1}× {out.name}"><Icon url={out.icon} name={out.name} size={36} />{#if (out.qty ?? 1) > 1}<span>{out.qty}</span>{/if}</a>
+              <a href={linkHref(out)} title="{out.qty ?? 1}× {out.name}"><Icon url={out.icon} name={out.name} size={40} />{#if (out.qty ?? 1) > 1}<span>{out.qty}</span>{/if}</a>
             {/each}
           </div>
         {/if}
@@ -390,6 +396,7 @@
       {#if detail.found_in.length}
         <section class="panel">
           <h3 class="section-title">Found in</h3>
+          <p class="sub"><a href="#/raid/farm/{item.id}">Best places to farm it</a>, across every map.</p>
           {#each detail.found_in as found}
             <div class="area">
               <LinkRow link={found.area} />
@@ -450,9 +457,10 @@
   .tooltip {
     background: var(--cream);
     color: var(--on-cream);
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     padding: 16px 16px 0;
+    font-size: 16px;
   }
   .art {
     display: grid;
@@ -477,26 +485,58 @@
     padding: 2px 6px;
     background: var(--tag);
     color: var(--tag-ink);
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.03em;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    line-height: 1.2;
+    line-height: 1.35;
   }
   .tag.glyph {
     padding: 2px 4px;
   }
+  /* The game sets item names in a heavy plain sans, not the condensed headline face. */
   h2 {
-    margin: 0;
-    font-size: 30px;
-    line-height: 1.05;
+    margin: 2px 0 0;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 27px;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
     text-transform: uppercase;
   }
   .description {
-    color: var(--on-cream-dim);
-    margin: 8px 0 0;
-    font-size: 15px;
+    color: #474b56;
+    margin: 6px 0 0;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  .mod-slots {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .mod-slot {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    padding: 2px;
+    background: #1b1f2e;
+    border: 1.5px solid #2f9c55;
+    border-radius: 5px;
+    color: #c9ccd4;
+    font-size: 10px;
+    text-align: center;
+  }
+  .mod-slot :global(img) {
+    opacity: 0.55;
+    filter: grayscale(1);
+  }
+  .ammo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .compat {
     margin: 6px 0 0;
@@ -525,7 +565,7 @@
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    padding: 6px 10px;
+    padding: 8px 10px;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
   }
   .row b {
@@ -572,7 +612,7 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    font-size: 15px;
+    font-size: 16px;
   }
   .track {
     display: flex;
@@ -589,10 +629,11 @@
     background: #3aa0c8;
   }
   .heading {
-    margin: 12px 0 4px;
-    font-family: var(--font-head);
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    margin: 12px 0 6px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
   }
   .heading.muted {
@@ -608,11 +649,11 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
     background: #1b1f2e;
-    border: 1px solid #2fcf5a55;
-    border-radius: 4px;
+    border: 1.5px solid #2f9c55;
+    border-radius: 5px;
   }
   .recycles span {
     position: absolute;

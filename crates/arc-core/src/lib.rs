@@ -7,6 +7,7 @@ pub mod dataset;
 pub mod events;
 pub mod model;
 pub mod patches;
+pub mod raid;
 pub mod routing;
 pub mod skills;
 pub mod tracking;

@@ -796,6 +796,89 @@ pub struct Profile {
     /// level puts exactly that back.
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub bench_from_stash: BTreeMap<String, BTreeMap<String, u32>>,
+    /// Raids planned on the Raid page.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub raid_plans: Vec<RaidPlan>,
+}
+
+/// A raid you have in mind: the map, what you're after, and either the auto plan's target
+/// areas or your own stops.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields, default)]
+pub struct RaidPlan {
+    pub id: String,
+    pub name: String,
+    pub map_id: String,
+    /// `planned` or `in_raid`.
+    pub status: String,
+    pub settings: RaidSettings,
+    /// What's switched off: `cat:quest`, `quest:<id>`, `craft:<id>`, `project:<id>`,
+    /// `bench:<id>`, `item:<id>` or `box:<marker type>`.
+    pub off: Vec<String>,
+    /// Items added by hand, beyond what's tracked.
+    pub extra_items: Vec<String>,
+    /// The auto area picked, by label ("A").
+    pub area: String,
+    /// Your own stops. With `custom` set they are the route instead of the auto areas.
+    pub custom: bool,
+    pub stops: Vec<PlanStop>,
+    /// Stops ticked off during the raid, by key.
+    pub checked: Vec<String>,
+    pub notes: String,
+}
+
+impl Default for RaidPlan {
+    fn default() -> Self {
+        Self {
+            id: String::new(),
+            name: String::new(),
+            map_id: String::new(),
+            status: "planned".into(),
+            settings: RaidSettings::default(),
+            off: Vec::new(),
+            extra_items: Vec::new(),
+            area: String::new(),
+            custom: false,
+            stops: Vec::new(),
+            checked: Vec::new(),
+            notes: String::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields, default)]
+pub struct RaidSettings {
+    /// How many target areas to offer.
+    pub areas: u32,
+    /// Area radius, in map units.
+    pub radius: f64,
+    /// Stops per area.
+    pub stops: u32,
+    /// Good containers wanted per copy needed.
+    pub confidence: u32,
+}
+
+impl Default for RaidSettings {
+    fn default() -> Self {
+        Self { areas: 3, radius: 250.0, stops: 8, confidence: 2 }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields, default)]
+pub struct PlanStop {
+    pub key: String,
+    pub x: f64,
+    pub y: f64,
+    pub name: String,
+    pub note: String,
+}
+
+impl Default for PlanStop {
+    fn default() -> Self {
+        Self { key: String::new(), x: 0.0, y: 0.0, name: String::new(), note: String::new() }
+    }
 }
 
 /// A friend's quest progress as of the share code they last sent.
@@ -827,6 +910,7 @@ impl Default for Profile {
             tracked_from: BTreeMap::new(),
             default_skill_plan: None,
             bench_from_stash: BTreeMap::new(),
+            raid_plans: Vec::new(),
         }
     }
 }

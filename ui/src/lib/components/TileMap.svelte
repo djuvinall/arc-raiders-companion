@@ -28,8 +28,14 @@
     /** False until this map's markers have loaded, so the first fit isn't of nothing. */
     ready?: boolean;
     onselect: (point: MapPoint | null) => void;
+    /** Circles drawn under the markers, such as a raid plan's target areas. */
+    areas?: { x: number; y: number; r: number; label: string; on?: boolean }[];
+    /** A line through these, in order: a route. */
+    path?: { x: number; y: number }[];
+    /** A click on empty map, in map coordinates. Without it such clicks clear the selection. */
+    onplace?: (at: { x: number; y: number }) => void;
   }
-  let { map, url, points, selected, onselect, bounds, ready = true }: Props = $props();
+  let { map, url, points, selected, onselect, bounds, ready = true, areas = [], path = [], onplace }: Props = $props();
 
   // Many markers in view draw as small badges, and only a flood of them as dots.
   const SMALL_LIMIT = 1500;
@@ -58,6 +64,12 @@
     const [la0, ln0, la1, ln1] = map.image.world_extent!;
     const [ty0, tx0, ty1, tx1] = map.image.tile_extent!;
     return [tx0 + ((p.x - ln0) / (ln1 - ln0)) * (tx1 - tx0), ty0 + ((p.y - la0) / (la1 - la0)) * (ty1 - ty0)];
+  };
+  /** Screen-independent tile pixels back to map coordinates. */
+  const unproject = (tx: number, ty: number) => {
+    const [la0, ln0, la1, ln1] = map.image.world_extent!;
+    const [ty0, tx0, ty1, tx1] = map.image.tile_extent!;
+    return { x: ln0 + ((tx - tx0) / (tx1 - tx0)) * (ln1 - ln0), y: la0 + ((ty - ty0) / (ty1 - ty0)) * (la1 - la0) };
   };
   // Projected once per point list, not on every pan.
   const projected = $derived(points.map((p) => project(p)));
@@ -131,6 +143,27 @@
       if (x < -20 || y < -20 || x > width + 20 || y > height + 20) continue;
       (points[i].number === undefined ? plain : stops).push({ point: points[i], x, y });
     }
+    for (const a of areas) {
+      const [px, py] = project(a);
+      const [ex] = project({ x: a.x + a.r, y: a.y });
+      const [x, y, r] = [px * scale + ox, py * scale + oy, Math.abs(ex - px) * scale];
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = a.on ? "rgba(242, 211, 74, 0.12)" : "rgba(242, 239, 230, 0.06)";
+      ctx.fill();
+      ctx.setLineDash(a.on ? [] : [6, 5]);
+      ctx.strokeStyle = a.on ? "rgba(242, 211, 74, 0.85)" : "rgba(242, 239, 230, 0.45)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "700 16px Barlow, sans-serif";
+      ctx.textAlign = "center";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(8, 10, 14, 0.9)";
+      ctx.strokeText(a.label, x, y - r - 6);
+      ctx.fillStyle = a.on ? "#f2d34a" : "#f2efe6";
+      ctx.fillText(a.label, x, y - r - 6);
+    }
     const dots = plain.length > DOT_LIMIT;
     const size = plain.length > SMALL_LIMIT ? 12 : zoom - fitZoom < 0.8 ? 16 : zoom - fitZoom < 2 ? 20 : 26;
     drawn = [];
@@ -147,6 +180,20 @@
       }
     }
     if (size > 12 && zoom - fitZoom >= LABEL_ZOOM) labels(ctx, plain, size);
+    if (path.length > 1) {
+      ctx.beginPath();
+      path.forEach((p, i) => {
+        const [px, py] = project(p);
+        if (i) ctx.lineTo(px * scale + ox, py * scale + oy);
+        else ctx.moveTo(px * scale + ox, py * scale + oy);
+      });
+      ctx.strokeStyle = "rgba(8, 10, 14, 0.8)";
+      ctx.lineWidth = 5;
+      ctx.stroke();
+      ctx.strokeStyle = GROUPS.route.color;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
     ctx.font = "700 13px Barlow, sans-serif";
     ctx.textAlign = "center";
     for (const v of stops) {
@@ -186,7 +233,7 @@
 
   // Changes queue one draw for the next frame, however many arrive in between.
   $effect(() => {
-    void [points, projected, zoom, ox, oy, width, height, hover, selected, canvas];
+    void [points, projected, zoom, ox, oy, width, height, hover, selected, canvas, areas, path];
     if (!frame) frame = requestAnimationFrame(draw);
   });
 
@@ -230,7 +277,14 @@
   }
 
   function onup(event: MouseEvent) {
-    if (drag && !drag.moved) onselect(nearest(event));
+    if (drag && !drag.moved) {
+      const hit = nearest(event);
+      if (!hit && onplace) {
+        const rect = box!.getBoundingClientRect();
+        const scale = 2 ** zoom;
+        onplace(unproject((event.clientX - rect.left - ox) / scale, (event.clientY - rect.top - oy) / scale));
+      } else onselect(hit);
+    }
     drag = null;
   }
 

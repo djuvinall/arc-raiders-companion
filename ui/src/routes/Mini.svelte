@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    itemVerdict, listItems, questList, questProgress, routePlan, setQuestObjective,
-    type ItemSummary, type QuestRow, type RoutePlan, type Verdict,
+    getProfile, itemVerdict, listItems, questList, questProgress, raidAuto, routePlan, saveRaidPlan, setQuestObjective,
+    type ItemSummary, type QuestRow, type RaidPlan, type RoutePlan, type Verdict,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
   import QuestTree from "../lib/components/QuestTree.svelte";
@@ -14,9 +14,29 @@
   let pick = $state<ItemSummary | null>(null);
   let verdict = $state<Verdict | null>(null);
 
+  // The plan you're in a raid with, and its stops as a checklist.
+  let raid = $state<RaidPlan | null>(null);
+  let raidStops = $state<{ key: string; name: string; detail: string }[]>([]);
+
   const load = async () => {
-    [plan, quests] = await Promise.all([routePlan(), questList()]);
+    const [p, q, profile] = await Promise.all([routePlan(), questList(), getProfile()]);
+    [plan, quests] = [p, q];
+    const going = profile.raid_plans?.find((r) => r.status === "in_raid") ?? null;
+    if (going && !going.custom) {
+      const auto = await raidAuto(going);
+      const area = auto.areas.find((a) => a.label === going.area) ?? auto.areas[0];
+      raidStops = (area?.stops ?? []).map((s) => ({ key: s.key, name: s.name, detail: s.items.slice(0, 2).join(", ") }));
+    } else {
+      raidStops = (going?.stops ?? []).map((s) => ({ key: s.key, name: s.name, detail: s.note }));
+    }
+    raid = going;
   };
+
+  async function tickStop(key: string, done: boolean) {
+    if (!raid) return;
+    raid.checked = done ? [...raid.checked, key] : raid.checked.filter((k) => k !== key);
+    await saveRaidPlan($state.snapshot(raid));
+  }
   load();
   listItems().then((all) => (items = all.filter((i) => !["cosmetic", "furniture"].includes(i.category) && !i.variant_of)));
 
@@ -90,6 +110,16 @@
     </div>
   {/if}
 
+  {#if raid}
+    <h3 class="section-title">Raid: {raid.name} ({raid.checked.length}/{raidStops.length})</h3>
+    {#each raidStops as s, i (s.key)}
+      <label class="stop small" class:finished={raid.checked.includes(s.key)}>
+        <input type="checkbox" checked={raid.checked.includes(s.key)} onchange={(e) => tickStop(s.key, e.currentTarget.checked)} />
+        <span><b>{i + 1}.</b> {s.name}{s.detail ? ` · ${s.detail}` : ""}</span>
+      </label>
+    {/each}
+  {/if}
+
   <div class="quests-head">
     <h3 class="section-title">Quests ({active.length})</h3>
     {#if active.length}
@@ -156,6 +186,14 @@
   }
   .verdict.recycle {
     background: #1d6f86;
+  }
+  .stop {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .stop.finished {
+    opacity: 0.55;
   }
   .quests-head {
     display: flex;

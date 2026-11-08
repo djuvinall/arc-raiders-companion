@@ -58,7 +58,7 @@
       case "home":
         return { title: "Home", subtitle: "Where you stand" };
       case "raid":
-        return { title: "Raid plan", subtitle: "Next run" };
+        return { title: "Raid", subtitle: "Plans and farming" };
       case "arcs":
         return { title: "ARCs", subtitle: "Enemy guide" };
       case "skills":
@@ -66,7 +66,7 @@
       case "weapons":
         return { title: "Weapons", subtitle: "Builds" };
       case "maps":
-        return { title: "Maps", subtitle: "Events and routes" };
+        return { title: "Maps", subtitle: "Markers and events" };
       case "quests":
         return { title: "Quests", subtitle: "Tracker" };
       case "projects":
@@ -105,7 +105,11 @@
       {:else if parts[0] === "home"}
         <Home {info} />
       {:else if parts[0] === "raid"}
-        <Raid mapId={parts[1]} />
+        <Raid
+          mapId={["plan", "farm"].includes(parts[1]) ? undefined : parts[1]}
+          planId={parts[1] === "plan" ? parts[2] : undefined}
+          farmItem={parts[1] === "farm" ? (parts[2] ?? "") : undefined}
+        />
       {:else if parts[0] === "arcs"}
         <Arcs id={parts[1]} />
       {:else if parts[0] === "skills"}

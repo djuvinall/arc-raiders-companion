@@ -302,6 +302,10 @@ pub struct ItemDetail {
     pub opens: Vec<DoorPresence>,
     /// Weapon mods only.
     pub mod_info: Option<ModInfo>,
+    /// Weapons only: the ammo it takes, and one tile per mod slot (the slot name, with the
+    /// icon of the lowest-tier mod that fits, like the game's empty-slot silhouettes).
+    pub ammo: Option<Link>,
+    pub mod_slots: Vec<Link>,
     /// Hand-entered where-to-find note, for items no source places.
     pub note: Option<ItemNote>,
     pub sold_by: Vec<Link>,
@@ -343,6 +347,18 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         found_in: found_in(ds, &item),
         opens: key_doors(ds, &item),
         mod_info: mod_info(ds, &item),
+        ammo: item.ammo_type.as_ref().map(|a| format!("{}-ammo", a.to_lowercase()))
+            .filter(|a| ds.item(a).is_some()).map(|a| item_link(ds, &a, None)),
+        mod_slots: weapons::slot_options(ds, id).unwrap_or_default().into_iter().map(|s| {
+            let pick = s.mods.iter().min_by_key(|m| m.tier).filter(|m| ds.item(&m.id).is_some());
+            let mut link = pick.map_or_else(
+                || Link { kind: "item", id: String::new(), name: String::new(), icon: None, qty: None, note: None },
+                |m| item_link(ds, &m.id, None),
+            );
+            link.name = slot_label(&s.slot);
+            link.note = Some(s.slot);
+            link
+        }).collect(),
         note: ds.files.notes.items.get(id).cloned(),
         base: item.variant_of.as_ref().map(|b| item_link(ds, b, None)),
         family: weapons::weapon_family_view(ds, id),
@@ -354,6 +370,14 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         project_rewards,
         item,
     })
+}
+
+/// "underbarrel" or "shotgun-muzzle" as the game names the slot.
+fn slot_label(slot: &str) -> String {
+    slot.split(['-', '_']).map(|w| {
+        let mut c = w.chars();
+        c.next().map_or_else(String::new, |f| f.to_uppercase().chain(c).collect())
+    }).collect::<Vec<_>>().join(" ")
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]

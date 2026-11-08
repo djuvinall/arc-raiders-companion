@@ -10,7 +10,8 @@ mod updates;
 use anyhow::{Context, Result};
 use arc_core::events::{self, MapEvents};
 use arc_core::advice::{self, Home, Verdict};
-use arc_core::model::{ChangelogEntry, GameMap, Poi, Profile, SkillPlan, SkillTree, WeaponBuild};
+use arc_core::model::{ChangelogEntry, GameMap, Poi, Profile, RaidPlan, RaidSettings, SkillPlan, SkillTree, WeaponBuild};
+use arc_core::raid;
 use arc_core::patches::{self, PatchNote};
 use arc_core::routing::{self, MapCover, Needed};
 use arc_core::skills::{self, PlanState};
@@ -300,6 +301,37 @@ fn route_plan(state: State<AppState>) -> RoutePlan {
     let needed = routing::needed_items(&state.dataset, &profile);
     let ids: Vec<String> = needed.iter().map(|n| n.item.id.clone()).collect();
     RoutePlan { covers: routing::poi_cover(&state.dataset, &ids), needed }
+}
+
+#[tauri::command]
+fn raid_auto(state: State<AppState>, plan: RaidPlan) -> raid::RaidAuto {
+    raid::auto_plan(&state.dataset, &state.profile.lock().expect("profile lock"), &plan)
+}
+
+#[tauri::command]
+fn farm_spots(state: State<AppState>, item_ids: Vec<String>, settings: RaidSettings) -> Vec<raid::TargetArea> {
+    raid::farm(&state.dataset, &item_ids, &settings)
+}
+
+/// Saves a raid plan, giving a new one an id. Returns it as saved.
+#[tauri::command]
+fn save_raid_plan(state: State<AppState>, mut plan: RaidPlan) -> CommandResult<RaidPlan> {
+    with_profile(&state, |p| {
+        if plan.id.is_empty() {
+            let next = (1..).find(|n| !p.raid_plans.iter().any(|r| r.id == format!("raid-{n}"))).unwrap_or(1);
+            plan.id = format!("raid-{next}");
+        }
+        match p.raid_plans.iter_mut().find(|r| r.id == plan.id) {
+            Some(existing) => *existing = plan.clone(),
+            None => p.raid_plans.push(plan.clone()),
+        }
+        plan
+    })
+}
+
+#[tauri::command]
+fn delete_raid_plan(state: State<AppState>, id: String) -> CommandResult<()> {
+    with_profile(&state, |p| p.raid_plans.retain(|r| r.id != id))
 }
 
 #[tauri::command]
@@ -600,6 +632,7 @@ fn main() {
             skill_tree, skill_plan_state, save_skill_plan, delete_skill_plan, set_default_skill_plan,
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
             save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
+            raid_auto, farm_spots, save_raid_plan, delete_raid_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, uncommit_resource, reopen_project_stage, set_project_objective, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update,

@@ -1,8 +1,8 @@
 <script lang="ts">
   import {
-    getItem, iconSrc, liveEvents, mapList, mapMarkers, mapPois, markerCounts, questList, routePlan,
+    getItem, getProfile, iconSrc, liveEvents, mapList, mapMarkers, mapPois, markerCounts, questList,
     type ItemDetail,
-    type EventsView, type GameMap, type MapCover, type MarkerSet, type Poi, type RoutePlan,
+    type EventsView, type GameMap, type MarkerSet, type Poi, type RaidPlan,
   } from "../lib/api";
   import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
   import { GROUPS, iconUrl } from "../lib/mapIcons";
@@ -47,7 +47,7 @@
   let set = $state<MarkerSet | null>(null);
   let pois = $state<Poi[]>([]);
   let events = $state<EventsView | null>(null);
-  let plan = $state<RoutePlan | null>(null);
+  let raidPlans = $state<RaidPlan[]>([]);
   let region = $state(remembered("event-region") ?? guess);
   let now = $state(Date.now());
   let selected = $state<MapPoint | null>(null);
@@ -85,7 +85,7 @@
     maps = all;
     open(all.find((m) => m.id === mapId) ?? all.find((m) => m.id === saved.map) ?? all[0]);
   });
-  routePlan().then((p) => (plan = p));
+  getProfile().then((p) => (raidPlans = p.raid_plans ?? []));
   questList().then((rows) => {
     questNames = new Map(rows.map((r) => [r.quest.id, r.quest.name]));
     tracked = new Set(rows.filter((r) => r.status === "active" || r.status === "needed").map((r) => r.quest.id));
@@ -214,10 +214,6 @@
         label: showLabels && (quest || category.group === "locations" || category.group === "events") ? name : null,
       });
     });
-    cover?.pois.forEach((stop, i) => out.push({
-      key: `s${stop.id}`, x: stop.x, y: stop.y, icon: "route", group: "route", number: i + 1,
-      title: `Stop ${i + 1}: ${stop.name}`,
-    }));
     return out;
   });
 
@@ -245,23 +241,15 @@
   const hiddenHere = $derived(legend.flatMap((g) => g.rows).filter((r) => isHidden(r.id)).length);
 
   const whole = $derived(set?.markers.map(([, x, y]) => ({ x, y })) ?? []);
-  const cover = $derived(plan?.covers.find((c) => c.map_id === current?.id) ?? null);
-  const stopPoi = $derived(selected?.group === "route" ? pois.find((p) => `s${p.id}` === selected?.key) ?? null : null);
-  const itemName = (id: string) => plan?.needed.find((n) => n.item.id === id)?.item.name ?? id;
+  const selectedPoi = $derived(selected ? pois.find((p) => p.x === selected?.x && p.y === selected?.y) ?? null : null);
+  const plansHere = $derived(raidPlans.filter((r) => r.map_id === current?.id));
   const when = (ms: number) => {
     const minutes = Math.round((ms - now) / 60000);
     if (minutes < 60) return `${Math.max(0, minutes)} min`;
     return `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
   };
   const eventsFor = (id: string) => events?.maps.find((m) => m.map_id === id);
-  // Equal coverage goes to the map with an event running, for more to do on the same trip.
   const liveCount = (id: string) => eventsFor(id)?.current.length ?? 0;
-  const ranked = $derived(
-    [...(plan?.covers ?? [])].sort((a, b) =>
-      b.covered_items.length - a.covered_items.length || liveCount(b.map_id) - liveCount(a.map_id) || a.pois.length - b.pois.length),
-  );
-  const haveNeeds = $derived((plan?.needed.length ?? 0) > 0);
-  const rankLabel = (c: MapCover) => `${c.covered_items.length}/${plan?.needed.length ?? 0} items, ${c.pois.length} stops`;
 </script>
 
 <div class="page">
@@ -402,35 +390,20 @@
       <section class="panel">
         <h3>{selected.title}</h3>
         <p class="dim small">{GROUPS[selected.group]?.label}</p>
-        {#if stopPoi?.loot_areas.length}<p class="small">Loot: {stopPoi.loot_areas.join(", ")}</p>{/if}
+        {#if selectedPoi?.loot_areas.length}<p class="small">Loot: {selectedPoi.loot_areas.join(", ")}</p>{/if}
       </section>
     {/if}
 
-    <section class="panel">
-      <h3 class="section-title">Needed gear</h3>
-      {#if haveNeeds}
-        <p class="small">{plan?.needed.length} items still to find.</p>
-        {#each ranked as c (c.map_id)}
-          <button class="cover" class:active={c.map_id === current?.id} onclick={() => { const m = maps.find((x) => x.id === c.map_id); if (m) open(m); }}>
-            <strong>{c.map_name}</strong>
-            <span class="dim small">{rankLabel(c)}</span>
-            {#each eventsFor(c.map_id)?.current ?? [] as event}<span class="small live">{event.name}</span>{/each}
-          </button>
+    {#if current}
+      <section class="panel">
+        <h3 class="section-title">Raid</h3>
+        <a class="button primary" href="#/raid/{current.id}">Plan a raid here</a>
+        {#each plansHere as r (r.id)}
+          <a class="small plan-link" href="#/raid/plan/{r.id}">{r.name}{r.status === "in_raid" ? " · in raid" : ""}</a>
         {/each}
-        {#if cover}
-          <h3 class="section-title stops">Stops on {cover.map_name}</h3>
-          {#each cover.pois as poi, i (poi.id)}
-            <p class="small"><b>{i + 1}.</b> {poi.name}: {poi.covers.map(itemName).join(", ")}</p>
-          {/each}
-          {#if cover.uncovered.length}
-            <p class="dim small">Not found in any loot area here: {cover.uncovered.map(itemName).join(", ")}</p>
-          {/if}
-        {/if}
-      {:else}
-        <p class="dim small">Track items, quests or projects and this ranks the maps that cover what you still need.</p>
-      {/if}
-      <p class="dim small">Stops are a set of places, not a walking path. Markers are community-mapped by MetaForge.</p>
-    </section>
+        <p class="dim small">Raid plans pick the areas worth heading for on {current.name}, from what you've tracked. Markers are community-mapped by MetaForge.</p>
+      </section>
+    {/if}
   </aside>
 </div>
 
@@ -651,34 +624,13 @@
     display: flex;
     gap: 2px;
   }
-  .cover {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    width: 100%;
-    padding: 8px;
-    background: none;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    color: var(--text);
-    cursor: pointer;
-    font: inherit;
-    text-align: left;
-  }
-  .cover.active {
-    background: var(--panel-2);
-    border-color: var(--border);
-  }
-  .live {
+  .plan-link {
     display: block;
-    color: var(--yellow);
+    margin-top: 6px;
   }
   .small {
     font-size: 13px;
     margin: 4px 0 0;
-  }
-  .stops {
-    margin-top: 12px;
   }
   @media (max-width: 1240px) {
     .page {

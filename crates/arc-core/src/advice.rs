@@ -6,7 +6,7 @@
 use crate::calc::{craft_tree_from, raw_totals};
 use crate::dataset::Dataset;
 use crate::model::*;
-use crate::routing::needed_items;
+use crate::routing::{needed_items, Needed};
 use crate::tracking::requirement_met;
 use crate::views::{item_link, Link};
 use serde::Serialize;
@@ -124,9 +124,57 @@ pub struct Home {
     pub blueprints_total: usize,
     pub bench_levels: u32,
     pub bench_levels_total: u32,
+    /// Tracked quests with the step to do next, in the order they were tracked.
+    pub quest_next: Vec<QuestNext>,
+    /// The items still to find, most wanted first.
+    pub needed_top: Vec<Needed>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct QuestNext {
+    pub id: String,
+    pub name: String,
+    pub trader: Option<String>,
+    /// Null when every step is ticked but the quest isn't turned in.
+    pub step: Option<String>,
+    pub maps: Vec<String>,
+    pub done: usize,
+    pub total: usize,
+}
+
+/// The first unticked step in log order. Done groups are skipped, and an either-or group
+/// follows the option already started, else its first option.
+pub fn next_step<'a>(objectives: &'a [Objective], id: &str, done: &[String], depth: usize) -> Option<&'a Objective> {
+    let node = objectives.iter().find(|o| o.id == id)?;
+    if depth > 16 {
+        return None;
+    }
+    match node.kind.as_str() {
+        "atomic" => (!done.contains(&node.id)).then_some(node),
+        "optional" => None,
+        "any" => {
+            let started = node.children.iter().find(|c| {
+                let mut ids = Vec::new();
+                collect_steps(objectives, c, &mut ids, 0);
+                ids.iter().any(|i| done.contains(i))
+            });
+            started.or(node.children.first()).and_then(|c| next_step(objectives, c, done, depth + 1))
+        }
+        _ => node.children.iter().find_map(|c| next_step(objectives, c, done, depth + 1)),
+    }
+}
+
+fn collect_steps(objectives: &[Objective], id: &str, out: &mut Vec<String>, depth: usize) {
+    let Some(node) = objectives.iter().find(|o| o.id == id) else { return };
+    if node.kind == "atomic" {
+        out.push(node.id.clone());
+    } else if depth < 16 {
+        node.children.iter().for_each(|c| collect_steps(objectives, c, out, depth + 1));
+    }
 }
 
 const ALMOST_SHOWN: usize = 8;
+const NEEDED_SHOWN: usize = 6;
 
 fn goal(ds: &Dataset, profile: &Profile, kind: &'static str, id: &str, name: String, needs: &[(String, u32)]) -> Option<Goal> {
     if needs.is_empty() {
@@ -186,13 +234,34 @@ pub fn home(ds: &Dataset, profile: &Profile) -> Home {
     almost.truncate(ALMOST_SHOWN);
     let blueprints: Vec<&Item> = ds.files.items.iter().filter(|i| i.category == Category::Blueprint).collect();
     let levels: BTreeMap<&str, u8> = ds.files.workbenches.iter().map(|b| (b.id.as_str(), b.max_level)).collect();
+    let needed = needed_items(ds, profile);
+    let mut needed_top = needed.clone();
+    needed_top.sort_by_key(|n| std::cmp::Reverse((n.reasons.len(), n.qty)));
+    needed_top.truncate(NEEDED_SHOWN);
+    let quest_next = ds.files.quests.iter().filter_map(|q| {
+        let progress = profile.quests.get(&q.id).filter(|p| !p.done)?;
+        let total = q.objectives.iter().filter(|o| o.kind == "atomic").count();
+        let step = next_step(&q.objectives, &q.objective_root, &progress.objectives_done, 0);
+        let trader = q.trader.as_ref().map(|t| ds.files.traders.iter().find(|x| &x.id == t).map_or(t.clone(), |x| x.name.clone()));
+        Some(QuestNext {
+            id: q.id.clone(),
+            name: q.name.clone(),
+            trader,
+            step: step.and_then(|o| o.description.clone()),
+            maps: step.map_or_else(Vec::new, |o| o.maps.clone()),
+            done: progress.objectives_done.len().min(total),
+            total,
+        })
+    }).collect();
     Home {
+        quest_next,
+        needed_top,
         ready,
         almost,
         quests_active: profile.quests.values().filter(|p| !p.done).count(),
         quests_done: profile.quests.values().filter(|p| p.done).count(),
         quests_total: ds.files.quests.len(),
-        items_needed: needed_items(ds, profile).len(),
+        items_needed: needed.len(),
         blueprints_found: blueprints.iter().filter(|b| profile.blueprints_found.contains(&b.id)).count(),
         blueprints_total: blueprints.len(),
         bench_levels: profile.workbenches.iter()
