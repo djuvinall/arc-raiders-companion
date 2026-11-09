@@ -16,6 +16,7 @@ mod normalize;
 mod output;
 mod precedence;
 mod probe;
+mod stamp;
 mod skills;
 
 use anyhow::{bail, Context, Result};
@@ -567,8 +568,17 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);
-    let files = Dataset::from_files(out.files)?.files;
+    let mut files = Dataset::from_files(out.files)?.files;
     let coverage = output::coverage(&files, &out.unresolved)?;
+    // The version follows the data: see stamp.rs.
+    let stamp_path = root.join("dataset/stamp.json");
+    let old_stamp = stamp::read(&stamp_path)?;
+    let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
+    let new_stamp = stamp::next(old_stamp.as_ref(), &stamp::hash(&output::render(&files, &coverage)?), &today);
+    if old_stamp.as_ref() != Some(&new_stamp) && !write {
+        println!("note: the data changed since dataset/stamp.json; sync --write gives it version {}", new_stamp.version());
+    }
+    files.version.dataset_version = new_stamp.version();
     let rendered = output::render(&files, &coverage)?;
 
     let data = root.join("dataset/data");
@@ -581,7 +591,8 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
             fs::write(data.join(name), text)?;
         }
         write_schemas(&data.join("schema"))?;
-        println!("wrote {}", data.display());
+        stamp::write(&stamp_path, &new_stamp)?;
+        println!("wrote {} as version {}", data.display(), new_stamp.version());
     }
     Ok(changes)
 }
