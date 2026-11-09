@@ -157,3 +157,12 @@ fn live_conditions_change_the_plan() {
     assert!(caches(&busy) >= caches(&quiet), "caches {} vs {}", caches(&busy), caches(&quiet));
     assert_ne!(quiet.areas, busy.areas, "the boost moves something");
 }
+
+#[test]
+fn arc_parts_show_only_their_arcs_spawns() {
+    let ds = real();
+    let detail = arc_core::views::item_detail(&ds, "turbine-compressor").unwrap();
+    let places: Vec<&str> = detail.found_maps.iter().flat_map(|m| m.places.iter().map(String::as_str)).collect();
+    assert!(!places.is_empty(), "the Turbine spawns should be listed");
+    assert!(places.iter().all(|p| *p == "Turbine"), "only ARC Turbine spawns, got {places:?}");
+}

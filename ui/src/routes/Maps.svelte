@@ -163,7 +163,9 @@
 
   const findAreas = $derived(finding?.item.loot_areas ?? []);
   const typeOf = (name: string) => set?.categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
-  const spots = $derived(pois.filter((p) => p.loot_areas.some((a) => findAreas.includes(a))));
+  // The spots the item page counted: an ARC part shows only its own ARCs' spawns.
+  const spotIds = $derived(new Set(finding?.found_in.flatMap((f) => f.maps.flatMap((m) => m.poi_ids)) ?? []));
+  const spots = $derived(pois.filter((p) => spotIds.has(p.id)));
   const areaName = (id: string) => finding?.found_in.find((f) => f.area.id === id)?.area.name ?? id.replace("-", " ");
 
   // Where the item can be, plus exits for planning the way out.

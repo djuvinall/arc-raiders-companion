@@ -52,7 +52,7 @@ export interface RecipeView {
 
 export interface FoundIn {
   area: Link;
-  maps: { map: Link; poi_count: number; places: string[] }[];
+  maps: MapPresence[];
 }
 
 export interface ItemSource {
@@ -70,6 +70,8 @@ export interface MapPresence {
   map: Link;
   poi_count: number;
   places: string[];
+  /** The spots counted, so the map shows the same ones. */
+  poi_ids: string[];
 }
 
 export interface UsedIn {

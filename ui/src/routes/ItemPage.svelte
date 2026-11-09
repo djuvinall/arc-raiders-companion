@@ -408,7 +408,7 @@
         {@const listed = new Set(detail.sources.map((s) => s.name.toLowerCase()))}
         {@const mapsHere = detail.found_maps.length
           ? detail.found_maps
-          : [...new Set(common.flatMap((s) => s.maps))].map((m) => ({ map: { kind: "map", id: m, name: mapName(m), icon: null, qty: null, note: null }, poi_count: 0, places: [] as string[] }))}
+          : [...new Set(common.flatMap((s) => s.maps))].map((m) => ({ map: { kind: "map", id: m, name: mapName(m), icon: null, qty: null, note: null }, poi_count: 0, places: [] as string[], poi_ids: [] as string[] }))}
         <section class="panel" data-report-label="Found in">
           <h3 class="section-title">Found in</h3>
           <p class="sub"><a href="#/raid/farm/{item.id}">Best places to farm it</a>, across every map.</p>

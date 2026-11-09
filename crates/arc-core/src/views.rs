@@ -124,6 +124,8 @@ pub struct MapPresence {
     pub poi_count: usize,
     /// Distinct named spots, for the "Generator, Locker" line.
     pub places: Vec<String>,
+    /// The spots counted, so the map shows the same ones.
+    pub poi_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -132,13 +134,48 @@ pub struct FoundIn {
     pub maps: Vec<MapPresence>,
 }
 
+/// `ARC Surveyor` and `Rollbot` both name `rollbot`; spawn spots say `Arc Courier`, `surveyor`,
+/// and source ids `containers/wasp_husk`.
+fn arc_word(name: &str) -> String {
+    let n = name.trim().to_lowercase().replace('_', " ");
+    let n = n.rsplit('/').next().unwrap_or(&n).to_string();
+    n.strip_prefix("arc ").unwrap_or(&n).to_string()
+}
+
+/// The ARC loot area's spots are ARC spawns and wrecks. An item is only at the ones it comes
+/// from: the ARCs that drop it and the husks, couriers or probes the app lists it in.
+fn arc_spot_names(ds: &Dataset, item: &Item) -> Vec<String> {
+    let mut names: Vec<String> = Vec::new();
+    for id in &item.drops_from {
+        names.push(arc_word(id));
+        if let Some(arc) = ds.files.arcs.iter().find(|a| &a.id == id) {
+            names.push(arc_word(&arc.name));
+        }
+    }
+    for source in crate::raid::item_sources(ds, &item.id).iter().filter(|s| s.chance != "unlikely") {
+        names.push(arc_word(&source.name));
+        names.push(arc_word(&source.id));
+    }
+    names
+}
+
+/// A spot named `Wasp Husk` counts for the generic `husk` too.
+fn arc_spot_matches(names: &[String], poi: &str) -> bool {
+    let word = arc_word(poi);
+    names.iter().any(|n| *n == word || (n == "husk" && word.ends_with(" husk")))
+}
+
 fn found_in(ds: &Dataset, item: &Item) -> Vec<FoundIn> {
+    let arc_names = arc_spot_names(ds, item);
     item.loot_areas.iter().map(|area_id| {
         let name = ds.files.loot_areas.iter().find(|a| &a.id == area_id)
             .map_or(area_id.as_str(), |a| a.name.as_str());
         let mut per_map: BTreeMap<&str, Vec<&Poi>> = BTreeMap::new();
         for &i in ds.index.pois_by_loot_area.get(area_id).map(Vec::as_slice).unwrap_or(&[]) {
             let poi = &ds.files.pois[i];
+            if area_id == "arc" && !arc_spot_matches(&arc_names, &poi.name) {
+                continue;
+            }
             per_map.entry(poi.map_id.as_str()).or_default().push(poi);
         }
         let maps = per_map.into_iter().map(|(map_id, pois)| {
@@ -147,7 +184,8 @@ fn found_in(ds: &Dataset, item: &Item) -> Vec<FoundIn> {
             let mut places: Vec<String> = pois.iter().map(|p| p.name.clone()).collect();
             places.sort();
             places.dedup();
-            MapPresence { map: entity_link("map", map_id, map_name, None), poi_count: pois.len(), places }
+            let poi_ids = pois.iter().map(|p| p.id.clone()).collect();
+            MapPresence { map: entity_link("map", map_id, map_name, None), poi_count: pois.len(), places, poi_ids }
         }).collect();
         FoundIn { area: entity_link("loot-area", area_id, name, None), maps }
     }).collect()
@@ -163,6 +201,7 @@ fn found_maps(found: &[FoundIn]) -> Vec<MapPresence> {
                 m.places.extend(presence.places.iter().cloned());
                 m.places.sort();
                 m.places.dedup();
+                m.poi_ids.extend(presence.poi_ids.iter().cloned());
             }
             None => out.push(presence.clone()),
         }
@@ -362,13 +401,14 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         .filter(|(_, s)| s.rewards.iter().any(|r| r.item_id == id))
         .map(|(p, s)| entity_link("project", &p.id, &p.name, Some(s.title.clone())))
         .collect();
+    let found = found_in(ds, &item);
     Some(ItemDetail {
         crafting: recipes(&item.recipe_ids),
         breakdown: recipes(&item.recycle_ids),
         used_in: calc::used_in(ds, id),
-        found_maps: found_maps(&found_in(ds, &item)),
+        found_maps: found_maps(&found),
         sources: crate::raid::item_sources(ds, id),
-        found_in: found_in(ds, &item),
+        found_in: found,
         opens: key_doors(ds, &item),
         mod_info: mod_info(ds, &item),
         ammo: item.ammo_type.as_ref().map(|a| format!("{}-ammo", a.to_lowercase()))
