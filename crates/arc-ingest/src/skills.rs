@@ -216,7 +216,8 @@ pub fn build(wikitext: &str, overlay: &Overlay) -> Result<SkillTree> {
         prereqs_entered: wired == nodes.len() - keystones,
         layout_in_game: placed == nodes.len() - options && slotted,
         nodes,
-        points: SkillPoints { from_levels: 76, max_level: 75, expedition_bonus_max: 5 },
+        // Up to 5 per Expedition, 15 in all (Embark, "The 5th Expedition", 2026-08-21).
+        points: SkillPoints { from_levels: 76, max_level: 75, expedition_bonus_max: 15 },
     })
 }
 

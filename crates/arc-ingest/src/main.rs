@@ -6,6 +6,8 @@
 //!   arc-ingest sync [--write]   same diff, and write dataset/data with --write
 
 mod arcs;
+mod arc_loot;
+mod containers;
 mod corrections;
 mod fetch;
 mod guns;
@@ -32,6 +34,10 @@ const PROJECTS_OVERLAY: &str = include_str!("../../../dataset/overlays/projects_
 const PROJECT_TASKS_OVERLAY: &str = include_str!("../../../dataset/overlays/project_tasks_overlay.json");
 const NOTES_OVERLAY: &str = include_str!("../../../dataset/overlays/notes_overlay.json");
 const QUESTS_OVERLAY: &str = include_str!("../../../dataset/overlays/quests_overlay.json");
+const CONTAINERS_OVERLAY: &str = include_str!("../../../dataset/overlays/containers_overlay.json");
+const CONDITIONS_OVERLAY: &str = include_str!("../../../dataset/overlays/conditions_overlay.json");
+const ARC_LOOT: &str = include_str!("../../../dataset/overlays/arc_loot.json");
+const TIP_FIXES: &str = include_str!("../../../dataset/overlays/tip_fixes.json");
 const STENCILS_OVERLAY: &str = include_str!("../../../dataset/overlays/stencils_overlay.json");
 const STENCIL_SWATCHES: &str = "https://static.metaforge.app/arc-raiders/ui/stencils";
 
@@ -470,6 +476,11 @@ fn tidy(files: &mut arc_core::dataset::DatasetFiles) {
             }
         }
     }
+    // The wiki's "Crane Secure Storage Keycard" is a naming slip for the Secure Storage
+    // Keycard: MetaForge and RaidTheory list only that card.
+    if files.items.iter().any(|i| i.id == "riven-tides-secure-storage-keycard") {
+        files.items.retain(|i| i.id != "riven-tides-crane-secure-storage-keycard");
+    }
     // MetaForge lists a few cosmetics twice, once under a placeholder id.
     let named: std::collections::BTreeSet<String> = files.items.iter()
         .filter(|i| !i.id.starts_with("game-cosmetic-"))
@@ -509,6 +520,8 @@ fn write_schemas(dir: &Path) -> Result<()> {
         ("version", schemars::schema_for!(m::DatasetVersion)),
         ("changelog", schemars::schema_for!(Vec<m::ChangelogEntry>)),
         ("notes", schemars::schema_for!(m::Notes)),
+        ("container", schemars::schema_for!(Vec<m::Container>)),
+        ("condition", schemars::schema_for!(Vec<m::MapCondition>)),
     ];
     for (name, schema) in schemas {
         let text = serde_json::to_string_pretty(&schema)? + "\n";
@@ -536,12 +549,17 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     tidy(&mut out.files);
     let (_, arc_pages) = newest_fixture(root, "wiki_arcs")?;
     arcs::apply(&mut out.files.arcs, &arc_pages["pages"]);
+    arcs::fix_tips(&mut out.files.arcs, TIP_FIXES)?;
+    let arc_loot = arc_loot::load(ARC_LOOT)?;
+    arc_loot::apply(&mut out.files.arcs, &mut out.files.items, &arc_loot)?;
     // Older snapshots predate these pages, so a missing one leaves the API's values.
     if let Ok((_, gun_pages)) = newest_fixture(root, "wiki_gear") {
         guns::apply(&mut out.files.items, &gun_pages["pages"]);
     }
     let (_, marker_fixture) = newest_fixture(root, "metaforge_markers")?;
     out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
+    out.files.containers = containers::build(CONTAINERS_OVERLAY, &arc_loot, &out.files.items, &mut out.files.markers)?;
+    out.files.conditions = containers::conditions(CONDITIONS_OVERLAY, &out.files.maps, &out.files.markers)?;
     apply_notes(&mut out.files)?;
     apply_project_tasks(&mut out.files)?;
     let fixes = corrections::load(&root.join("dataset/overlays/corrections"))?;

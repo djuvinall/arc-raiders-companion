@@ -62,6 +62,8 @@ export interface ItemSource {
   chance: "likely" | "possible" | "unlikely";
   score: number;
   maps: string[];
+  /** Breach to open, condition-only, named in its loot table, and so on. */
+  notes: string[];
 }
 
 export interface MapPresence {
@@ -605,11 +607,23 @@ export interface RaidPlan {
   stops: PlanStop[];
   checked: string[];
   notes: string;
+  /** What the raid is mainly for; side areas are picked around it. */
+  primary?: Primary | null;
+}
+
+export interface Primary {
+  /** quest, place, arc or marker. */
+  kind: string;
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  floors: number | null;
 }
 
 export interface RaidStop {
   key: string;
-  kind: "container" | "plant" | "arc" | "quest" | "custom";
+  kind: "container" | "plant" | "arc" | "quest" | "custom" | "primary";
   name: string;
   x: number;
   y: number;
@@ -632,6 +646,24 @@ export interface TargetArea {
   covers: { item_id: string; name: string; likely: number; possible: number; enough: boolean }[];
   exits: { name: string; x: number; y: number; distance: number }[];
   walk: number;
+  /** With a primary objective: how far past the area's edge it is. */
+  detour: number | null;
+}
+
+export interface MapPick {
+  map_id: string;
+  map_name: string;
+  score: number;
+  best: TargetArea | null;
+  quest_steps: number;
+  items_here: string[];
+  items_missing: string[];
+  conditions: ConditionNote[];
+}
+
+export interface ConditionNote {
+  name: string;
+  effects: string[];
 }
 
 export interface RaidAuto {
@@ -640,14 +672,19 @@ export interface RaidAuto {
   boxes: { key: string; name: string; count: number; on: boolean }[];
   areas: TargetArea[];
   quest_stops: RaidStop[];
+  primary: RaidStop | null;
+  conditions: ConditionNote[];
 }
 
 export const RAID_DEFAULTS: RaidSettings = { areas: 3, radius: 250, stops: 8, confidence: 2 };
 export const newRaidPlan = (mapId: string, name: string): RaidPlan => ({
   id: "", name, map_id: mapId, status: "planned", settings: { ...RAID_DEFAULTS },
-  off: [], extra_items: [], area: "", custom: false, stops: [], checked: [], notes: "",
+  off: [], extra_items: [], area: "", custom: false, stops: [], checked: [], notes: "", primary: null,
 });
-export const raidAuto = (plan: RaidPlan) => invoke<RaidAuto>("raid_auto", { plan });
+/** `live`: names of the conditions on the plan's map now. */
+export const raidAuto = (plan: RaidPlan, live: string[] = []) => invoke<RaidAuto>("raid_auto", { plan, live });
+/** `live`: map id to the names of the conditions there now. */
+export const suggestMaps = (plan: RaidPlan, live: Record<string, string[]> = {}) => invoke<MapPick[]>("suggest_maps", { plan, live });
 export const farmSpots = (itemIds: string[], settings: RaidSettings) => invoke<TargetArea[]>("farm_spots", { itemIds, settings });
 export const saveRaidPlan = (plan: RaidPlan) => invoke<RaidPlan>("save_raid_plan", { plan });
 export const deleteRaidPlan = (id: string) => invoke<void>("delete_raid_plan", { id });

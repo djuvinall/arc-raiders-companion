@@ -416,7 +416,7 @@
             <h4 class="minor">Look in</h4>
             {#each common as source (source.id)}
               <p class="source">
-                <span>{source.name}</span>
+                <span>{source.name}{#if source.notes.length} <span class="sub">· {source.notes.join(" · ")}</span>{/if}</span>
                 <span class="chance {source.chance}">{source.chance}</span>
                 <span class="sub">{source.maps.length} {source.maps.length === 1 ? "map" : "maps"}</span>
               </p>
@@ -844,7 +844,7 @@
   .source {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto 64px;
-    max-width: 440px;
+    max-width: 640px;
     align-items: center;
     gap: 10px;
     margin: 2px 0 2px 8px;

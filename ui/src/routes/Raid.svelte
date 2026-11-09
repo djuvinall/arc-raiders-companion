@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    deleteRaidPlan, farmSpots, getProfile, liveEvents, listItems, mapList, mapPois, newRaidPlan, raidAuto,
-    RAID_DEFAULTS, saveRaidPlan,
-    type EventsView, type GameMap, type ItemSummary, type Poi, type RaidAuto, type RaidPlan, type RaidStop,
-    type TargetArea,
+    deleteRaidPlan, farmSpots, getProfile, liveEvents, listItems, mapList, mapMarkers, mapPois, newRaidPlan, raidAuto,
+    RAID_DEFAULTS, saveRaidPlan, suggestMaps,
+    type EventsView, type GameMap, type ItemSummary, type MapPick, type MarkerSet, type Poi, type Primary, type RaidAuto,
+    type RaidPlan, type RaidStop, type TargetArea,
   } from "../lib/api";
   import TileMap, { type MapPoint } from "../lib/components/TileMap.svelte";
 
@@ -43,6 +43,9 @@
   let farmResults = $state<TargetArea[] | null>(null);
   let farmPick = $state("");
   let farmIndex = $state(0);
+  let picks = $state<MapPick[] | null>(null);
+  let suggesting = $state(false);
+  let markers = $state<MarkerSet | null>(null);
 
   Promise.all([mapList(), getProfile(), listItems()]).then(([m, p, i]) => {
     maps = m;
@@ -54,7 +57,11 @@
     else if (open && mode === "plans") show(open);
     if (farmItem) runFarm();
   });
-  liveEvents(region).then((e) => (events = e), () => {});
+  // Live conditions change the plan, so work it out again once they arrive.
+  liveEvents(region).then((e) => {
+    events = e;
+    refresh();
+  }, () => {});
 
   const mapName = (id: string) => maps.find((m) => m.id === id)?.name ?? id;
   const itemName = (id: string) => items.find((i) => i.id === id)?.name ?? id;
@@ -77,14 +84,76 @@
   async function loadMap(id: string) {
     if (loadedMap === id) return;
     floor = 0;
-    pois = await mapPois(id);
+    [pois, markers] = await Promise.all([mapPois(id), mapMarkers(id)]);
     loadedMap = id;
+  }
+
+  /** Ranks every map for what's tracked, with the same switches a new plan starts with. */
+  async function suggest() {
+    suggesting = true;
+    const now = Object.fromEntries((events?.maps ?? []).map((m) => [m.map_id, m.current.map((e) => e.name)]));
+    picks = await suggestMaps(newRaidPlan("", "Raid"), now);
+    suggesting = false;
+  }
+
+  // The primary objective: a quest step, a named place, an ARC to hunt, or a picked marker.
+  const PLACE_KINDS = ["landmark", "building"];
+  // One entry per name: some places have a marker per floor or per door.
+  const places = $derived.by(() => {
+    const seen = new Set<string>();
+    return pois
+      .filter((p) => PLACE_KINDS.includes(p.kind) && p.name && !/(\s(key|card|floor)|keycard)$/i.test(p.name) && !/spawn|zipline|field crate/i.test(p.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((p) => !seen.has(p.name.toLowerCase()) && seen.add(p.name.toLowerCase()) !== undefined);
+  });
+  /** One spot per ARC type: the marker closest to the middle of where that ARC appears. */
+  const arcSpots = $derived.by(() => {
+    const set = markers;
+    if (!set) return [];
+    const byType = new Map<number, [number, number, number | null][]>();
+    for (const [c, x, y, f] of set.markers) {
+      if (set.categories[c]?.group === "arc") byType.set(c, [...(byType.get(c) ?? []), [x, y, f]]);
+    }
+    return [...byType].map(([c, list]) => {
+      const mx = list.reduce((sum, p) => sum + p[0], 0) / list.length;
+      const my = list.reduce((sum, p) => sum + p[1], 0) / list.length;
+      const away = (p: [number, number, number | null]) => Math.hypot(p[0] - mx, p[1] - my);
+      const mid = list.reduce((best, p) => (away(p) < away(best) ? p : best));
+      return { id: set.categories[c].id, name: set.categories[c].name, x: mid[0], y: mid[1], floors: mid[2], count: list.length };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  function setPrimary(value: string) {
+    if (!plan) return;
+    const [kind, ...rest] = value.split(":");
+    const id = rest.join(":");
+    let next: Primary | null = null;
+    if (kind === "quest") {
+      const q = auto?.quest_stops.find((s) => s.key === id);
+      if (q) next = { kind, id: q.key, name: q.items[0] + ": " + q.name, x: q.x, y: q.y, floors: q.floors };
+    } else if (kind === "place") {
+      const p = pois.find((x) => x.id === id);
+      if (p) next = { kind, id: p.id, name: p.name, x: p.x, y: p.y, floors: p.zlayers };
+    } else if (kind === "arc") {
+      const a = arcSpots.find((x) => x.id === id);
+      if (a) next = { kind, id: a.id, name: "Hunt " + a.name, x: a.x, y: a.y, floors: a.floors };
+    }
+    plan.primary = next;
+    save();
+  }
+
+  function primaryFromSelected() {
+    if (!plan || !selected) return;
+    const s = selected;
+    plan.primary = { kind: "marker", id: s.key, name: s.label ?? s.title, x: s.x, y: s.y, floors: null };
+    selected = null;
+    save();
   }
 
   async function refresh() {
     if (!plan) return;
     const asked = $state.snapshot(plan);
-    const result = await raidAuto(asked);
+    const result = await raidAuto(asked, live(asked.map_id).map((e) => e.name));
     if (plan && plan.id === asked.id && plan.map_id === asked.map_id) {
       auto = result;
       areaIndex = Math.max(0, result.areas.findIndex((a) => a.label === plan?.area));
@@ -253,6 +322,9 @@
         }
       }
     }
+    if (mode === "plans" && auto?.primary && onFloor(auto.primary.floors)) {
+      out.push({ key: "primary", x: auto.primary.x, y: auto.primary.y, icon: "quests", group: "route", title: "Primary: " + auto.primary.name, label: "Primary" });
+    }
     route.forEach((s, i) => out.push({ key: `r${s.key}`, x: s.x, y: s.y, icon: "route", group: "route", number: i + 1, title: `${i + 1}. ${s.name}${s.detail ? `: ${s.detail}` : ""}` }));
     return out;
   });
@@ -301,6 +373,20 @@
         {#each maps as m (m.id)}<option value={m.id}>{m.name}{live(m.id).length ? ` · ${live(m.id).map((e) => e.name).join(", ")}` : ""}</option>{/each}
       </select>
       <button class="button small" onclick={() => start(newMap)}>Plan a raid here</button>
+      <button class="button small dark" disabled={suggesting} onclick={suggest}>{suggesting ? "Ranking maps…" : "Suggest a map"}</button>
+      {#if picks}
+        <p class="dim small">Best for what you're tracking, quest steps included.</p>
+        {#each picks as pick, i (pick.map_id)}
+          <button class="plan" onclick={() => start(pick.map_id)} title="Plan a raid here">
+            <strong>{i + 1}. {pick.map_name}</strong>
+            <span class="dim small">
+              {pick.best ? "Best: " + (pick.best.name || "open ground") : "Nothing tracked here"}{pick.quest_steps ? " · " + pick.quest_steps + (pick.quest_steps === 1 ? " quest step" : " quest steps") : ""}
+            </span>
+            {#if pick.items_here.length}<span class="dim small">Good for {short(pick.items_here)}</span>{/if}
+            {#if pick.conditions.length}<span class="small badge" title={pick.conditions.flatMap((c) => c.effects).join("\n")}>{pick.conditions.map((c) => c.name).join(", ")}</span>{/if}
+          </button>
+        {/each}
+      {/if}
     {:else}
       <h3 class="section-title">Farm items</h3>
       <p class="dim small">The best places on any map for what you pick.</p>
@@ -372,6 +458,44 @@
         </div>
       </div>
       {#if message}<p class="small message" role="status">{message}</p>{/if}
+      {#if auto?.conditions.length}
+        <div class="live">
+          {#each auto.conditions as c (c.name)}
+            <p class="small"><strong>Live now: {c.name}</strong></p>
+            {#each c.effects as e}<p class="dim small">{e}</p>{/each}
+          {/each}
+        </div>
+      {/if}
+
+      <h3 class="section-title">Primary objective</h3>
+      {#if plan.primary}
+        <p class="small"><strong>{plan.primary.name}</strong> <button class="link" onclick={() => { if (plan) { plan.primary = null; save(); } }}>clear</button></p>
+        <p class="dim small">The areas below are side trips: ranked by what they give against how far they are from it, and each loop passes it.</p>
+      {:else}
+        <p class="dim small">Optional. Pick what the raid is mainly for, and the areas become side trips around it.</p>
+      {/if}
+      <select class="field" aria-label="Primary objective" value="" onchange={(e) => { const v = e.currentTarget.value; e.currentTarget.value = ""; if (v) setPrimary(v); }}>
+        <option value="">{plan.primary ? "Change…" : "Choose…"}</option>
+        {#if auto?.quest_stops.length}
+          <optgroup label="Quest steps">
+            {#each auto.quest_stops as q (q.key)}<option value={"quest:" + q.key}>{q.items[0]}: {q.name}</option>{/each}
+          </optgroup>
+        {/if}
+        {#if arcSpots.length}
+          <optgroup label="Hunt an ARC">
+            {#each arcSpots as a (a.id)}<option value={"arc:" + a.id}>{a.name} ({a.count} spawns)</option>{/each}
+          </optgroup>
+        {/if}
+        {#if places.length}
+          <optgroup label="Go to a place">
+            {#each places as p (p.id)}<option value={"place:" + p.id}>{p.name}</option>{/each}
+          </optgroup>
+        {/if}
+      </select>
+      {#if selected && selected.group !== "route"}
+        <p class="small"><button class="link" onclick={primaryFromSelected}>Make "{selected.label ?? selected.title}" the primary objective</button></p>
+      {/if}
+
       {#if selected && plan.custom && selected.group !== "route"}
         <p class="small"><strong>{selected.title}</strong> <button class="link" onclick={addSelected}>Add as stop</button></p>
       {/if}
@@ -393,12 +517,12 @@
         {/each}
       {/if}
 
-      <h3 class="section-title">Target areas</h3>
+      <h3 class="section-title">{plan.primary ? "Side areas" : "Target areas"}</h3>
       {#each auto?.areas ?? [] as a, i (a.label)}
         <div class="area" class:on={i === areaIndex && !plan.custom}>
           <button class="area-head" onclick={() => { areaIndex = i; if (plan) { plan.custom = false; plan.area = a.label; save(false); } }}>
             <strong>{a.label}. {a.name || "Open ground"}</strong>
-            <span class="dim small" title="Covered: how much of what you want has enough chances here. Chances: how many, against what the plan asks for. Loop length is a straight line in map units.">{pct(a.value)} covered · {a.depth}× chances · {a.stops.length} stops · loop {a.walk}</span>
+            <span class="dim small" title="Covered: how much of what you want has enough chances here. Chances: how many, against what the plan asks for. Loop length is a straight line in map units.">{pct(a.value)} covered · {a.depth}× chances · {a.stops.length} stops · loop {a.walk}{a.detour === null || a.detour === undefined ? "" : a.detour ? " · " + a.detour + " off the objective" : " · around the objective"}</span>
           </button>
           {#if i === areaIndex}
             {@render covers(a)}
@@ -474,6 +598,14 @@
 </div>
 
 <style>
+  .live {
+    padding: 6px 8px;
+    border: 1px solid var(--yellow);
+    border-radius: 6px;
+  }
+  .live p {
+    margin: 0;
+  }
   .page {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr) 320px;

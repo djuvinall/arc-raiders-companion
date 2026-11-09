@@ -28,40 +28,12 @@ const CENTRES: usize = 1500;
 /// Each quest stop inside an area adds this much to its value.
 const QUEST_STOP_VALUE: f64 = 0.75;
 
-/// What each container type tends to hold. `*` means anything that spawns in loot areas at
-/// all; `cat:` tags match an item's category. A model, tuned by hand: correct it here when
-/// the game says otherwise.
-const POOLS: &[(&str, &[(&str, f64)])] = &[
-    ("containers/base_container", &[("*", 0.5)]),
-    ("containers/locker", &[("residential", 0.8), ("commercial", 0.6), ("security", 0.6), ("medical", 0.5), ("technological", 0.4), ("*", 0.3)]),
-    ("containers/bag", &[("residential", 1.0), ("commercial", 0.8), ("old-world", 0.6), ("*", 0.25)]),
-    ("containers/suitcase", &[("residential", 1.0), ("commercial", 0.8), ("old-world", 0.7), ("*", 0.25)]),
-    ("containers/basket", &[("residential", 0.8), ("nature", 0.8), ("old-world", 0.5)]),
-    ("containers/box", &[("commercial", 1.0), ("residential", 0.6)]),
-    ("containers/car", &[("mechanical", 1.0), ("industrial", 0.7), ("*", 0.2)]),
-    ("containers/utility_crate", &[("mechanical", 1.0), ("electrical", 1.0), ("industrial", 0.8), ("*", 0.3)]),
-    ("containers/electrical_container", &[("electrical", 1.2), ("technological", 0.8)]),
-    ("containers/industrial_container", &[("industrial", 1.2), ("mechanical", 0.8)]),
-    ("containers/med_crate", &[("medical", 1.5), ("cat:healing", 1.5)]),
-    ("containers/ammo_crate", &[("cat:ammo", 1.5)]),
-    ("containers/weapon_case", &[("cat:weapon", 1.5), ("cat:weapon-mod", 1.5), ("security", 0.4)]),
-    ("containers/combat_supplies", &[("cat:ammo", 1.0), ("cat:healing", 1.0), ("cat:grenade", 1.0), ("cat:gadget", 0.6)]),
-    ("containers/raider_cache", &[("raider", 1.2), ("security", 0.8), ("cat:ammo", 0.8), ("cat:healing", 0.6), ("*", 0.4)]),
-    ("containers/frozen_raider_cache", &[("raider", 1.2), ("security", 0.8), ("cat:ammo", 0.8), ("*", 0.4)]),
-    ("containers/hurricane_cache", &[("raider", 1.0), ("security", 0.8), ("*", 0.5)]),
-    ("containers/breachable_container", &[("security", 1.2), ("technological", 1.0), ("exodus", 0.6)]),
-    ("containers/security_breach", &[("security", 1.2), ("technological", 1.0), ("exodus", 0.8)]),
-    ("containers/arc_probe", &[("arc", 1.3), ("technological", 0.4)]),
-    ("containers/arc_courier", &[("arc", 1.3), ("technological", 0.4)]),
-    ("containers/arc_husk", &[("arc", 1.2)]),
-    ("containers/baron_husk", &[("arc", 1.2)]),
-    ("containers/deforester_husk", &[("arc", 1.2)]),
-    ("containers/rocketeer_husk", &[("arc", 1.2)]),
-    ("containers/wasp_husk", &[("arc", 1.0)]),
-    ("containers/android", &[("technological", 1.0), ("electrical", 0.8), ("exodus", 0.6)]),
-    ("locations/field_crate", &[("*", 0.6), ("cat:ammo", 0.5), ("cat:healing", 0.5)]),
-    ("locations/supply_station", &[("cat:ammo", 0.6), ("cat:healing", 0.6)]),
-];
+/// An item a container's own loot table names, when the table is sure of it.
+const LISTED: f64 = 1.5;
+/// Named, but the source flags it unconfirmed or only one source has it.
+const LISTED_UNSURE: f64 = 1.0;
+/// Containers tied to a map condition are only there some raids.
+const CONDITION_ONLY: f64 = 0.35;
 
 /// Plants and the item they give, where the names differ.
 const NATURE_ITEMS: &[(&str, &str)] = &[("olive", "olives")];
@@ -158,8 +130,9 @@ fn tags(ds: &Dataset, item: &Item) -> BTreeSet<String> {
     out
 }
 
-/// How well one container type suits one item, before zone and rarity.
-fn affinity(category: &str, w: &Wanted) -> f64 {
+/// How well one container type suits one item, before zone and rarity. Container types,
+/// what they hold and how strongly come from containers.json.
+fn affinity(ds: &Dataset, category: &str, w: &Wanted, live: &[&MapCondition]) -> f64 {
     if let Some(plant) = category.strip_prefix("nature/") {
         let id = NATURE_ITEMS.iter().find(|(p, _)| *p == plant).map_or(plant, |(_, i)| i);
         return if w.item.id == id { PLANT } else { 0.0 };
@@ -167,17 +140,37 @@ fn affinity(category: &str, w: &Wanted) -> f64 {
     if let Some(arc) = category.strip_prefix("arc/") {
         return if w.item.drops_from.iter().any(|a| a == arc) { ARC_DROP } else { 0.0 };
     }
-    let Some((_, pool)) = POOLS.iter().find(|(c, _)| *c == category) else { return 0.0 };
+    let Some(container) = ds.files.containers.iter().find(|c| c.marker == category && c.loot) else { return 0.0 };
+    let on_now = container.conditions.iter().any(|c| live.iter().any(|l| l.name.eq_ignore_ascii_case(c)));
+    let condition = if container.conditions.is_empty() || container.group != "condition" || on_now { 1.0 } else { CONDITION_ONLY };
+    if let Some(listed) = container.items.iter().find(|i| i.item_id == w.item.id) {
+        return condition * if listed.sure { LISTED } else { LISTED_UNSURE };
+    }
     let spawns = w.tags.iter().any(|t| !t.starts_with("cat:"));
-    pool.iter().map(|(tag, weight)| match *tag {
-        "*" if spawns => *weight,
-        t if w.tags.contains(t) => *weight,
+    condition * container.pool.iter().map(|p| match p.tag.as_str() {
+        "*" if spawns => p.weight,
+        t if w.tags.contains(t) => p.weight,
         _ => 0.0,
     }).fold(0.0, f64::max)
 }
 
-fn modelled(category: &str) -> bool {
-    category.starts_with("nature/") || category.starts_with("arc/") || POOLS.iter().any(|(c, _)| *c == category)
+/// The item is named in this source's own short list: an ARC's drops or a container's loot
+/// table. A short list makes even a rare item a fair bet, so rarity counts for less.
+fn named(ds: &Dataset, category: &str, item: &Item) -> bool {
+    if let Some(arc) = category.strip_prefix("arc/") {
+        return item.drops_from.iter().any(|a| a == arc);
+    }
+    ds.files.containers.iter().any(|c| c.marker == category && c.items.iter().any(|i| i.item_id == item.id))
+}
+
+fn rarity_at(ds: &Dataset, category: &str, item: &Item) -> f64 {
+    let r = rarity_factor(item.rarity);
+    if named(ds, category, item) { r.sqrt() } else { r }
+}
+
+fn modelled(ds: &Dataset, category: &str) -> bool {
+    category.starts_with("nature/") || category.starts_with("arc/")
+        || ds.files.containers.iter().any(|c| c.marker == category && c.loot)
 }
 
 /// One kind of place an item can come from: a container type or an ARC.
@@ -193,6 +186,8 @@ pub struct ItemSource {
     pub score: f64,
     /// Maps with at least one of these.
     pub maps: Vec<String>,
+    /// "Breach", "Needs the Security Breach skill", "During Cold Snap", "Named in its loot table".
+    pub notes: Vec<String>,
 }
 
 /// Everything the spawn model says can hold an item, best chance first. Same scores as the
@@ -202,19 +197,35 @@ pub fn item_sources(ds: &Dataset, item_id: &str) -> Vec<ItemSource> {
     let w = Wanted { item, qty: 1, tags: tags(ds, item) };
     let zoned = if w.tags.iter().any(|t| !t.starts_with("cat:")) { ZONE_BONUS } else { 1.0 };
     let mut out: Vec<ItemSource> = ds.files.markers.categories.iter().enumerate().filter_map(|(i, c)| {
-        let base = affinity(&c.id, &w);
+        let base = affinity(ds, &c.id, &w, &[]);
         if base == 0.0 {
             return None;
         }
         // ARC drops and plants don't depend on the zone around them.
         let zone = if c.id.starts_with("arc/") || c.id.starts_with("nature/") { 1.0 } else { zoned };
-        let score = base * zone * rarity_factor(item.rarity);
+        let score = base * zone * rarity_at(ds, &c.id, item);
         let maps: Vec<String> = ds.files.maps.iter()
             .filter(|m| ds.files.markers.maps.get(&m.id).is_some_and(|list| list.iter().any(|mk| usize::from(mk.0) == i)))
             .map(|m| m.id.clone())
             .collect();
+        let mut notes = Vec::new();
+        if let Some(box_) = ds.files.containers.iter().find(|k| k.marker == c.id) {
+            if box_.items.iter().any(|l| l.item_id == item.id) {
+                notes.push("Named in its loot table".to_string());
+            }
+            if let Some(needs) = &box_.needs {
+                notes.push(format!("Needs the {needs}"));
+            } else if box_.breach {
+                notes.push("Breach to open".to_string());
+            }
+            if !box_.conditions.is_empty() {
+                notes.push(format!("During {}", box_.conditions.join(" or ")));
+            }
+        } else if c.id.starts_with("arc/") {
+            notes.push("Drops when destroyed".to_string());
+        }
         (!maps.is_empty()).then(|| ItemSource {
-            id: c.id.clone(), name: c.name.clone(), group: c.group.clone(), chance: chance(score), score, maps,
+            id: c.id.clone(), name: c.name.clone(), group: c.group.clone(), chance: chance(score), score, maps, notes,
         })
     }).collect();
     out.sort_by(|a, b| b.score.total_cmp(&a.score).then_with(|| a.name.cmp(&b.name)));
@@ -264,25 +275,39 @@ struct Spot<'a> {
     scores: Vec<f64>,
 }
 
-fn spots<'a>(ds: &'a Dataset, map_id: &str, wants: &[Wanted], off_boxes: &BTreeSet<&str>) -> Vec<Spot<'a>> {
+/// The conditions live on a map, matched by name against the schedule's event names.
+fn live_on<'a>(ds: &'a Dataset, map_id: &str, live: &[String]) -> Vec<&'a MapCondition> {
+    ds.files.conditions.iter()
+        .filter(|c| c.maps.iter().any(|m| m == map_id))
+        .filter(|c| live.iter().any(|l| l.eq_ignore_ascii_case(&c.name) || l.to_lowercase().contains(&c.name.to_lowercase())))
+        .collect()
+}
+
+fn rare_or_better(r: Option<Rarity>) -> bool {
+    matches!(r, Some(Rarity::Rare | Rarity::Epic | Rarity::Legendary))
+}
+
+fn spots<'a>(ds: &'a Dataset, map_id: &str, wants: &[Wanted], off_boxes: &BTreeSet<&str>, live: &[&MapCondition]) -> Vec<Spot<'a>> {
     let markers = ds.files.markers.maps.get(map_id).map_or(&[][..], |m| &m[..]);
     let zone_pois: Vec<&Poi> = ds.files.pois.iter().filter(|p| p.map_id == map_id && !p.loot_areas.is_empty()).collect();
     let zones = Grid::new(zone_pois.iter().enumerate().map(|(i, p)| (i, p.x, p.y)), ZONE_RADIUS);
     markers.iter().enumerate().filter_map(|(i, m)| {
         let category = ds.files.markers.categories.get(usize::from(m.0))?;
-        if !modelled(&category.id) || off_boxes.contains(category.id.as_str()) {
+        if !modelled(ds, &category.id) || off_boxes.contains(category.id.as_str()) {
             return None;
         }
         let zone: BTreeSet<&str> = zones.near(m.1, m.2)
             .filter(|&p| (zone_pois[p].x - m.1).hypot(zone_pois[p].y - m.2) <= ZONE_RADIUS)
             .flat_map(|p| zone_pois[p].loot_areas.iter().map(String::as_str)).collect();
         let scores: Vec<f64> = wants.iter().map(|w| {
-            let base = affinity(&category.id, w);
+            let base = affinity(ds, &category.id, w, live)
+                * live.iter().flat_map(|c| &c.boosts).filter(|b| b.marker == category.id).map(|b| b.factor).product::<f64>();
             if base == 0.0 {
                 return 0.0;
             }
             let zoned = if w.tags.iter().any(|t| zone.contains(t.as_str())) { ZONE_BONUS } else { 1.0 };
-            base * zoned * rarity_factor(w.item.rarity)
+            let value = if rare_or_better(w.item.rarity) { live.iter().map(|c| c.loot_value).product::<f64>() } else { 1.0 };
+            base * zoned * rarity_at(ds, &category.id, w.item) * value
         }).collect();
         scores.iter().any(|s| *s > 0.0).then(|| Spot {
             key: format!("{map_id}:{i}"), category, x: m.1, y: m.2, floors: m.3, scores,
@@ -341,6 +366,8 @@ pub struct TargetArea {
     pub exits: Vec<Exit>,
     /// Straight-line length of the loop through the stops.
     pub walk: f64,
+    /// With a primary objective: how far past the area's edge it is, in map units.
+    pub detour: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -360,6 +387,49 @@ pub struct RaidAuto {
     pub areas: Vec<TargetArea>,
     /// Quest steps on this map, for quests that are switched on.
     pub quest_stops: Vec<Stop>,
+    /// The plan's primary objective as a stop, when it has one on this map.
+    pub primary: Option<Stop>,
+    /// Conditions live on this map now that the plan counted.
+    pub conditions: Vec<ConditionNote>,
+}
+
+/// One map's case for a raid: its best area and what else is there for you.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct MapPick {
+    pub map_id: String,
+    pub map_name: String,
+    /// Ranking score: the best area's worth plus a little for every other quest step.
+    pub score: f64,
+    pub best: Option<TargetArea>,
+    /// Quest steps on this map for quests that are switched on.
+    pub quest_steps: usize,
+    /// Items with enough chances somewhere on the map.
+    pub items_here: Vec<String>,
+    /// Wanted items nothing on this map can hold.
+    pub items_missing: Vec<String>,
+    /// Conditions live there now that the ranking counted.
+    pub conditions: Vec<ConditionNote>,
+}
+
+/// A live condition and what it changes, for showing beside a plan.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct ConditionNote {
+    pub name: String,
+    pub effects: Vec<String>,
+}
+
+fn condition_note(c: &MapCondition) -> ConditionNote {
+    let mut effects = Vec::new();
+    if c.loot_value > 1.0 {
+        effects.push("Increased loot value: rare and better items count for more".to_string());
+    } else if c.loot_value < 1.0 {
+        effects.push("Decreased loot value".to_string());
+    }
+    for b in &c.boosts {
+        effects.push(format!("More {} than usual", b.marker.rsplit('/').next().unwrap_or(&b.marker).replace('_', " ")));
+    }
+    effects.extend(c.loot_effects.iter().take(2).cloned());
+    ConditionNote { name: c.name.clone(), effects }
 }
 
 fn dist(a: (f64, f64), b: (f64, f64)) -> f64 {
@@ -414,18 +484,58 @@ fn exits(ds: &Dataset, map_id: &str, at: (f64, f64)) -> Vec<Exit> {
     all
 }
 
-/// The nearest named place, skipping spots named only for what they are ("Zipline").
-fn place_name(ds: &Dataset, map_id: &str, at: (f64, f64)) -> String {
-    let generic = |name: &str| ds.files.markers.categories.iter().any(|c| c.name.eq_ignore_ascii_case(name));
-    ds.files.pois.iter()
-        .filter(|p| p.map_id == map_id && matches!(p.kind, PoiKind::Landmark | PoiKind::Building) && !generic(&p.name))
-        .min_by(|a, b| dist(at, (a.x, a.y)).total_cmp(&dist(at, (b.x, b.y))))
-        .map_or_else(String::new, |p| p.name.clone())
+/// A spot named after a key, keycard or floor ("Dam Staff Key Room" is fine; "Buried City JKV
+/// Employee Access Card" and "first floor" aren't places anyone would name an area by).
+fn key_named(ds: &Dataset, name: &str) -> bool {
+    let lower = name.to_lowercase();
+    lower.ends_with(" key") || lower.ends_with(" card") || lower.contains("keycard") || lower.ends_with(" floor")
+        || ds.files.items.iter().any(|i| i.category == Category::Key && i.name.eq_ignore_ascii_case(name))
 }
 
-/// The best non-overlapping areas on one map for these wants.
+/// A marker label fit to name an area by, with the map's name taken off the front. Labels
+/// are typed by hand upstream, so this skips spawns, crates, ziplines, notes and sentences.
+fn place_label(ds: &Dataset, map_name: &str, name: &str) -> Option<String> {
+    const NOISE: &[&str] = &["spawn", "field crate", "zipline", "player", "button", "nest", "snow pile", "supply station", "mast lift"];
+    let lower = name.to_lowercase();
+    let generic = ds.files.markers.categories.iter().any(|c| c.name.eq_ignore_ascii_case(name));
+    if generic || key_named(ds, name) || name.len() > 40 || name.contains('"') || name.ends_with('.')
+        || NOISE.iter().any(|n| lower.contains(n)) || !name.chars().next().is_some_and(char::is_uppercase) {
+        return None;
+    }
+    let short = map_name.trim_start_matches("The ");
+    let first = short.split_whitespace().next().unwrap_or(short);
+    let trimmed = [map_name, short, first].iter()
+        .find_map(|p| name.strip_prefix(p).filter(|rest| rest.starts_with(' ')))
+        .unwrap_or(name).trim();
+    (!trimmed.is_empty()).then(|| trimmed.to_string())
+}
+
+/// The nearest well-named place.
+fn place_name(ds: &Dataset, map_id: &str, at: (f64, f64)) -> String {
+    let map_name = ds.files.maps.iter().find(|m| m.id == map_id).map_or("", |m| m.name.as_str());
+    ds.files.pois.iter()
+        .filter(|p| p.map_id == map_id && matches!(p.kind, PoiKind::Landmark | PoiKind::Building | PoiKind::Extract))
+        .filter_map(|p| place_label(ds, map_name, &p.name).map(|n| (n, dist(at, (p.x, p.y)))))
+        .min_by(|a, b| a.1.total_cmp(&b.1))
+        .map_or_else(String::new, |(n, _)| n)
+}
+
+/// How much an area's worth is kept at a distance from the primary objective: full beside
+/// it, half at `DETOUR` radii away.
+const DETOUR: f64 = 3.0;
+
+fn detour_factor(primary: Option<&Stop>, at: (f64, f64), radius: f64) -> f64 {
+    primary.map_or(1.0, |p| {
+        let d = dist(at, (p.x, p.y)) / (radius * DETOUR);
+        1.0 / (1.0 + d * d)
+    })
+}
+
+/// The best non-overlapping areas on one map for these wants. With a primary objective,
+/// areas near it rank higher and each loop passes through it.
 fn search(
     ds: &Dataset, map_id: &str, wants: &[Wanted], spots: &[Spot], quest_stops: &[Stop], settings: &RaidSettings,
+    primary: Option<&Stop>,
 ) -> Vec<TargetArea> {
     let radius = settings.radius.clamp(60.0, 1500.0);
     let confidence = f64::from(settings.confidence.clamp(1, 10));
@@ -450,7 +560,8 @@ fn search(
         let loot: f64 = sums.iter().zip(&targets).map(|(s, t)| (s / t).min(1.0)).sum::<f64>() / wants.len().max(1) as f64;
         let quests = quest_grid.near(cx, cy).filter(|&q| dist((cx, cy), (quest_stops[q].x, quest_stops[q].y)) <= radius).count();
         let depth = sums.iter().zip(&targets).map(|(s, t)| s / t).sum::<f64>() / wants.len().max(1) as f64;
-        (loot + (quests as f64 * QUEST_STOP_VALUE).min(3.0), depth, (cx, cy))
+        let near = detour_factor(primary, (cx, cy), radius);
+        ((loot + (quests as f64 * QUEST_STOP_VALUE).min(3.0)) * near, depth, (cx, cy))
     }).collect();
     // Areas that cover the same share rank by how deep their chances go.
     scored.sort_by(|a, b| b.0.total_cmp(&a.0).then(b.1.total_cmp(&a.1)));
@@ -466,7 +577,7 @@ fn search(
             continue;
         }
         taken.push(at);
-        areas.push(area(ds, map_id, &map_name, at, (value, depth), wants, spots, &grid, quest_stops, &quest_grid, &targets, settings, areas.len()));
+        areas.push(area(ds, map_id, &map_name, at, (value, depth), wants, spots, &grid, quest_stops, &quest_grid, &targets, settings, areas.len(), primary));
     }
     areas
 }
@@ -475,6 +586,7 @@ fn search(
 fn area(
     ds: &Dataset, map_id: &str, map_name: &str, at: (f64, f64), (value, depth): (f64, f64), wants: &[Wanted], spots: &[Spot],
     grid: &Grid, quest_stops: &[Stop], quest_grid: &Grid, targets: &[f64], settings: &RaidSettings, index: usize,
+    primary: Option<&Stop>,
 ) -> TargetArea {
     let radius = settings.radius.clamp(60.0, 1500.0);
     let inside: Vec<usize> = grid.near(at.0, at.1).filter(|&n| dist(at, (spots[n].x, spots[n].y)) <= radius).collect();
@@ -500,6 +612,11 @@ fn area(
     stops.extend(quest_grid.near(at.0, at.1)
         .filter(|&q| dist(at, (quest_stops[q].x, quest_stops[q].y)) <= radius)
         .map(|q| quest_stops[q].clone()));
+    let detour = primary.map(|p| (dist(at, (p.x, p.y)) - radius).max(0.0).round());
+    if let Some(p) = primary {
+        stops.retain(|s| s.key != p.key);
+        stops.insert(0, p.clone());
+    }
     let centre = if stops.is_empty() {
         at
     } else {
@@ -528,6 +645,7 @@ fn area(
         covers,
         exits: out,
         walk: length.round(),
+        detour,
     }
 }
 
@@ -541,7 +659,7 @@ fn wanted<'a>(ds: &'a Dataset, profile: &Profile, items: &BTreeMap<String, u32>)
 }
 
 fn placeable(ds: &Dataset, w: &Wanted) -> bool {
-    ds.files.markers.categories.iter().any(|c| affinity(&c.id, w) > 0.0)
+    ds.files.markers.categories.iter().any(|c| affinity(ds, &c.id, w, &[]) > 0.0)
 }
 
 fn quest_stops(ds: &Dataset, profile: &Profile, map_id: &str, off: &BTreeSet<&str>) -> Vec<Stop> {
@@ -559,8 +677,85 @@ fn quest_stops(ds: &Dataset, profile: &Profile, map_id: &str, off: &BTreeSet<&st
     }).collect()
 }
 
+/// What a plan is for: every source, and the items switched on, after the stash.
+fn plan_wants<'a>(ds: &'a Dataset, profile: &Profile, plan: &RaidPlan) -> (Vec<Raw>, BTreeMap<String, u32>) {
+    let off: BTreeSet<&str> = plan.off.iter().map(String::as_str).collect();
+    let all = sources(ds, profile, &plan.extra_items);
+    let source_on = |key: &str, kind: &str| !off.contains(key) && !off.contains(format!("cat:{kind}").as_str());
+    let mut totals: BTreeMap<String, u32> = BTreeMap::new();
+    for (key, kind, _, items) in &all {
+        if source_on(key, kind) {
+            for (id, qty) in items {
+                *totals.entry(id.clone()).or_default() += qty;
+            }
+        }
+    }
+    totals.retain(|id, _| !off.contains(format!("item:{id}").as_str()));
+    (all, totals)
+}
+
+/// Where a primary objective sits, as a stop on the plan's map.
+fn primary_stop(plan: &RaidPlan) -> Option<Stop> {
+    let p = plan.primary.as_ref()?;
+    Some(Stop {
+        key: format!("primary:{}", p.id), kind: "primary", name: p.name.clone(), x: p.x, y: p.y, floors: p.floors,
+        items: vec!["Primary objective".into()],
+    })
+}
+
+/// Every map ranked for this plan's wants and quest steps, best first.
+pub fn suggest_maps(ds: &Dataset, profile: &Profile, plan: &RaidPlan) -> Vec<MapPick> {
+    suggest_maps_live(ds, profile, plan, &BTreeMap::new())
+}
+
+/// The same, counting the conditions live on each map now (map id to event names).
+pub fn suggest_maps_live(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live: &BTreeMap<String, Vec<String>>) -> Vec<MapPick> {
+    let (_, totals) = plan_wants(ds, profile, plan);
+    let wants = wanted(ds, profile, &totals);
+    let off: BTreeSet<&str> = plan.off.iter().map(String::as_str).collect();
+    let boxes_off: BTreeSet<&str> = off.iter().filter_map(|k| k.strip_prefix("box:")).collect();
+    let one = RaidSettings { areas: 1, ..plan.settings.clone() };
+    let mut picks: Vec<MapPick> = ds.files.maps.iter().map(|m| {
+        let now = live_on(ds, &m.id, live.get(&m.id).map_or(&[][..], Vec::as_slice));
+        let spots_here = spots(ds, &m.id, &wants, &boxes_off, &now);
+        let quests = quest_stops(ds, profile, &m.id, &off);
+        let best = search(ds, &m.id, &wants, &spots_here, &quests, &one, None).into_iter().next();
+        let mut sums = vec![0.0; wants.len()];
+        for s in &spots_here {
+            for (sum, v) in sums.iter_mut().zip(&s.scores) {
+                *sum += v;
+            }
+        }
+        let (mut here, mut missing) = (Vec::new(), Vec::new());
+        for (w, sum) in wants.iter().zip(&sums) {
+            if *sum >= f64::from(w.qty.max(1)) * f64::from(plan.settings.confidence.clamp(1, 10)) {
+                here.push(w.item.name.clone());
+            } else if *sum == 0.0 {
+                missing.push(w.item.name.clone());
+            }
+        }
+        // Quest steps outside the best area still pull a map up: they're needed anyway.
+        let in_best = best.as_ref().map_or(0, |b| b.stops.iter().filter(|s| s.kind == "quest").count());
+        let coverage = if wants.is_empty() { 0.0 } else { here.len() as f64 / wants.len() as f64 };
+        let score = best.as_ref().map_or(0.0, |b| b.value) + coverage
+            + (quests.len().saturating_sub(in_best) as f64 * QUEST_STOP_VALUE * 0.5).min(2.0);
+        MapPick {
+            map_id: m.id.clone(), map_name: m.name.clone(), score: (score * 100.0).round() / 100.0, best,
+            quest_steps: quests.len(), items_here: here, items_missing: missing,
+            conditions: now.iter().map(|c| condition_note(c)).collect(),
+        }
+    }).collect();
+    picks.sort_by(|a, b| b.score.total_cmp(&a.score).then_with(|| a.map_name.cmp(&b.map_name)));
+    picks
+}
+
 /// The auto plan for a raid: what it's for (with switches), and the best target areas.
 pub fn auto_plan(ds: &Dataset, profile: &Profile, plan: &RaidPlan) -> RaidAuto {
+    auto_plan_live(ds, profile, plan, &[])
+}
+
+/// The same, with the map's live conditions (event names from the schedule).
+pub fn auto_plan_live(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live: &[String]) -> RaidAuto {
     let off: BTreeSet<&str> = plan.off.iter().map(String::as_str).collect();
     let all = sources(ds, profile, &plan.extra_items);
     let source_on = |key: &str, kind: &str| !off.contains(key) && !off.contains(format!("cat:{kind}").as_str());
@@ -590,7 +785,8 @@ pub fn auto_plan(ds: &Dataset, profile: &Profile, plan: &RaidPlan) -> RaidAuto {
         .collect();
 
     let boxes_off: BTreeSet<&str> = off.iter().filter_map(|k| k.strip_prefix("box:")).collect();
-    let spots_here = spots(ds, &plan.map_id, &wants, &boxes_off);
+    let now = live_on(ds, &plan.map_id, live);
+    let spots_here = spots(ds, &plan.map_id, &wants, &boxes_off, &now);
     let mut counts: BTreeMap<&str, (usize, &str)> = BTreeMap::new();
     for m in ds.files.markers.maps.get(&plan.map_id).map_or(&[][..], |m| &m[..]) {
         if let Some(c) = ds.files.markers.categories.get(usize::from(m.0)).filter(|c| c.id.starts_with("containers/")) {
@@ -601,7 +797,8 @@ pub fn auto_plan(ds: &Dataset, profile: &Profile, plan: &RaidPlan) -> RaidAuto {
         key: format!("box:{id}"), name: name.to_string(), count, on: !boxes_off.contains(id),
     }).collect();
     let quests = quest_stops(ds, profile, &plan.map_id, &off);
-    let areas = search(ds, &plan.map_id, &wants, &spots_here, &quests, &plan.settings);
+    let primary = primary_stop(plan);
+    let areas = search(ds, &plan.map_id, &wants, &spots_here, &quests, &plan.settings, primary.as_ref());
     RaidAuto {
         sources: all.into_iter().map(|(key, kind, name, items)| Source {
             on: source_on(&key, kind),
@@ -614,6 +811,8 @@ pub fn auto_plan(ds: &Dataset, profile: &Profile, plan: &RaidPlan) -> RaidAuto {
         boxes,
         areas,
         quest_stops: quests,
+        primary,
+        conditions: now.iter().map(|c| condition_note(c)).collect(),
     }
 }
 
@@ -623,8 +822,8 @@ pub fn farm(ds: &Dataset, item_ids: &[String], settings: &RaidSettings) -> Vec<T
     let wants: Vec<Wanted> = wanted(ds, &Profile::default(), &items);
     let per_map = RaidSettings { areas: 2, ..settings.clone() };
     let mut all: Vec<TargetArea> = ds.files.maps.iter().flat_map(|m| {
-        let spots_here = spots(ds, &m.id, &wants, &BTreeSet::new());
-        search(ds, &m.id, &wants, &spots_here, &[], &per_map)
+        let spots_here = spots(ds, &m.id, &wants, &BTreeSet::new(), &[]);
+        search(ds, &m.id, &wants, &spots_here, &[], &per_map, None)
     }).collect();
     all.sort_by(|a, b| b.value.total_cmp(&a.value).then(b.depth.total_cmp(&a.depth)));
     all.truncate(8);

@@ -41,6 +41,37 @@ pub fn apply(arcs: &mut [Arc], pages: &Value) {
     }
 }
 
+#[derive(serde::Deserialize)]
+struct TipFixes {
+    fixes: Vec<TipFix>,
+}
+
+#[derive(serde::Deserialize)]
+struct TipFix {
+    arc: String,
+    find: String,
+    replace: String,
+}
+
+/// Rewrites tip sentences that patches made stale. A fix whose sentence is gone is
+/// reported, so a wiki edit can retire it.
+pub fn fix_tips(arcs: &mut [Arc], overlay: &str) -> anyhow::Result<()> {
+    let fixes: TipFixes = serde_json::from_str(overlay)?;
+    for fix in &fixes.fixes {
+        let Some(arc) = arcs.iter_mut().find(|a| a.id == fix.arc) else {
+            println!("note: tip_fixes: no ARC {}", fix.arc);
+            continue;
+        };
+        match arc.tips.as_mut().filter(|t| t.contains(&fix.find)) {
+            Some(tips) => {
+                *tips = tips.replace(&fix.find, &fix.replace).replace("  ", " ").trim().to_string();
+            }
+            None => println!("note: tip_fixes: {} tips no longer say {:?}", fix.arc, fix.find),
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

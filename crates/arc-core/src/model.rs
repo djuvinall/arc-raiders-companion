@@ -431,6 +431,79 @@ pub struct MarkerCategory {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct MapMarker(pub u16, pub f64, pub f64, pub Option<u32>, pub Option<String>);
 
+/// A loot container type as the raid planner models it, one per map marker type.
+/// Built from `overlays/containers_overlay.json` and `overlays/arc_loot.json`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Container {
+    /// The map marker type, as `containers/med_crate`.
+    pub marker: String,
+    pub name: String,
+    /// `normal`, `raider`, `arc` or `condition`.
+    pub group: String,
+    /// False for markers that aren't searched for loot, such as Field Crates.
+    pub loot: bool,
+    /// Loot areas (`medical`), item categories (`cat:healing`) or `*` (anything that spawns
+    /// in loot areas), each with how strongly this container favours it.
+    pub pool: Vec<PoolWeight>,
+    /// Items named in the container's own loot table.
+    pub items: Vec<ContainerItem>,
+    pub breach: bool,
+    /// A skill or tool needed to open it.
+    pub needs: Option<String>,
+    /// The zone it sits in changes what it holds.
+    pub zone_dependent: bool,
+    /// Map conditions it's tied to; empty when it's always there.
+    pub conditions: Vec<String>,
+    /// `confirmed`, `likely`, `unverified` or `in-game`.
+    pub confidence: String,
+    /// The wiki's name for it, when that differs or is worth linking.
+    pub wiki: Option<String>,
+    /// The display name still needs checking in game.
+    pub check_name: bool,
+    pub notes: Option<String>,
+}
+
+/// A map condition (event) and how it changes loot, for the raid planner.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MapCondition {
+    pub name: String,
+    /// Embark's major/minor tag; None when the official tracker doesn't list it.
+    pub major: Option<bool>,
+    pub maps: Vec<String>,
+    /// Scales chances for rare-and-up items while it's live: above 1 for "increased loot
+    /// value", below for "decreased". An estimate; the game gives no numbers.
+    pub loot_value: f64,
+    /// Marker types that spawn more often while it's live.
+    pub boosts: Vec<MarkerBoost>,
+    pub loot_effects: Vec<String>,
+    pub arc_effects: Vec<String>,
+    pub confidence: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MarkerBoost {
+    pub marker: String,
+    pub factor: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct PoolWeight {
+    pub tag: String,
+    pub weight: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ContainerItem {
+    pub item_id: String,
+    /// On the container's own page and not flagged, or backed by a second source.
+    pub sure: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct LootArea {
@@ -825,6 +898,23 @@ pub struct RaidPlan {
     /// Stops ticked off during the raid, by key.
     pub checked: Vec<String>,
     pub notes: String,
+    /// What the raid is mainly for. Side areas are then picked by what they give
+    /// against how far they are from it.
+    pub primary: Option<Primary>,
+}
+
+/// A raid's main goal: a quest step, a named place, an ARC to hunt, or a marker.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields, default)]
+pub struct Primary {
+    /// `quest`, `place`, `arc` or `marker`.
+    pub kind: String,
+    /// The quest id, POI id, ARC marker type or marker key.
+    pub id: String,
+    pub name: String,
+    pub x: f64,
+    pub y: f64,
+    pub floors: Option<u32>,
 }
 
 impl Default for RaidPlan {
@@ -842,6 +932,7 @@ impl Default for RaidPlan {
             stops: Vec::new(),
             checked: Vec::new(),
             notes: String::new(),
+            primary: None,
         }
     }
 }

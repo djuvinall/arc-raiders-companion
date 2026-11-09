@@ -1,0 +1,1176 @@
+{
+ "retrieved": "2026-11-08",
+ "patch": "2.4.1",
+ "sources": [
+  {
+   "id": "off_tracker",
+   "url": "https://arcraiders.com/map-conditions",
+   "date": "2026-11-08 (live schedule window 2026-11-08 19:00 to 2026-11-10 11:00 UTC; embedded data lists condition type major/minor)"
+  },
+  {
+   "id": "off_2.4.1",
+   "url": "https://store.steampowered.com/news/app/1808500/view/719046905302089863",
+   "date": "2026-11 (hotfix 2.4.1, mirrored at arcraiders.wiki Update:2.4.1)"
+  },
+  {
+   "id": "off_2.4.0",
+   "url": "https://arcraiders.com/news/store-update-2-4-0",
+   "date": "2026-11-03"
+  },
+  {
+   "id": "off_2.3.0",
+   "url": "https://arcraiders.com/news/live-update-2-3-0",
+   "date": "2026-10-27 (fetched directly)"
+  },
+  {
+   "id": "off_2.2.0",
+   "url": "https://arcraiders.com/news/store-update-2-2-0",
+   "date": "2026-10-20 (via wiki mirror Update:2.2.0)"
+  },
+  {
+   "id": "off_2.1.0",
+   "url": "https://arcraiders.com/news/store-update-2-1-0",
+   "date": "2026-10-13 (via wiki mirror)"
+  },
+  {
+   "id": "off_2.0",
+   "url": "https://arcraiders.com/news/frozen-trail-2-0-update",
+   "date": "2026-10-08 (via wiki mirror Update:2.0)"
+  },
+  {
+   "id": "off_ft_preview",
+   "url": "https://arcraiders.com/news/frozen-trail-content-preview",
+   "date": "2026-09-23"
+  },
+  {
+   "id": "off_1.42.0",
+   "url": "https://arcraiders.com/news/live-update-1-42-0",
+   "date": "2026-08-18 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.33.0",
+   "url": "https://arcraiders.com/news/live-update-1-33-0",
+   "date": "2026-06-16 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.26.0",
+   "url": "https://arcraiders.com/news/riven-tides-patch-notes-1-26-0",
+   "date": "2026-04-28 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.22.0",
+   "url": "https://arcraiders.com/news/patch-notes-1-22-0",
+   "date": "2026-03-31 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.18.0",
+   "url": "https://arcraiders.com/news/patch-notes-1-18-0",
+   "date": "2026-03-03 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.17.0",
+   "url": "https://arcraiders.com/en/news/shrouded-sky-patch-notes-1-17-0",
+   "date": "2026-02-24 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.13.0",
+   "url": "https://arcraiders.com/news/patch-notes-1-13-0",
+   "date": "2026-01-27 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.7.0",
+   "url": "https://arcraiders.com/en/news/cold-snap-patch-notes",
+   "date": "2025-12-16 (via wiki mirror)"
+  },
+  {
+   "id": "off_1.2.0",
+   "url": "https://arcraiders.wiki/wiki/Update:1.2.0",
+   "date": "patch 1.2.0 (wiki mirror of official notes)"
+  },
+  {
+   "id": "wiki_maps",
+   "url": "https://arcraiders.wiki/wiki/Maps",
+   "date": "retrieved 2026-11-08"
+  },
+  {
+   "id": "wiki_conditions",
+   "url": "https://arcraiders.wiki/wiki/Night_Raid",
+   "date": "retrieved 2026-11-08; one page per condition (Night_Raid, Electromagnetic_Storm, Cold_Snap, Hidden_Bunker, Locked_Gate, Hurricane, Close_Scrutiny, ARC_Frigate, Beachcombing, Bird_City, Lush_Blooms, Prospecting_Probes, Husk_Graveyard, Uncovered_Caches, Launch_Tower_Loot, Harvester, Matriarch_(map_condition), Redirection). The bullet lists on these pages copy the in-game condition text"
+  },
+  {
+   "id": "wiki_mappages",
+   "url": "https://arcraiders.wiki/wiki/Dam_Battlegrounds",
+   "date": "retrieved 2026-11-08; map pages Dam_Battlegrounds, Buried_City, Spaceport, The_Blue_Gate, Stella_Montis, Riven_Tides, Pendola_Pass"
+  },
+  {
+   "id": "wiki_keys",
+   "url": "https://arcraiders.wiki/wiki/Dam_Control_Tower_Key",
+   "date": "retrieved 2026-11-08; individual key item pages, many are stubs"
+  },
+  {
+   "id": "wiki_blueprints",
+   "url": "https://arcraiders.wiki/wiki/Blueprints",
+   "date": "retrieved 2026-11-08; the page itself says its spawn data is not 100% confirmed"
+  },
+  {
+   "id": "wiki_containers",
+   "url": "https://arcraiders.wiki/wiki/Containers",
+   "date": "retrieved 2026-11-08"
+  },
+  {
+   "id": "wiki_misc",
+   "url": "https://arcraiders.wiki/wiki/Fallen_Emperor",
+   "date": "retrieved 2026-11-08; also Extraction_Points, Raider_Hatch, Ballistic_Gondola, Harvester_Payload, Emperor_Gateway_Conduit, Raider_Cache, First_Wave_Cache, Matriarch, Queen"
+  },
+  {
+   "id": "mf_mapdata",
+   "url": "https://metaforge.app/api/game-map-data?tableID=arc_map_data&mapID=<dam|buried-city|spaceport|blue-gate|stella-montis|riven-tides|pendola-pass>",
+   "date": "retrieved 2026-11-08; community-maintained map markers (records updated through 2026-10)"
+  },
+  {
+   "id": "mf_blueprints",
+   "url": "https://metaforge.app/arc-raiders/how-to-find-every-blueprint-in-arc-raiders",
+   "date": "undated guide; mentions January 2026"
+  }
+ ],
+ "conditions": [
+  {
+   "name": "Night Raid",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Stella Montis",
+    "Riven Tides",
+    "Pendola Pass"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game description: 'Raiders have been finding especially good loot behind locked doors, and keys have been more plentiful.'",
+    "In-game bullets: Increased loot value; Fewer active Return Points; No active Raider Hatches",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)",
+    "Wiki blueprint table (unconfirmed): Wolfpack blueprint drops only in Night Raid; tier-III attachment blueprints (Angled Grip III, Compensator III, Extended Barrel III, Extended Light/Medium/Shotgun Mag III, Muzzle Brake III, Shotgun Choke III, Stable Stock III, Vertical Grip III, Lightweight Stock) drop only in Electromagnetic Storm, Locked Gate or Night Raid; Padded Stock and Shotgun Silencer also drop in Hidden Bunker",
+    "Wiki editorial with no official source: more containers spawn, and more ARC cells and cores drop (Advanced ARC Powercell, Bastion Cell, etc.)"
+   ],
+   "arc_effects": [
+    "In-game description: 'The heightened Raider activity has attracted more ARC than usual.'",
+    "1.22.0 (official): more variety of Leaper, Bombardier, Bastion and Rocketeer spawns during Night Raid"
+   ],
+   "source": "off_tracker; wiki_conditions; off_2.3.0; off_1.22.0; off_1.33.0; wiki_blueprints",
+   "confidence": "confirmed",
+   "notes": [
+    "Free loadouts are disabled (1.33.0; it began as a 3-week experiment and the wiki still lists it)",
+    "Map list comes from wiki infoboxes. The official 40-hour schedule window showed only Dam, Buried City, Spaceport, Stella Montis and Pendola Pass, so Blue Gate and Riven Tides are unconfirmed for the current rotation",
+    "Per the wiki, Stella Montis runs only Normal and Night Raid"
+   ]
+  },
+  {
+   "name": "Electromagnetic Storm",
+   "maps": [
+    "Dam Battlegrounds",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: Increased loot value; Fewer active Return Points; No active Raider Hatches; Lightning strikes",
+    "More crashed Probes and Couriers (wiki)",
+    "Fossilized Lightning appears where lightning strikes; it salvages or recycles into Explosive Compound (wiki)",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)",
+    "Wiki blueprint table (unconfirmed): Snap Hook and Surge Coil blueprints drop only in EMS; tier-III attachment blueprints (Angled Grip III, Compensator III, Extended Barrel III, Extended Light/Medium/Shotgun Mag III, Muzzle Brake III, Shotgun Choke III, Stable Stock III, Vertical Grip III, Lightweight Stock) drop only in Electromagnetic Storm, Locked Gate or Night Raid",
+    "1.13.0 (official): fewer container types can spawn condition-specific blueprints during EMS, Hidden Bunker and Locked Gate"
+   ],
+   "arc_effects": [
+    "Lightning can instantly destroy small ARC and briefly disable large ARC; flying ARC such as Rocketeers fall from the sky (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_2.3.0; off_1.13.0; wiki_blueprints",
+   "confidence": "confirmed",
+   "notes": [
+    "The official 40-hour window showed only Dam Battlegrounds"
+   ]
+  },
+  {
+   "name": "Hurricane",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: Increased loot value; Debris affects Shields; Higher-threat ARC",
+    "First Wave Caches spawn and give better loot than normal Raider Caches; the wiki says players report tier IV weapons and rare blueprints",
+    "1.18.0 (official): rare blueprint drop rate in First Wave Caches slightly lowered, high-tier material drop rate raised",
+    "Wiki blueprint table (unconfirmed): the Canto blueprint drops only in Hurricane, from First Wave Caches",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)"
+   ],
+   "arc_effects": [
+    "'Higher-threat ARC', and the wiki says the storm draws more ARC",
+    "1.22.0 (official): fewer Comets during Hurricane"
+   ],
+   "source": "off_tracker; wiki_conditions; off_1.18.0; off_1.22.0; off_2.3.0",
+   "confidence": "confirmed",
+   "notes": [
+    "The official 40-hour window showed only Buried City"
+   ]
+  },
+  {
+   "name": "Cold Snap",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: Harvest Candleberries; Increased loot value; Damaging cold",
+    "Raider Caches have better loot and must be breached (wiki)",
+    "Fireworks Box blueprint: the wiki says Cold Snap only, but MetaForge says it is in the Industrial pool and still dropped after Cold Snap ended (Jan 2026). The two sources conflict"
+   ],
+   "arc_effects": [],
+   "source": "wiki_conditions; wiki_maps; off_1.7.0; wiki_blueprints; mf_blueprints",
+   "confidence": "likely",
+   "notes": [
+    "Not on the official tracker's condition list on 2026-11-08, so it is out of rotation",
+    "Seasonal: added 1.7.0 (2025-12-16), removed 1.11.0, re-added 1.15.0. The wiki calls it major; there is no official type because it is off the tracker"
+   ]
+  },
+  {
+   "name": "Hidden Bunker",
+   "maps": [
+    "Spaceport"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: Fewer active Return Points; No active Raider Hatches; Activate Rooftop Antennas; Retrieve data from the bunker",
+    "The bunker is west/southwest of the Departure Building. Activate 4 rooftop antennas (progress is shared by the lobby), then download data at 8 terminals inside, each usable once (wiki)",
+    "Wiki blueprint table (unconfirmed): Padded Stock and Shotgun Silencer blueprints",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)"
+   ],
+   "arc_effects": [
+    "The first interaction with each antenna spawns Wasps and Hornets; two Bastions and a Bombardier patrol the bunker entrances (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "confirmed",
+   "notes": [
+    "Raids last 40 minutes",
+    "The official tracker lists it as major but showed no scheduled occurrences on 2026-11-08"
+   ]
+  },
+  {
+   "name": "Locked Gate",
+   "maps": [
+    "The Blue Gate"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: Fewer active Return Points; No active Raider Hatches; Collect Security Codes",
+    "Opens the underground tunnels at Checkpoint. Take 4 security codes (Raider's Refuge, Pilgrim's Peak, Reinforced Reception, Ancient Fort) to the Gate Control Room console (wiki)",
+    "Wiki blueprint table (unconfirmed): tier-III attachment blueprints (Angled Grip III, Compensator III, Extended Barrel III, Extended Light/Medium/Shotgun Mag III, Muzzle Brake III, Shotgun Choke III, Stable Stock III, Vertical Grip III, Lightweight Stock) drop only in Electromagnetic Storm, Locked Gate or Night Raid",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)"
+   ],
+   "arc_effects": [
+    "Two Rocketeers guard Pilgrim's Peak; Buried Mines surround each code location (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "confirmed",
+   "notes": [
+    "Raids last 40 minutes"
+   ]
+  },
+  {
+   "name": "Close Scrutiny",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: No active locked doors (key rooms open without a key; puzzle rooms stay locked); Decreased overall loot value; Increased ARC loot",
+    "Surveyors, guarded by Vaporizers, call in ARC Assessors. Breach an Assessor's pylons for Assessor Matrix and other ARC loot (wiki)"
+   ],
+   "arc_effects": [
+    "Starting a pylon breach spawns a swarm of flying ARC: Vaporizers, Rocketeers, Fireflies, Hornets and Wasps (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_1.33.0",
+   "confidence": "confirmed",
+   "notes": [
+    "ARC Operation. Free loadouts disabled (1.33.0)",
+    "The official 40-hour window showed Dam and Buried City"
+   ]
+  },
+  {
+   "name": "ARC Frigate",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Pendola Pass",
+    "Riven Tides"
+   ],
+   "major": true,
+   "loot_effects": [
+    "In-game bullets: No active locked doors; Decreased overall loot value; No active Raider Hatches",
+    "Frigate containers hold mid-tier ARC loot with a small chance of Amplification Modules, Frigate Inductors and ARC Data. The final Cargo has a much higher rate of Frigate Diagnostic Nodes, Amplification Modules and other amplification parts (wiki)",
+    "2.3.0 (official): areas further inside the Frigate have a higher chance of higher-tier rewards",
+    "Since 2.3.0 (official): Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition (that pool's drop chance was slightly lowered)"
+   ],
+   "arc_effects": [
+    "Surface ARC spawns are greatly reduced and ARC Turbines do not spawn (wiki)",
+    "Hydras, Rocketeers, Vaporizers, Fireflies, Hornets and Wasps defend the Frigate (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_2.0; off_2.3.0",
+   "confidence": "confirmed",
+   "notes": [
+    "ARC Operation; raids last 35 minutes; no free loadout (wiki)",
+    "The official window showed Buried City, Dam, Pendola Pass, Spaceport and Blue Gate. Riven Tides comes from the wiki only"
+   ]
+  },
+  {
+   "name": "Harvester",
+   "maps": [
+    "Dam Battlegrounds",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Finishing the Harvester core sequence (3 fusion cores, then 12 yellow targets) guarantees 1 to 3 Equalizer or Jupiter blueprints (wiki)",
+    "The Harvester's breachable containers drop ARC materials such as ARC Alloy, Advanced ARC Powercell and Impure ARC Coolant (wiki)"
+   ],
+   "arc_effects": [
+    "A Queen guards the Harvester (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "confirmed",
+   "notes": [
+    "The official tracker classes it as minor"
+   ]
+  },
+  {
+   "name": "Matriarch",
+   "maps": [
+    "Dam Battlegrounds",
+    "Spaceport",
+    "The Blue Gate"
+   ],
+   "major": false,
+   "loot_effects": [
+    "The Matriarch drops high-tier ARC materials, including Advanced ARC Powercell, ARC Motion Core, Magnetic Accelerator, Matriarch Reactor and ARC Insulated Coupler (wiki)",
+    "2.0 (official): higher-tier loot moved from the leg armour to the leg pieces on the Queen and Matriarch",
+    "1.7.0 (official): the Aphelion blueprint drop moved from the Matriarch to Stella Montis"
+   ],
+   "arc_effects": [
+    "Spawns the Matriarch with defending ARC 'children' (official description)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_2.0; off_1.7.0",
+   "confidence": "confirmed",
+   "notes": [
+    "The official tracker classes it as minor"
+   ]
+  },
+  {
+   "name": "Uncovered Caches",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Riven Tides"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Many more Raider Caches, which explode if left too long, and their loot value is increased (wiki)",
+    "Raider Caches hold ammo, blueprints, grenades, healing items, shields, quick-use items and weapons (wiki)"
+   ],
+   "arc_effects": [],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "likely",
+   "notes": [
+    "The official tracker lists it as minor; the overview data held one Buried City occurrence, but its condition page showed none scheduled"
+   ]
+  },
+  {
+   "name": "Prospecting Probes",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Riven Tides"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Many more Probes, which are ARC loot containers (wiki)"
+   ],
+   "arc_effects": [
+    "Probes are more often guarded by flying ARC such as Wasps (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "confirmed"
+  },
+  {
+   "name": "Lush Blooms",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Riven Tides"
+   ],
+   "major": false,
+   "loot_effects": [
+    "More Nature loot and Wicker Baskets (wiki)"
+   ],
+   "arc_effects": [],
+   "source": "off_tracker; wiki_conditions",
+   "confidence": "confirmed"
+  },
+  {
+   "name": "Husk Graveyard",
+   "maps": [
+    "Dam Battlegrounds",
+    "Buried City",
+    "Spaceport",
+    "The Blue Gate",
+    "Riven Tides"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Many more Wasp, Rocketeer and Courier husks to loot, and they can be electrified when breached. Baron Husks are unchanged (wiki)"
+   ],
+   "arc_effects": [],
+   "source": "wiki_conditions",
+   "confidence": "likely",
+   "notes": [
+    "Not on the official tracker list on 2026-11-08, so probably out of rotation"
+   ]
+  },
+  {
+   "name": "Bird City",
+   "maps": [
+    "Buried City"
+   ],
+   "major": false,
+   "loot_effects": [
+    "More trinkets in rooftop chimney nests, including Duck trinkets found only in this condition (wiki)",
+    "1.17.0 (official): slightly lower chance of rare loot in chimneys"
+   ],
+   "arc_effects": [
+    "Many more ARC drones of all types patrol the sky (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_1.13.0; off_1.17.0",
+   "confidence": "confirmed",
+   "notes": [
+    "Extra ziplines are placed"
+   ]
+  },
+  {
+   "name": "Beachcombing",
+   "maps": [
+    "Riven Tides"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Dig on the north beaches with a Dockmaster's Detector for Weapon Cases, Suitcases (basic materials, ship models) and fruit or fertilizer. Some digs turn up mines or Ticks (wiki)"
+   ],
+   "arc_effects": [
+    "Buried Ticks and more birds (wiki)"
+   ],
+   "source": "off_tracker; wiki_conditions; off_1.26.0",
+   "confidence": "confirmed"
+  },
+  {
+   "name": "Launch Tower Loot",
+   "maps": [
+    "Spaceport"
+   ],
+   "major": false,
+   "loot_effects": [
+    "Extra loot at the top of the Launch Tower. To open the zipline doors, put a fuel cell into the generator at their base (wiki)",
+    "1.22.0 (official): higher chance of high-tier loot from finishing the rooftop activity"
+   ],
+   "arc_effects": [
+    "Official description: ARC 'ramped up their defenses'"
+   ],
+   "source": "wiki_conditions; off_1.22.0",
+   "confidence": "likely",
+   "notes": [
+    "Not on the official tracker list on 2026-11-08, so probably out of rotation"
+   ]
+  },
+  {
+   "name": "Redirection",
+   "maps": [
+    "Pendola Pass"
+   ],
+   "major": false,
+   "loot_effects": [
+    "In-game bullets: No Flash Freeze; Emperor Relays active; Falling Debris",
+    "Loot and deploy Emperor Beacons to call down Harvester Payloads, breachable containers with ARC materials and parts (wiki)",
+    "Payloads can drop the Emperor Gateway Conduit blueprint. 2.3.0 (official) lowered that chance and added a small chance of ARC parts and high-tier ARC loot instead"
+   ],
+   "arc_effects": [],
+   "source": "off_tracker; wiki_conditions; off_2.3.0",
+   "confidence": "confirmed",
+   "notes": [
+    "The official tracker classes it as minor"
+   ]
+  }
+ ],
+ "maps": [
+  {
+   "name": "Dam Battlegrounds",
+   "unlock": "No unlock requirement (wiki)",
+   "duration_min": 30,
+   "conditions_available": [
+    "Night Raid",
+    "Electromagnetic Storm",
+    "Hurricane",
+    "Cold Snap (out of rotation)",
+    "Close Scrutiny",
+    "ARC Frigate",
+    "Harvester",
+    "Matriarch",
+    "Prospecting Probes",
+    "Lush Blooms",
+    "Uncovered Caches",
+    "Husk Graveyard"
+   ],
+   "zones": [
+    {
+     "name": "Controlled Access Zone",
+     "loot": "High-value loot area added in 1.17.0. To open it, put a Fuel Cell into the wall socket, press 4 switches at nearly the same time, then deposit randomised items (ARC Performance Steel, Industrial Battery, Motor, Wires, etc.) to unlock the final door",
+     "source": "wiki_mappages",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Primary Facility (Industrial Garage), map centre",
+     "loot": "Industrial loot (explosive blueprints)",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    },
+    {
+     "name": "Residential areas",
+     "loot": "Residential containers (attachment blueprints)",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Research & Administration building, first floor",
+     "key": "Dam Staff Room Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Water Treatment buildings, south side, first floor",
+     "key": "Dam Surveillance Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Testing Annex, 2 ground-floor doors (one key opens one door)",
+     "key": "Dam Testing Annex Key (Rare)",
+     "loot": "Lockers, drawers, filing cabinets",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Controlled Access Zone building",
+     "key": "Dam Controlled Access Zone Key (Rare)",
+     "loot": "Electrical panel, computer, drawers, filing cabinets",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Control Tower, top floor",
+     "key": "Dam Control Tower Key (Epic)",
+     "loot": "Weapon Case, Ammo Case, Medical Bag, lockers",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Power rod room; Fuel Cell Room",
+     "key": "Fuel cell or puzzle, no key",
+     "loot": "Not listed",
+     "source": "mf_mapdata"
+    }
+   ],
+   "extractions": [
+    "Elevators and lifts (MetaForge names): Central Swamp Lift, North Complex Elevator, Red Lakes Balcony Lift, Water Treatment Elevator",
+    "Raider Hatches (need a Raider Hatch Key): Spillway, Pump House, Good Old Baron's, Sunroof"
+   ],
+   "notes": [
+    "2.2.0 (official): ARC Turbines no longer spawn in standard sessions or most minor conditions; where they still can, they spawn almost every time",
+    "1.22.0 (official): Shredders appear on Dam only in certain conditions"
+   ]
+  },
+  {
+   "name": "Buried City",
+   "unlock": "CONFLICT: the Buried City wiki page says 6 rounds, the wiki Maps page says 8 rounds played",
+   "duration_min": 30,
+   "conditions_available": [
+    "Night Raid",
+    "Hurricane",
+    "Cold Snap (out of rotation)",
+    "Close Scrutiny",
+    "ARC Frigate",
+    "Bird City",
+    "Lush Blooms",
+    "Uncovered Caches",
+    "Prospecting Probes",
+    "Husk Graveyard"
+   ],
+   "zones": [
+    {
+     "name": "Hospital",
+     "loot": "Medical (white medical drawers hold augment and medical blueprints)",
+     "source": "mf_blueprints; wiki_keys",
+     "confidence": "likely"
+    },
+    {
+     "name": "Grandioso Apartments",
+     "loot": "Residential",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    },
+    {
+     "name": "Rooftop chimneys (Bird City only)",
+     "loot": "Trinkets, including Duck trinkets",
+     "source": "wiki_conditions",
+     "confidence": "confirmed"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "J Kozma Ventures (Space Travel) building, north side, 4th floor",
+     "key": "Buried City JKV Employee Access Card (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Several doors across the city",
+     "key": "Buried City Residential Master Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Hospital, north-west corner, 2nd floor",
+     "key": "Buried City Hospital Key (Rare)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Town Hall, north side, ground level",
+     "key": "Buried City Town Hall Key (Epic)",
+     "loot": "2 Security Lockers, 1 Weapon Case",
+     "source": "wiki_keys"
+    }
+   ],
+   "extractions": [
+    "Metro stations (MetaForge names): Northern, Southern, Eastern and Western Station",
+    "Raider Hatches: Old Town, Train Station, Highway Overpass, plus one unnamed hatch"
+   ],
+   "notes": [
+    "2.2.0 (official): ARC Turbines now spawn in almost every session"
+   ]
+  },
+  {
+   "name": "Spaceport",
+   "unlock": "12 rounds played (wiki)",
+   "duration_min": 30,
+   "duration_note": "40 minutes during Hidden Bunker",
+   "conditions_available": [
+    "Night Raid",
+    "Electromagnetic Storm",
+    "Hurricane",
+    "Cold Snap (out of rotation)",
+    "Hidden Bunker",
+    "Close Scrutiny",
+    "ARC Frigate",
+    "Harvester",
+    "Matriarch",
+    "Launch Tower Loot",
+    "Prospecting Probes",
+    "Lush Blooms",
+    "Uncovered Caches",
+    "Husk Graveyard"
+   ],
+   "zones": [
+    {
+     "name": "Launch Tower top",
+     "loot": "Extra and high-tier loot, during Launch Tower Loot only",
+     "source": "wiki_conditions; off_1.22.0",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Outskirts Bunker (Hidden Bunker only)",
+     "loot": "Data terminals",
+     "source": "wiki_conditions",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Departure Building breach room",
+     "loot": "1.2.0 (official) sealed one room so it must be breached, and raised its loot to match the effort",
+     "source": "off_1.2.0",
+     "confidence": "confirmed"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Shipping Warehouse, north side, second floor",
+     "key": "Spaceport Warehouse Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Trench Towers, 8 doors (2 on the first floor and 2 on the second floor of each tower)",
+     "key": "Spaceport Trench Tower Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Container Storage, east side, top floor (1 of 3 doors)",
+     "key": "Spaceport Container Storage Key (Rare)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Control Tower B6, ground-level doors leading to the top floor",
+     "key": "Spaceport Control Tower Key (Rare)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    }
+   ],
+   "extractions": [
+    "Elevators (MetaForge names): Central, East, South and West Elevator",
+    "Raider Hatches: Trench Hatch West, Trench Hatch East, Departures Hatch, Control Hatch"
+   ],
+   "notes": [
+    "2.2.0 (official): ARC Turbines now spawn in almost every session"
+   ]
+  },
+  {
+   "name": "The Blue Gate",
+   "unlock": "18 rounds played (wiki)",
+   "duration_min": 30,
+   "duration_note": "40 minutes during Locked Gate",
+   "conditions_available": [
+    "Night Raid",
+    "Electromagnetic Storm",
+    "Hurricane",
+    "Cold Snap (out of rotation)",
+    "Locked Gate",
+    "Close Scrutiny",
+    "ARC Frigate",
+    "Harvester",
+    "Matriarch",
+    "Prospecting Probes",
+    "Lush Blooms",
+    "Uncovered Caches",
+    "Husk Graveyard"
+   ],
+   "zones": [
+    {
+     "name": "Underground complex and tunnels behind Checkpoint",
+     "loot": "Opened with the Locked Gate codes; contents not documented",
+     "source": "wiki_conditions",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Security Wing breachable room",
+     "loot": "Augment (Combat Mk.3) blueprints; a popular farm",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    },
+    {
+     "name": "Maintenance Wing",
+     "loot": "Industrial (explosive blueprints)",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    },
+    {
+     "name": "Village",
+     "loot": "Residential containers",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Location not documented",
+     "key": "Blue Gate Village Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Cellar west of Olive Grove",
+     "key": "Blue Gate Cellar Key (Rare since 1.7.0)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Pilgrim's Peak basement",
+     "key": "Blue Gate Communication Tower Key (Rare)",
+     "loot": "2-4 Server Racks, 1 Weapon Box, 2-3 drawers, 2-3 resource crates, 1-6 loose items",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Confiscation Room, Security Wing ground floor (underground), next to the Traffic Tunnel below Headhouse",
+     "key": "Blue Gate Confiscation Room Key (Epic)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Patrol Cars; Cellar Door fuel-cell puzzle",
+     "key": "Patrol car key or fuel cell",
+     "loot": "Not listed",
+     "source": "mf_mapdata"
+    }
+   ],
+   "extractions": [
+    "Airshafts (MetaForge names): Warehouse, Overlook, Forest and Cliffside Airshaft",
+    "Raider Hatches: Prefab, Fragrant, Lucky, Reinforced"
+   ],
+   "notes": [
+    "Per the wiki blueprint table (unconfirmed), Combat and Tactical Mk.3 augment blueprints drop only on Stella Montis and The Blue Gate"
+   ]
+  },
+  {
+   "name": "Stella Montis",
+   "unlock": "24 rounds played (wiki)",
+   "duration_min": 30,
+   "conditions_available": [
+    "Night Raid"
+   ],
+   "zones": [
+    {
+     "name": "Loading Bay",
+     "loot": "Industrial",
+     "source": "mf_blueprints",
+     "confidence": "likely"
+    },
+    {
+     "name": "Medical Research (has a locked room)",
+     "loot": "Medical, inferred from the name; contents not documented",
+     "source": "1.23.0 bug-fix note (wiki mirror)",
+     "confidence": "unverified"
+    },
+    {
+     "name": "Map-exclusive blueprints",
+     "loot": "Aphelion, Deadline, Pulse Mine, Seeker Grenade, Trailblazer (wiki); Gas Mine (MetaForge). The wiki marks its spawn data as not fully confirmed",
+     "source": "wiki_blueprints; mf_blueprints; off_1.7.0",
+     "confidence": "likely"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Location not documented",
+     "key": "Stella Montis Assembly Admin Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Location not documented",
+     "key": "Stella Montis Medical Storage Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Location not documented",
+     "key": "Stella Montis Security Checkpoint Key (Rare)",
+     "loot": "Box Locker",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Storage room, top floor, east side",
+     "key": "Stella Montis Archives Key (Epic)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Fuel-cell doors (Corridor/Lobby, Cafeteria, Atrium/Lobby, Seed Vault) and the Capacitor Door",
+     "key": "Fuel cell or capacitor, no key",
+     "loot": "Not listed",
+     "source": "mf_mapdata"
+    }
+   ],
+   "extractions": [
+    "Seed Vault Airshaft",
+    "Metro stations: Lobby and Loading Bay",
+    "Raider Hatches: Sandbox, Assembly, Eastern Tunnel (MetaForge)"
+   ],
+   "notes": [
+    "1.7.0 (official): raised some item and blueprint spawn rates on Stella Montis",
+    "2.4.1 hotfix (official): fixed players entering the Seed Vault extract while it was closed"
+   ]
+  },
+  {
+   "name": "Riven Tides",
+   "unlock": "20 rounds/raids played (wiki)",
+   "duration_min": 30,
+   "conditions_available": [
+    "Night Raid",
+    "Beachcombing",
+    "Uncovered Caches",
+    "Lush Blooms",
+    "Husk Graveyard",
+    "Prospecting Probes",
+    "ARC Frigate (wiki only)"
+   ],
+   "zones": [
+    {
+     "name": "Stacking Yard puzzle",
+     "loot": "Press 4 hidden buttons to open loot room 1. Repair the lift (Battery and Wires), then carry a battery back to room 1 to open loot room 2 and a building with 'even higher loot'",
+     "source": "wiki_mappages",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Panorama Azzurro hotel",
+     "loot": "7 hotel keycard rooms (Common keys)",
+     "source": "wiki_keys; off_1.26.0",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Port Authority Building",
+     "loot": "Classified Records room; the Secure Storage room (Epic) is inside another key room",
+     "source": "wiki_keys; mf_mapdata",
+     "confidence": "likely"
+    },
+    {
+     "name": "North beaches (Beachcombing only)",
+     "loot": "Buried valuables",
+     "source": "wiki_conditions",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Map-exclusive blueprints",
+     "loot": "Crash Mat, Powered Descender, White Flag",
+     "source": "wiki_blueprints",
+     "confidence": "likely"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Panorama Azzurro hotel rooms 102, 107, 113, 205, 208, 311, 404",
+     "key": "Riven Tides Hotel Keycard No. <room> (Common)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Port Authority Building",
+     "key": "Riven Tides Classified Records Keycard (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Middle Crane House",
+     "key": "Riven Tides Crane House Keycard (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Secure Storage room, Port Authority Building",
+     "key": "Riven Tides Secure Storage Keycard (Epic)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Patrol Cars",
+     "key": "Patrol car key",
+     "loot": "Not listed",
+     "source": "mf_mapdata"
+    }
+   ],
+   "extractions": [
+    "Elevators (MetaForge names): Seaside Elevator, Customs Elevator",
+    "Raider Hatches: Saltswept, Hilltop, Weighbridge"
+   ],
+   "notes": [
+    "2.0 (official): overall loot value raised by about 15%",
+    "1.26.0 (official, all maps): fewer weapons spawn on map outskirts, to raise the value of high-tier areas and locked rooms",
+    "2.2.0 (official): ARC Turbines now spawn in almost every session"
+   ]
+  },
+  {
+   "name": "Pendola Pass",
+   "unlock": "25 rounds played (wiki)",
+   "duration_min": 30,
+   "conditions_available": [
+    "Night Raid",
+    "Redirection",
+    "ARC Frigate"
+   ],
+   "zones": [
+    {
+     "name": "Dynamic Loot Zones",
+     "loot": "2.0 (official): some areas' loot value changes from raid to raid, but the loot type never changes (Residential stays Residential). Pendola Pass only, described as a test",
+     "source": "off_2.0",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Fallen Emperor (dungeon)",
+     "loot": "Puzzle rooms that vary from raid to raid and hold Amplified Weapon parts; elsewhere these come only from the ARC Frigate and Harvester Payloads (wiki). 2.3.0 (official): containers near the entrance give lower-tier rewards, with higher-tier loot deeper inside",
+     "source": "wiki_misc; off_2.3.0",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Official POIs: supermarket, town square, Cielo Sereno Observatory, buried train depot (Almatera Station)",
+     "loot": "Not documented officially",
+     "source": "off_ft_preview; wiki_keys",
+     "confidence": "confirmed"
+    },
+    {
+     "name": "Storm Huts",
+     "loot": "Hold containers, including a Medical Bag (from a 2.3.0 fix note)",
+     "source": "off_2.3.0",
+     "confidence": "confirmed"
+    }
+   ],
+   "locked_rooms": [
+    {
+     "name": "Old Town apartment",
+     "key": "Pendola Pass Old Town Key (Uncommon)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Controlled Receiving Facility (Railyard)",
+     "key": "Pendola Pass Railyard Key (CONFLICT: Uncommon on the map page, epic on the key page)",
+     "loot": "Not listed",
+     "source": "wiki_keys; wiki_mappages"
+    },
+    {
+     "name": "Almatera Station",
+     "key": "Pendola Pass Train Station Key (CONFLICT: Rare on the map page, epic on the key page)",
+     "loot": "Not listed",
+     "source": "wiki_keys; wiki_mappages"
+    },
+    {
+     "name": "Cielo Sereno Observatory",
+     "key": "Pendola Pass Observatory Key (Epic)",
+     "loot": "Not listed",
+     "source": "wiki_keys"
+    },
+    {
+     "name": "Fallen Emperor",
+     "key": "Emperor Gateway Conduit (Legendary). Crafted at Workbench 1 from ARC Insulated, Conductive and Plated Couplers once its blueprint is learned (blueprint drops from Harvester Payloads in Redirection or major conditions); also the final Frozen Trail premium pass reward",
+     "loot": "Amplification parts; higher tier the deeper you go",
+     "source": "wiki_misc; wiki_blueprints"
+    }
+   ],
+   "extractions": [
+    "Ballistic Gondola: activate a transceiver and a gondola lands. Board by breaching a red tube panel, riding on top, or grappling onto it (wiki). MetaForge transceiver names: Reckless, Glacial, Supermarket, Northern",
+    "No Raider Hatches recorded on Pendola Pass in MetaForge data (unverified)"
+   ],
+   "notes": [
+    "Flash Freeze is a stronger Cold Snap built into the map: get to a shelter or take damage. It is off during Redirection",
+    "Hydras appear only on the Frigate and the Emperor (wiki)",
+    "2.1.0 (official): night lighting made darker"
+   ]
+  }
+ ],
+ "rarity_rules": [
+  {
+   "rule": "Container tier (none, yellow, red) raises the chance of higher-rarity loot but does not guarantee it",
+   "source": "wiki_containers",
+   "confidence": "likely"
+  },
+  {
+   "rule": "Loot tables depend on location: the same container yields loot of its zone type (Residential, Industrial, Medical, Security, Electrical, Commercial, Technological, ARC, Raider, Nature, Exodus, Old World). Not every container type adapts. MetaForge tags containers with the same zone types",
+   "source": "wiki_containers; mf_mapdata",
+   "confidence": "likely"
+  },
+  {
+   "rule": "Pendola Pass Dynamic Loot Zones: a zone's value changes each raid, its loot type stays fixed",
+   "source": "off_2.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Locked-room loot value rises with key rarity (1.22.0 raised all locked rooms on that scale; 1.7.0 raised Epic key rooms)",
+   "source": "off_1.22.0; off_1.7.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Fewer weapons spawn on map outskirts. Outskirt weapons can spawn at around 15 durability, versus about 60 in locked rooms",
+   "source": "off_1.26.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Night Raid, Electromagnetic Storm, Cold Snap and Hurricane show 'Increased loot value' in game. Night Raid's description stresses loot behind locked doors and more keys",
+   "source": "wiki_conditions (in-game text)",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "ARC Operations (Close Scrutiny, ARC Frigate) show 'Decreased overall loot value' and open all key-locked rooms. Close Scrutiny adds ARC loot; the Frigate has its own containers and Cargo",
+   "source": "wiki_conditions",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints drop in any major condition; that pool's drop chance was slightly lowered",
+   "source": "off_2.3.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "The wiki says 'Blueprints for rare and epic items are more commonly found during x2 Major Map Conditions', with no source and no multiplier. Several third-party sites say the '2x' tag on major conditions means double Trials points, not double loot. Do not model this as 2x blueprints",
+   "source": "wiki_blueprints",
+   "confidence": "unverified"
+  },
+  {
+   "rule": "Some blueprints are condition-only: tier-III attachments (EMS, Locked Gate, Night Raid); Wolfpack (Night Raid); Snap Hook and Surge Coil (EMS); Canto (Hurricane First Wave Caches); Fireworks Box (Cold Snap, disputed by MetaForge). Others are map-only: Stella Montis, Riven Tides, and Stella Montis plus Blue Gate for Mk.3 augments. The wiki says its spawn data is not fully confirmed",
+   "source": "wiki_blueprints; mf_blueprints",
+   "confidence": "likely"
+  },
+  {
+   "rule": "Blueprint families follow container type: weapons and gun parts in Raider containers, explosives in Industrial, medical in Medical, augments in Security (rarely Medical), utilities in Electrical, attachments in Residential",
+   "source": "wiki_blueprints",
+   "confidence": "likely"
+  },
+  {
+   "rule": "1.13.0 reduced the container types that can spawn condition-specific blueprints in EMS, Hidden Bunker and Locked Gate",
+   "source": "off_1.13.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Fallen Emperor and ARC Frigate: higher-tier loot sits deeper inside",
+   "source": "off_2.3.0",
+   "confidence": "confirmed"
+  },
+  {
+   "rule": "Since 1.42.0 schedules are regional. The official tracker runs conditions in 1-hour slots per map, offset by region (north-america, brazil, east-asia, oceania, ...). In-game countdowns appear only 60 minutes before a condition starts (1.33.0)",
+   "source": "off_1.42.0; off_1.33.0; off_tracker",
+   "confidence": "confirmed"
+  }
+ ],
+ "official_condition_types_2026_11_08": {
+  "major": [
+   "ARC Frigate",
+   "Close Scrutiny",
+   "Electromagnetic Storm",
+   "Hidden Bunker",
+   "Hurricane",
+   "Locked Gate",
+   "Night Raid"
+  ],
+  "minor": [
+   "Beachcombing",
+   "Bird City",
+   "Harvester",
+   "Lush Blooms",
+   "Matriarch",
+   "Prospecting Probes",
+   "Redirection",
+   "Uncovered Caches"
+  ],
+  "not_on_tracker": [
+   "Cold Snap",
+   "Husk Graveyard",
+   "Launch Tower Loot"
+  ]
+ }
+}

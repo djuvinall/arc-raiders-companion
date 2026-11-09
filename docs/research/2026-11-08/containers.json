@@ -1,0 +1,4809 @@
+{
+ "retrieved": "2026-11-08",
+ "game_patch": "2.4.1",
+ "conventions": {
+  "zone_dependent": "true = wiki states the container's loot changes by zone; null = not stated (the Containers page says only SOME containers do this, and names only red Lockers). Never false, because no page says a container is zone-independent.",
+  "breach": "From each page's infobox 'Must Be Breached'. null = blank.",
+  "loot_types": "Only the wiki infobox values that are loot-area names. Non-area values (Ammo, QuickUse, Weapon, Grenade, Blueprint, Material, Trinket) were moved into categories; the raw field is kept in wiki_loot_field. Empty = the infobox gives none.",
+  "categories_basis": "'stated' = the page names the category; 'derived_from_items' = inferred by us from the listed items.",
+  "confidence": "confirmed = page states it and does not flag it unconfirmed; likely = page flags the data unconfirmed/WIP, or a single guide; unverified = placeholder/empty pool, so only name/breach/infobox fields are known.",
+  "event_only / event_affected": "Raw infobox fields 'Event Only' / 'Event Affected'.",
+  "metaforge_event_masks": "MetaForge marker field eventConditionMask is a per-map bitmask; bit 0 = No Event. Decoded from MetaForge's map bundle: dam/blue-gate Cold Snap = bit 9, buried-city Cold Snap = bit 8, spaceport Cold Snap = bit 11; Hurricane = bit 12, Close Scrutiny = bit 14, Husk Graveyard = bit 4, Prospecting Probes = bit 1, Uncovered Caches = bit 3, Lush Blooms = bit 6, ARC Frigate = bit 16."
+ },
+ "sources": [
+  {
+   "id": "wiki_containers",
+   "url": "https://arcraiders.wiki/wiki/Containers",
+   "rev": "43934"
+  },
+  {
+   "id": "wiki_container_pages",
+   "url": "https://arcraiders.wiki/w/api.php?action=parse&page=<Page>&prop=wikitext",
+   "rev": "per container: source_rev"
+  },
+  {
+   "id": "wiki_infobox_template",
+   "url": "https://arcraiders.wiki/wiki/Template:Infobox_container",
+   "rev": "35010"
+  },
+  {
+   "id": "wiki_car",
+   "url": "https://arcraiders.wiki/wiki/Car",
+   "rev": "23391"
+  },
+  {
+   "id": "wiki_field_depot",
+   "url": "https://arcraiders.wiki/wiki/Field_Depot",
+   "rev": "27923"
+  },
+  {
+   "id": "wiki_supply_call_station",
+   "url": "https://arcraiders.wiki/wiki/Supply_Call_Station",
+   "rev": "31982"
+  },
+  {
+   "id": "wiki_update_1_7_0",
+   "url": "https://arcraiders.wiki/wiki/Update:1.7.0",
+   "rev": "40054"
+  },
+  {
+   "id": "wiki_cargo",
+   "url": "https://arcraiders.wiki/w/api.php?action=cargotables&format=json",
+   "rev": "no container table (tables: augments, crafting, items, projectItems, projects, questItems, quests, recycling, trials, weaponMods, weeklyTrials, workshopUpgrades)"
+  },
+  {
+   "id": "metaforge_map_markers",
+   "url": "https://metaforge.app/api/game-map-data?tableID=arc_map_data&mapID=<dam|blue-gate|buried-city|spaceport|stella-montis|riven-tides|pendola-pass>",
+   "rev": "fetched 2026-11-08"
+  },
+  {
+   "id": "metaforge_map_legend",
+   "url": "https://metaforge.app/_app/immutable/chunks/BWolraHo.js (map page bundle, containersCategory)",
+   "rev": "fetched 2026-11-08"
+  },
+  {
+   "id": "metaforge_frozen_cache_guide",
+   "url": "https://metaforge.app/arc-raiders/search-frozen-raider-caches-on-pendola-pass",
+   "rev": "fetched 2026-11-08"
+  },
+  {
+   "id": "official_2_3_0",
+   "url": "https://arcraiders.com/news/live-update-2-3-0",
+   "rev": "2026-10-27"
+  },
+  {
+   "id": "official_2_2_0",
+   "url": "https://arcraiders.com/news/store-update-2-2-0",
+   "rev": "2026-10-20"
+  },
+  {
+   "id": "official_2_4_1",
+   "url": "https://arcraiders.com/news/hotfix-2-4-1",
+   "rev": "2026-11-05 (no container changes)"
+  }
+ ],
+ "patch_changes": [
+  {
+   "patch": "1.2.0",
+   "change": "Security Lockers were over-providing valuable items and were adjusted.",
+   "source": "wiki Security Locker history"
+  },
+  {
+   "patch": "1.7.0",
+   "change": "Security Lockers now spawn dynamically across all maps instead of fixed placements. Also: more Great Mullein spawns, higher loot value in Epic key-card rooms, and blueprint spawns spread to more areas.",
+   "source": "wiki_update_1_7_0"
+  },
+  {
+   "patch": "1.36.0",
+   "change": "ARC Turbine parts no longer drop from Couriers.",
+   "source": "wiki ARC Courier history"
+  },
+  {
+   "patch": "2.2.0",
+   "change": "ARC Turbines removed from standard sessions and most minor conditions; near-guaranteed in remaining conditions (Buried City, Riven Tides, Blue Gate, Spaceport).",
+   "source": "official_2_2_0"
+  },
+  {
+   "patch": "2.3.0",
+   "change": "Loot tiers by depth: Emperor containers near the entrance give lower-tier loot and higher tiers sit deeper inside; the Frigate also gets a higher chance of high-tier loot further in. Redirection pods: lower Emperor Key blueprint chance, plus a small chance of ARC parts. Some Storm Hut containers on Pendola Pass were moved. NOTE: no general Pendola Pass loot-tier change was found; the tier changes are for the Emperor and the Frigate.",
+   "source": "official_2_3_0"
+  }
+ ],
+ "containers": [
+  {
+   "name": "ARC Assessor",
+   "group": "condition",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [
+    "Blueprints"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "ARC Powercell",
+    "ARC Alloy",
+    "Advanced ARC Powercell",
+    "Advanced Electrical Components",
+    "ARC Circuitry",
+    "ARC Coolant",
+    "ARC Flex Rubber",
+    "ARC Motion Core",
+    "ARC Performance Steel",
+    "ARC Synthetic Resin",
+    "ARC Thermo Lining",
+    "Assessor Matrix",
+    "Dolabra Blueprint"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Close Scrutiny"
+   ],
+   "notes": "Wiki list links it as 'Assessor'. Spawns only during the Close Scrutiny ARC Operation (infobox Event Only = Yes); breaching calls down an ARC squadron. Loot is in breachable containers outside the Assessor; small chance of Dolabra Blueprint. 3 sections, trapped. Added 1.22.0.",
+   "source": "https://arcraiders.wiki/wiki/ARC_Assessor",
+   "source_rev": 44511,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": true,
+   "event_affected": false,
+   "trapped": "Yes",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "wiki_list_aliases": [
+    "Assessor"
+   ]
+  },
+  {
+   "name": "ARC Courier",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced ARC Powercell",
+    "ARC Alloy",
+    "ARC Circuitry",
+    "ARC Motion Core",
+    "ARC Powercell",
+    "Burned ARC Circuitry",
+    "Damaged ARC Motion Core",
+    "Damaged Hornet Driver",
+    "Damaged Wasp Driver",
+    "Fireball Burner",
+    "Hornet Driver",
+    "Pop Trigger",
+    "Sentinel Firing Core",
+    "Skulker Targeter",
+    "Spotter Relay",
+    "Surveyor Vault",
+    "Vaporizer Regulator",
+    "Bully Fragmenter"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Wiki list links it as 'Courier'. Page: 'Drops are confirmed, ranges are not'. Items commented out in the wikitext (ARC Flex Rubber, ARC Performance Steel, ARC Synthetic Resin, Damaged ARC Powercell, Degraded ARC Rubber, Dried-Out ARC Resin, Impure ARC Coolant) are excluded. Infobox: Event Affected = Yes (which condition is not stated). 1.36.0: ARC Turbine parts no longer drop from Couriers.",
+   "source": "https://arcraiders.wiki/wiki/ARC_Courier",
+   "source_rev": 42876,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": false,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": "700",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "wiki_list_aliases": [
+    "Courier"
+   ]
+  },
+  {
+   "name": "Baron Husk",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced ARC Powercell",
+    "ARC Alloy",
+    "ARC Circuitry",
+    "ARC Coolant",
+    "ARC Flex Rubber",
+    "ARC Motion Core",
+    "ARC Performance Steel",
+    "ARC Powercell",
+    "ARC Synthetic Resin",
+    "ARC Thermo Lining",
+    "Burned ARC Circuitry",
+    "Damaged ARC Motion Core",
+    "Damaged ARC Powercell",
+    "Degraded ARC Rubber",
+    "Dried-Out ARC Resin",
+    "Impure ARC Coolant",
+    "Rusty ARC Steel",
+    "Tattered ARC Lining"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Page: 'Drops are confirmed, ranges are not'. Trapped = Yes.",
+   "source": "https://arcraiders.wiki/wiki/Baron_Husk",
+   "source_rev": 35012,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "Yes",
+   "search_xp": "500",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Deforester Husk",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced ARC Powercell",
+    "Advanced Electrical Components",
+    "Advanced Mechanical Components",
+    "ARC Circuitry",
+    "ARC Coolant",
+    "ARC Flex Rubber",
+    "ARC Motion Core",
+    "ARC Performance Steel",
+    "ARC Powercell",
+    "ARC Synthetic Resin",
+    "Burned ARC Circuitry",
+    "Damaged ARC Powercell",
+    "Degraded ARC Rubber",
+    "Impure ARC Coolant"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Puzzle site on Blue Gate (3 sites: one near Maintenance Bunker, two near Adorned Wreckage); needs two ARC Powercells per husk, timed fire hazards. Page: 'These drops are confirmed, ranges are not. There may be other items.' Trapped = Yes.",
+   "source": "https://arcraiders.wiki/wiki/Deforester_Husk",
+   "source_rev": 35013,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "Yes",
+   "search_xp": "0",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Harvester",
+   "group": "condition",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [
+    "Blueprints"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "ARC Powercell",
+    "ARC Alloy",
+    "Burned ARC Circuitry",
+    "Impure ARC Coolant",
+    "Advanced ARC Powercell",
+    "ARC Circuitry",
+    "ARC Coolant",
+    "ARC Flex Rubber",
+    "ARC Motion Core",
+    "ARC Performance Steel",
+    "ARC Synthetic Resin",
+    "ARC Thermo Lining",
+    "Equalizer Blueprint",
+    "Jupiter Blueprint"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Harvester"
+   ],
+   "notes": "Map condition: fixed-location structure guarded by the Queen. Breachable containers on the upper level hold fusion cores / ARC loot; completing the core activation sequence opens central containers with a guaranteed 1-3 Equalizer or Jupiter blueprints. Trapped (fire discharge, electrical surge).",
+   "source": "https://arcraiders.wiki/wiki/Harvester",
+   "source_rev": 44508,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": true,
+   "event_affected": false,
+   "trapped": "Yes",
+   "search_xp": "?",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "ARC Probe",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "ARC Powercell",
+    "ARC Alloy",
+    "ARC Circuitry",
+    "ARC Motion Core",
+    "ARC Synthetic Resin"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [
+    "ARC Probe (3 panels)",
+    "Crashed ARC Probe (1 panel)"
+   ],
+   "conditions": [
+    "Prospecting Probes (MetaForge marker masks; wiki lists Probe under condition-related but the page does not name the condition)"
+   ],
+   "notes": "Wiki list links it as both 'ARC Probe' and 'Probe' (same page). Beeps to alert ARC while breached; trapped after a failed breach. Infobox Event Affected = Yes.",
+   "source": "https://arcraiders.wiki/wiki/ARC_Probe",
+   "source_rev": 42079,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": false,
+   "event_affected": true,
+   "trapped": "After A Failed Breach",
+   "search_xp": "700",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "wiki_list_aliases": [
+    "Probe"
+   ]
+  },
+  {
+   "name": "Rocketeer Husk",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced ARC Powercell",
+    "ARC Alloy",
+    "ARC Coolant",
+    "ARC Powercell",
+    "ARC Thermo Lining",
+    "Damaged Rocketeer Driver",
+    "Launcher Ammo",
+    "Rocketeer Driver"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Husk Graveyard (MetaForge marker masks; wiki infobox only says Event Only = Yes / Event Affected = Yes)"
+   ],
+   "notes": "Page flags its pool '*Data is not confirmed, WIP*'. Infobox Event Only = Yes conflicts with MetaForge having many non-condition markers - treat condition gating as uncertain.",
+   "source": "https://arcraiders.wiki/wiki/Rocketeer_Husk",
+   "source_rev": 37542,
+   "confidence": "likely",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": true,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": "700",
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Wasp Husk",
+   "group": "arc",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced ARC Powercell",
+    "ARC Alloy",
+    "ARC Circuitry",
+    "ARC Coolant",
+    "ARC Flex Rubber",
+    "ARC Powercell",
+    "ARC Performance Steel",
+    "ARC Thermo Lining",
+    "Damaged Wasp Driver",
+    "Light Ammo",
+    "Wasp Driver"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Husk Graveyard (MetaForge marker masks; wiki infobox Event Affected = Yes)"
+   ],
+   "notes": "Page: every ARC container has a slightly different loot pool of ARC-related recyclables.",
+   "source": "https://arcraiders.wiki/wiki/Wasp_Husk",
+   "source_rev": 35035,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "ARC-related",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": false,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": "400",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Harvester Payload",
+   "group": "condition",
+   "loot_types": [
+    "ARC"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Emperor Beacon (summoned)"
+   ],
+   "notes": "Stub. Falls from the sky when an Emperor Beacon is activated, with damaging debris. Some payload containers need breaching, others can be searched directly; ARC materials and parts. No item list. Added 2.0 (Frozen Trail). Infobox Event Only = Yes.",
+   "source": "https://arcraiders.wiki/wiki/Harvester_Payload",
+   "source_rev": 43362,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Condition-related"
+   ],
+   "wiki_loot_field": "ARC",
+   "event_only": true,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "breach_note": "mixed: some require breach, some do not"
+  },
+  {
+   "name": "First Wave Cache",
+   "group": "condition",
+   "loot_types": [],
+   "categories": [
+    "Ammo",
+    "Blueprints",
+    "Grenades",
+    "Healing",
+    "Quick Use",
+    "Shields",
+    "Weapons",
+    "Weapon Attachments"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Hurricane"
+   ],
+   "notes": "Stub. Spawns during the Hurricane map modifier (MetaForge calls these 'Hurricane Cache').",
+   "source": "https://arcraiders.wiki/wiki/First_Wave_Cache",
+   "source_rev": 28791,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Condition-related",
+    "Raider"
+   ],
+   "wiki_loot_field": "QuickUse<br>Ammo<br>Weapon<br>Blueprint",
+   "event_only": true,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "700",
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Wicker Basket",
+   "group": "condition",
+   "loot_types": [
+    "Nature"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Assorted Seeds",
+    "Resin",
+    "Volcanic Rock",
+    "Agave",
+    "Apricot",
+    "Fertilizer",
+    "Great Mullein",
+    "Lemon",
+    "Mushroom",
+    "Olives",
+    "Prickly Pear",
+    "Roots",
+    "Candleberries",
+    "Moss"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Lush Blooms",
+    "Cold Snap"
+   ],
+   "notes": "Appears on maps with Lush Blooms or Cold Snap active; may also spawn on Stella Montis in the Cafeteria behind an unpowered door. Holds many Scrappy training items. Infobox: Event Only = No, Event Affected = Yes.",
+   "source": "https://arcraiders.wiki/wiki/Wicker_Basket",
+   "source_rev": 27999,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Condition-related",
+    "Normal"
+   ],
+   "wiki_loot_field": "Nature",
+   "event_only": false,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Bird Nest",
+   "group": "condition",
+   "loot_types": [
+    "Nature"
+   ],
+   "categories": [
+    "Trinkets"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Agave",
+    "Alien Duck",
+    "Arcade Duck",
+    "Apricot",
+    "Assorted Seeds",
+    "Breathtaking Snow Globe",
+    "Chemicals",
+    "Complex Gun Parts",
+    "Doodly Duck",
+    "Exodus Modules",
+    "Fabric",
+    "Familiar Duck",
+    "Fine Wristwatch",
+    "Flashy Duck",
+    "Frosty Duck",
+    "Gentle Duck",
+    "Lance's Mixtape (5th Edition)",
+    "Lemon",
+    "Magnetic Accelerator",
+    "Metal Parts",
+    "MRI Duck",
+    "Mushroom",
+    "Music Box",
+    "Olives",
+    "Painted Box",
+    "Plastic Parts",
+    "Pottery",
+    "Prickly Pear",
+    "Red Coral Jewelry",
+    "Rubber Duck",
+    "Rubber Parts",
+    "Silver Teaspoon Set",
+    "Statuette",
+    "Tropical Duck",
+    "Vase",
+    "Volcanic Rock"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [
+    "Bird City"
+   ],
+   "notes": "Only active during the Bird City map condition. Infobox loot field 'Nature<br>Trinket'.",
+   "source": "https://arcraiders.wiki/wiki/Bird_Nest",
+   "source_rev": 41041,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Condition-related (gallery only, not in the text list)"
+   ],
+   "wiki_loot_field": "Nature<br>Trinket",
+   "event_only": true,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Ammo Case",
+   "group": "raider",
+   "loot_types": [],
+   "categories": [
+    "Ammo"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Light Ammo",
+    "Medium Ammo",
+    "Heavy Ammo",
+    "Shotgun Ammo"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Infobox loot field 'Ammo' (item category, not a loot area).",
+   "source": "https://arcraiders.wiki/wiki/Ammo_Case",
+   "source_rev": 19887,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider"
+   ],
+   "wiki_loot_field": "Ammo",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Backpack",
+   "group": "raider",
+   "loot_types": [
+    "Raider"
+   ],
+   "categories": [
+    "Quick Use",
+    "Topside Materials"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Pool lists 'Topside Material' and 'Quick Use Items' only.",
+   "source": "https://arcraiders.wiki/wiki/Backpack",
+   "source_rev": 32011,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider"
+   ],
+   "wiki_loot_field": "Raider",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Grenade Tube",
+   "group": "raider",
+   "loot_types": [],
+   "categories": [
+    "Grenades",
+    "Gun Parts",
+    "Blueprints"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Blaze Grenade",
+    "Explosive Compound",
+    "Gas Grenade",
+    "Firecracker",
+    "Heavy Fuze Grenade",
+    "Light Gun Parts",
+    "Light Impact Grenade",
+    "Li'l Smoke Grenade",
+    "Lure Grenade",
+    "Medium Gun Parts",
+    "Mod Components",
+    "Sensors",
+    "Showstopper",
+    "Smoke Grenade",
+    "Snap Blast Grenade",
+    "Tagging Grenade",
+    "Trigger 'Nade",
+    "Wolfpack",
+    "Heavy Gun Parts Blueprint",
+    "Other Blueprints (unspecified)"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Infobox loot field 'Grenade'. Chance column is all 'x%' (unknown).",
+   "source": "https://arcraiders.wiki/wiki/Grenade_Tube",
+   "source_rev": 26785,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider"
+   ],
+   "wiki_loot_field": "Grenade",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Medical Bag",
+   "group": "raider",
+   "loot_types": [
+    "Medical"
+   ],
+   "categories": [
+    "Healing"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Bandage",
+    "Herbal Bandage",
+    "Sterilized Bandage",
+    "Vita Shot",
+    "Defibrillator",
+    "Shield Recharger",
+    "Surge Shield Recharger",
+    "Adrenaline Shot",
+    "Durable Cloth",
+    "Antiseptic"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [
+    "Stella Montis loot table (adds Osprey Blueprint)"
+   ],
+   "conditions": [],
+   "notes": "Commonly in hospitals and pharmacies. Both tables flagged '*Data is not confirmed*'. Stella Montis table adds 'Osprey Blueprint' (qty 1). 2.3.0 patch notes mention a Medical Bag in Pendola Pass Storm Huts.",
+   "source": "https://arcraiders.wiki/wiki/Medical_Bag",
+   "source_rev": 25901,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Raider"
+   ],
+   "wiki_loot_field": "Medical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false,
+   "items_stella_montis_extra": [
+    "Osprey Blueprint"
+   ]
+  },
+  {
+   "name": "Raider Cache",
+   "group": "raider",
+   "loot_types": [],
+   "categories": [
+    "Ammo",
+    "Blueprints",
+    "Grenades",
+    "Healing",
+    "Quick Use",
+    "Shields",
+    "Weapons",
+    "Weapon Attachments"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [
+    "Frozen Raider Cache (Cold Snap; Pendola Pass) - must be breached / opened with Raider Tool"
+   ],
+   "conditions": [
+    "Uncovered Caches (extra spawns, higher-quality loot)",
+    "Cold Snap (higher-quality loot; frozen, must be breached)"
+   ],
+   "notes": "Pool table lists Ammo, Blueprints, Grenades, Healing, Quick Use, Shields, Weapons; prose also names weapon attachments. During Cold Snap caches lack the usual flora/sign and need breaching. MetaForge guide: Pendola Pass has both frozen (Raider Tool) and normal (hands) caches.",
+   "source": "https://arcraiders.wiki/wiki/Raider_Cache",
+   "source_rev": 35112,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider",
+    "Condition-related"
+   ],
+   "wiki_loot_field": "QuickUse<br>Ammo<br>Weapon",
+   "event_only": false,
+   "event_affected": true,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "breach_note": "No normally; Yes for the frozen Cold Snap variant"
+  },
+  {
+   "name": "Weapon Case",
+   "group": "raider",
+   "loot_types": [],
+   "categories": [
+    "Ammo",
+    "Gun Parts",
+    "Weapons",
+    "Weapon Attachments"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Always includes ammo matching the weapon inside. Infobox loot field 'Weapon<br>Ammo'.",
+   "source": "https://arcraiders.wiki/wiki/Weapon_Case",
+   "source_rev": 21571,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider"
+   ],
+   "wiki_loot_field": "Weapon<br>Ammo",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Supply Drop",
+   "group": "raider",
+   "loot_types": [],
+   "categories": [
+    "Ammo",
+    "Quick Use",
+    "Weapons"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Called in with a flare at a Supply Call Station (Stella Montis has its own Supply Drop variant). Gallery puts it under Raider, text list under Normal. Breach = Yes.",
+   "source": "https://arcraiders.wiki/wiki/Supply_Drop",
+   "source_rev": 23314,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Raider (gallery)",
+    "Normal (text list)"
+   ],
+   "wiki_loot_field": "Ammo<br>QuickUse<br>Weapon",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Android",
+   "group": "normal",
+   "loot_types": [
+    "Electrical",
+    "Technological"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Battery",
+    "Sensors",
+    "Electrical Components",
+    "Voltage Converter",
+    "Power Rod"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; pool flagged '*Data is not confirmed*'. MetaForge has Android markers only on Pendola Pass and Stella Montis.",
+   "source": "https://arcraiders.wiki/wiki/Android",
+   "source_rev": 36998,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical<br>Technological",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Beige Multi Drawers",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool (dummy row), flagged not confirmed. Category: Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/Beige_Multi_Drawers",
+   "source_rev": 23326,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Black Crate",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [
+    "Blueprints"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; pool lists only 'Blueprints' with X% chance, flagged not confirmed. Category: Security containers.",
+   "source": "https://arcraiders.wiki/wiki/Black_Crate",
+   "source_rev": 32832,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Blue Cabinet",
+   "group": "normal",
+   "loot_types": [
+    "Medical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. 'Contains various medical items'; pool row only 'Other'. Category: Residential containers. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Blue_Cabinet",
+   "source_rev": 31236,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Medical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Blue Multi Drawers",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Fabric"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "'Medical themed items'; location Spaceport > Launch Towers > top floor. Pool (Fabric only) flagged not confirmed; no loot type in infobox.",
+   "source": "https://arcraiders.wiki/wiki/Blue_Multi_Drawers",
+   "source_rev": 23293,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Box Locker",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Location: Stella Montis > Lobby, behind the Stella Montis Security Checkpoint Key door. Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Box_Locker",
+   "source_rev": 23256,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Breaker Box",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Electrical components, wiring, breakers. Locations: Dam Battlegrounds > Testing Annex (bottom, maybe locked room); Spaceport > Launch Towers (top). Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Breaker_Box",
+   "source_rev": 32029,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Broken Fridge",
+   "group": "normal",
+   "loot_types": [
+    "Nature"
+   ],
+   "categories": [
+    "Topside Materials"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Assorted Seeds",
+    "Chemicals"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Perishable food items, assorted seeds, chemicals, misc. Infobox loot field 'Nature<br>Material'.",
+   "source": "https://arcraiders.wiki/wiki/Broken_Fridge",
+   "source_rev": 23258,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Nature<br>Material",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Bus Rear Trunk",
+   "group": "normal",
+   "loot_types": [
+    "Industrial",
+    "Mechanical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced Mechanical Components",
+    "Chemicals",
+    "Metal Brackets",
+    "Motor",
+    "Number Plate",
+    "Rusted Gear",
+    "Rusted Tools"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; must be breached. Quantity/chance blank.",
+   "source": "https://arcraiders.wiki/wiki/Bus_Rear_Trunk",
+   "source_rev": 34707,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial<br>Mechanical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Bus Side Trunk",
+   "group": "normal",
+   "loot_types": [
+    "Mechanical",
+    "Electrical"
+   ],
+   "categories": [
+    "Shields"
+   ],
+   "categories_basis": "derived_from_items",
+   "items": [
+    "Medium Shield",
+    "Rusted Tools"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Pool: Mechanical items, Electrical items, Medium Shield, Rusted Tools, Other.",
+   "source": "https://arcraiders.wiki/wiki/Bus_Side_Trunk",
+   "source_rev": 34574,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Mechanical<br>Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Capsule Delivery Terminal",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Requested via the nearby Capsule Request Terminal (Stella Montis supply equivalent). Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Capsule_Delivery_Terminal",
+   "source_rev": 23263,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Car Hood",
+   "group": "normal",
+   "loot_types": [
+    "Mechanical",
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Metal Parts",
+    "Chemicals",
+    "Rubber Parts",
+    "Metal Brackets",
+    "Oil",
+    "Number Plate",
+    "Wires",
+    "Rusted Bolts",
+    "Mechanical Components",
+    "Light Bulb",
+    "Motor",
+    "Industrial Battery",
+    "Rusted Gear"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Must be breached. Page: list is not complete; many Mechanical and Electrical table items can appear. Wiki 'Car' page: cars have a breachable Car Hood plus searchable seats; some cars have an alarm trap (disable by hitting/shooting the red light).",
+   "source": "https://arcraiders.wiki/wiki/Car_Hood",
+   "source_rev": 28011,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Mechanical<br>Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Car Tool Cabinet",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; 'currently has no documented contents'. Category: Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/Car_Tool_Cabinet",
+   "source_rev": 31237,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Chiffonier Drawer",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed. Category: Residential containers.",
+   "source": "https://arcraiders.wiki/wiki/Chiffonier_Drawer",
+   "source_rev": 23267,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Computer",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; electrical items and components; pool row 'Other'. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Computer",
+   "source_rev": 31238,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Computer Panel Drawer",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Cooling Fan",
+    "Damaged Heat Sink",
+    "Fried Motherboard",
+    "Metal Parts",
+    "Plastic Parts",
+    "Processor",
+    "Wires"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Items listed; page flags '*Percent chance is not confirmed*' (relative: Plastic Parts very common; Processor, Wires common; Cooling Fan, Damaged Heat Sink, Fried Motherboard rare). No loot type in infobox; category Electrical containers.",
+   "source": "https://arcraiders.wiki/wiki/Computer_Panel_Drawer",
+   "source_rev": 23269,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Control Console",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; electrical components and control modules. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Control_Console",
+   "source_rev": 32025,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Control Panel",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Advanced Mechanical Components",
+    "Rusted Gear",
+    "Chemicals",
+    "Mechanical Components",
+    "Rusted Bolts",
+    "Oil",
+    "Metal Brackets",
+    "Metal Parts"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Pool: Electrical items plus the listed mechanical items.",
+   "source": "https://arcraiders.wiki/wiki/Control_Panel",
+   "source_rev": 41339,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Dumpster",
+   "group": "normal",
+   "loot_types": [
+    "Misc"
+   ],
+   "categories": [
+    "Recyclables"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; 'miscellaneous discarded items and recyclables'.",
+   "source": "https://arcraiders.wiki/wiki/Dumpster",
+   "source_rev": 31241,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Misc",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Electrical Cabinet",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Electrical_Cabinet",
+   "source_rev": 32027,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Field Depot Pneumatic Delivery System",
+   "group": "normal",
+   "loot_types": [
+    "Misc"
+   ],
+   "categories": [
+    "Ammo",
+    "Grenades",
+    "Healing",
+    "Shields",
+    "Weapons"
+   ],
+   "categories_basis": "derived_from_items",
+   "items": [
+    "Light Shield",
+    "Medium Ammo",
+    "Heavy Ammo",
+    "Light Impact Grenade",
+    "Firecracker",
+    "Shotgun Ammo",
+    "Blaze Grenade",
+    "Li'l Smoke Grenade",
+    "Bandage",
+    "Showstopper",
+    "Heavy Fuze Grenade",
+    "Il Toro I",
+    "Light Ammo",
+    "Anvil I",
+    "Seeker Grenade",
+    "Lure Grenade",
+    "Gas Grenade"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Reward container at a Field Depot after delivering a Field Crate (800 XP for delivery; opening gives none). Field Depots are static, on every map except Stella Montis. Quantities partly known.",
+   "source": "https://arcraiders.wiki/wiki/Field_Depot_Pneumatic_Delivery_System",
+   "source_rev": 36684,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Misc",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Refrigerator",
+   "group": "normal",
+   "loot_types": [
+    "Residential",
+    "Nature"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Assorted Seeds",
+    "Chemicals"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Wiki text list links 'Fridge' (redirects here). Food items, seeds, chemicals.",
+   "source": "https://arcraiders.wiki/wiki/Refrigerator",
+   "source_rev": 33909,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential<br>Nature",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "wiki_list_aliases": [
+    "Fridge"
+   ]
+  },
+  {
+   "name": "Generator Fuse Box",
+   "group": "normal",
+   "loot_types": [
+    "Electrical",
+    "Mechanical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Pool: Electrical items, Mechanical items, Other. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Generator_Fuse_Box",
+   "source_rev": 23413,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical<br>Mechanical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Green Container Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Industrial",
+    "Mechanical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Industrial and mechanical components; storage yards, workshops, container areas. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Green_Container_Drawer",
+   "source_rev": 23278,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial<br>Mechanical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Green Industrial Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Industrial"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; industrial, mechanical and misc items. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Green_Industrial_Drawer",
+   "source_rev": 31243,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Heater",
+   "group": "normal",
+   "loot_types": [
+    "Mechanical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Mechanical components and heating parts. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Heater",
+   "source_rev": 31244,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Mechanical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Heater Box",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed. Category: Electrical containers.",
+   "source": "https://arcraiders.wiki/wiki/Heater_Box",
+   "source_rev": 23286,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "High Voltage Breaker Box",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Placeholder pool, not confirmed. Category: Electrical containers.",
+   "source": "https://arcraiders.wiki/wiki/High_Voltage_Breaker_Box",
+   "source_rev": 23676,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Industrial Cleaner",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [
+    "Shields",
+    "Ammo"
+   ],
+   "categories_basis": "derived_from_items",
+   "items": [
+    "Chemicals",
+    "Industrial Battery",
+    "Light Bulb",
+    "Metal Brackets",
+    "Mechanical Components",
+    "Motor",
+    "Oil",
+    "Wires",
+    "Advanced Mechanical Components",
+    "Light Shield",
+    "Surge Shield Recharger",
+    "Heavy Ammo"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Pool flagged '*Data is not confirmed*'; no loot type in infobox; category Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/Industrial_Cleaner",
+   "source_rev": 41338,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Industrial Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Industrial"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; empty pool table. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Industrial_Drawer",
+   "source_rev": 37898,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Locker",
+   "group": "normal",
+   "loot_types": [
+    "Industrial"
+   ],
+   "categories": [
+    "Ammo",
+    "Keys",
+    "Quick Use",
+    "Recyclables",
+    "Topside Materials",
+    "Trinkets"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": true,
+   "variants": [
+    "Red Locker",
+    "Green Locker",
+    "Blue Locker",
+    "Security Locker (separate page)"
+   ],
+   "conditions": [],
+   "notes": "Wiki list gallery shows 'Red Locker' and text list has 'Green Locker' - both redirect here. Infobox loot type Industrial, but the Containers page's example says red lockers spawn residential loot in residential zones. Per-colour differences not documented.",
+   "source": "https://arcraiders.wiki/wiki/Locker",
+   "source_rev": 43937,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "wiki_list_aliases": [
+    "Red Locker",
+    "Green Locker",
+    "Blue Locker"
+   ]
+  },
+  {
+   "name": "Mechanical Cabinet",
+   "group": "normal",
+   "loot_types": [
+    "Mechanical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Mechanical_Cabinet",
+   "source_rev": 31246,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Mechanical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Medical Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Medical"
+   ],
+   "categories": [
+    "Healing"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; medical supplies and consumables; clinics, hospitals, medical rooms.",
+   "source": "https://arcraiders.wiki/wiki/Medical_Drawer",
+   "source_rev": 32035,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Medical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Metal Crate",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Rubber Parts",
+    "Water Filter",
+    "Cat Bed",
+    "Power Cable",
+    "Very Comfortable Pillow",
+    "Water Pump",
+    "Crude Explosives",
+    "Metal Parts",
+    "Rusted Tools",
+    "Adrenaline Shot",
+    "Steel Spring"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Must be breached. No loot type in infobox; category Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/Metal_Crate",
+   "source_rev": 23290,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Mobile Generator",
+   "group": "normal",
+   "loot_types": [
+    "Industrial"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Mobile_Generator",
+   "source_rev": 31248,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Industrial",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Office Trash Can",
+   "group": "normal",
+   "loot_types": [
+    "Misc"
+   ],
+   "categories": [
+    "Recyclables"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Misc items and recyclables.",
+   "source": "https://arcraiders.wiki/wiki/Office_Trash_Can",
+   "source_rev": 23294,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Misc",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Oscilloscope",
+   "group": "normal",
+   "loot_types": [
+    "Technological",
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Battery",
+    "Processor",
+    "Wires"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Battery 1-5 100%, Processor 1 100%, Wires 1-5 80% - flagged '*Data is not confirmed*'.",
+   "source": "https://arcraiders.wiki/wiki/Oscilloscope",
+   "source_rev": 23410,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Technological<br>Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Outdoor Trash Can",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [
+    "Recyclables"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Misc discarded items and recyclables; streets, alleys.",
+   "source": "https://arcraiders.wiki/wiki/Outdoor_Trash_Can",
+   "source_rev": 23296,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Power Distribution Box",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub. Breach = Yes. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Power_Distribution_Box",
+   "source_rev": 32024,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Recording Panel",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Control/surveillance areas. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Recording_Panel",
+   "source_rev": 32028,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Recycling Bin",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed. Category: Residential containers.",
+   "source": "https://arcraiders.wiki/wiki/Recycling_Bin",
+   "source_rev": 23299,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Residential Cabinet",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Pool row 'Other'. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Residential_Cabinet",
+   "source_rev": 23301,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Residential Closet",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Stub; pool row 'Other'. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Residential_Closet",
+   "source_rev": 31235,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": true,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Residential Desk Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Pool row 'Other'. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Residential_Desk_Drawer",
+   "source_rev": 23303,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Residential Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Pool row 'Other'. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Residential_Drawer",
+   "source_rev": 23304,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Residential Under Desk Drawer",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Residential_Under_Desk_Drawer",
+   "source_rev": 23305,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Security Locker",
+   "group": "normal",
+   "loot_types": [
+    "Misc"
+   ],
+   "categories": [
+    "Ammo",
+    "Grenades",
+    "Gun Parts",
+    "Weapons",
+    "Quick Use",
+    "Topside Materials"
+   ],
+   "categories_basis": "stated",
+   "items": [
+    "Complex Gun Parts"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Must be breached and only Raiders with the Security Breach perk can breach/search it. Weapons and components; rarely epic weapons and Complex Gun Parts; exact table unknown. 1.7.0: dynamically spawned across all maps instead of statically placed (so map markers are candidate spots, not guaranteed). 1.2.0: reduced over-provision of valuables. Infobox loot field 'Weapon<br>Ammo<br>QuickUse<br>Material<br>Misc'.",
+   "source": "https://arcraiders.wiki/wiki/Security_Locker",
+   "source_rev": 23306,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Weapon<br>Ammo<br>QuickUse<br>Material<br>Misc",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false,
+   "requires_perk": "Security Breach"
+  },
+  {
+   "name": "Seed Vault",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Assorted Seeds",
+    "Metal Parts",
+    "Chemicals",
+    "Plastic Parts"
+   ],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Pool flagged '*Data is not confirmed*'. No loot type in infobox.",
+   "source": "https://arcraiders.wiki/wiki/Seed_Vault",
+   "source_rev": 23308,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Seed Drawer Box",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Seed_Drawer_Box",
+   "source_rev": 23307,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Server Rack",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [
+    "Sensors",
+    "Plastic Parts",
+    "Fried Motherboard",
+    "Metal Parts",
+    "Processor",
+    "Damaged Heat Sink",
+    "Cooling Fan",
+    "Wires",
+    "Power Rod"
+   ],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Pool flagged '*Data is not confirmed*'.",
+   "source": "https://arcraiders.wiki/wiki/Server_Rack",
+   "source_rev": 23309,
+   "confidence": "likely",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Small Breaker Box",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Small_Breaker_Box",
+   "source_rev": 23310,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Solar Panel Box",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Electrical and solar parts. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Solar_Panel_Box",
+   "source_rev": 32030,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Steel Cupboard",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Location: Stella Montis > Lobby, Security Checkpoint room under the stairs. Placeholder pool.",
+   "source": "https://arcraiders.wiki/wiki/Steel_Cupboard",
+   "source_rev": 23312,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Suitcase",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "'Currently has no documented contents.' Category: Residential containers.",
+   "source": "https://arcraiders.wiki/wiki/Suitcase",
+   "source_rev": 23313,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Terminal",
+   "group": "normal",
+   "loot_types": [
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Electrical items. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Terminal",
+   "source_rev": 23325,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Tiny Breaker Box",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Location: Spaceport > Launch Towers > top floor. Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Tiny_Breaker_Box",
+   "source_rev": 23324,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "Truck",
+   "group": "normal",
+   "loot_types": [
+    "Mechanical",
+    "Electrical"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Must be breached. Mechanical items, Electrical items, Other; industrial and transport areas. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Truck",
+   "source_rev": 28581,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Mechanical<br>Electrical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Wall Terminal",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": true,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Breach = Yes. Placeholder pool, not confirmed.",
+   "source": "https://arcraiders.wiki/wiki/Wall_Terminal",
+   "source_rev": 23428,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "White Medical Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Medical"
+   ],
+   "categories": [
+    "Healing"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Medical supplies; medical rooms and clinics.",
+   "source": "https://arcraiders.wiki/wiki/White_Medical_Drawer",
+   "source_rev": 32034,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Medical",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": "200",
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "White Multi Drawers",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed. Category: Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/White_Multi_Drawers",
+   "source_rev": 23319,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  },
+  {
+   "name": "White Office Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [
+    "Quick Use"
+   ],
+   "categories_basis": "stated",
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Residential items and quick use supplies; offices.",
+   "source": "https://arcraiders.wiki/wiki/White_Office_Drawer",
+   "source_rev": 32040,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Wooden Drawer",
+   "group": "normal",
+   "loot_types": [
+    "Residential"
+   ],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Residential items. Pool only names loot types/'Other' - no specific items.",
+   "source": "https://arcraiders.wiki/wiki/Wooden_Drawer",
+   "source_rev": 23316,
+   "confidence": "confirmed",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "Residential",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": false,
+   "pool_placeholder": false
+  },
+  {
+   "name": "Yellow Tool Cabinet",
+   "group": "normal",
+   "loot_types": [],
+   "categories": [],
+   "categories_basis": null,
+   "items": [],
+   "breach": false,
+   "zone_dependent": null,
+   "variants": [],
+   "conditions": [],
+   "notes": "Placeholder pool, not confirmed. Category: Industrial containers.",
+   "source": "https://arcraiders.wiki/wiki/Yellow_Tool_Cabinet",
+   "source_rev": 23315,
+   "confidence": "unverified",
+   "wiki_sections": [
+    "Normal"
+   ],
+   "wiki_loot_field": "",
+   "event_only": false,
+   "event_affected": false,
+   "trapped": "No",
+   "search_xp": null,
+   "stub": false,
+   "pool_flagged_unconfirmed": true,
+   "pool_placeholder": true
+  }
+ ],
+ "marker_map": [
+  {
+   "marker": "containers/ammo_crate",
+   "container": "Ammo Case",
+   "confidence": "likely",
+   "metaforge_legend_name": "Ammo Crate",
+   "metaforge_marker_count": 754,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "MetaForge legend says 'Ammo Crate'. The wiki has no container by that name; its raider ammo container is the Ammo Case (light/medium/heavy/shotgun ammo). Community labels on these markers say 'Ammo Crate'/'Ammo Box', and lootAreas is mostly 'Raider'. 2.3.0 patch notes call one on Pendola Pass an 'ammo box'. The name differs, so this is likely, not confirmed.",
+   "top_instance_names": [
+    [
+     "Ammo Crate",
+     13
+    ],
+    [
+     "Ammo Box",
+     2
+    ],
+    [
+     "Lobby Security Key Room Ammo Crate",
+     2
+    ],
+    [
+     "Inside apartment",
+     1
+    ],
+    [
+     "Ammo crate before room.",
+     1
+    ],
+    [
+     "Inside car",
+     1
+    ],
+    [
+     "Parkour Containers",
+     1
+    ],
+    [
+     "Ammo box",
+     1
+    ],
+    [
+     "2nd floor, Behind Couch",
+     1
+    ],
+    [
+     "Ammo crate on the light truck",
+     1
+    ],
+    [
+     "Ammo crate",
+     1
+    ],
+    [
+     "On top of Pipes",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/android",
+   "container": "Android",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Android",
+   "metaforge_marker_count": 86,
+   "metaforge_maps": [
+    "pendola-pass",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Android' matches the wiki Android container; instance names say 'Android'. Markers only on Pendola Pass and Stella Montis.",
+   "top_instance_names": [
+    [
+     "Android",
+     41
+    ],
+    [
+     "Andriod",
+     1
+    ],
+    [
+     "Magnetic Accelerator Just Sitting Here 9 Times Out Of 10!",
+     1
+    ],
+    [
+     "android",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/arc_courier",
+   "container": "ARC Courier",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Arc Courier",
+   "metaforge_marker_count": 1349,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Arc Courier' matches the wiki 'ARC Courier' ('Courier' on the Containers list). Includes crashed Couriers. A few markers are mislabelled by the community (one says 'Arc Rocketeer Husk', one 'Crashed Arc Probe').",
+   "top_instance_names": [
+    [
+     "Arc Courier",
+     25
+    ],
+    [
+     "Arc Courier [HB]",
+     2
+    ],
+    [
+     "Arc Rocketeer Husk",
+     1
+    ],
+    [
+     "Under hideout. Right of wall art",
+     1
+    ],
+    [
+     "Crashed Courier x2",
+     1
+    ],
+    [
+     "Crashed Arc Courier",
+     1
+    ],
+    [
+     "Arc Courier Opposite Red Lakes Balcony",
+     1
+    ],
+    [
+     "Ark Courier [HB]",
+     1
+    ],
+    [
+     "Crashed Arc Probe - E Storm",
+     1
+    ],
+    [
+     "Arc Courier [SD]",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/arc_husk",
+   "container": null,
+   "confidence": "unverified",
+   "metaforge_legend_name": "Arc Husk",
+   "metaforge_marker_count": 5,
+   "metaforge_maps": [
+    "blue-gate",
+    "riven-tides"
+   ],
+   "evidence": "Legend 'Arc Husk' is a generic husk bucket, not a wiki container. Only 5 markers (Blue Gate, Riven Tides), named 'First Wave Husk', 'Deforester Husk', 'Arc Husk'. The wiki has a page for each husk type (Baron, Deforester, Rocketeer, Wasp) but no generic 'ARC Husk'. Treat it as an unknown husk type.",
+   "also_matches": [
+    "Baron Husk",
+    "Deforester Husk",
+    "Rocketeer Husk",
+    "Wasp Husk"
+   ],
+   "top_instance_names": [
+    [
+     "First Wave Husk",
+     1
+    ],
+    [
+     "Deforester Husk",
+     1
+    ],
+    [
+     "Arc Husk",
+     1
+    ],
+    [
+     "Ark Husk",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/arc_probe",
+   "container": "ARC Probe",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Arc Probe",
+   "metaforge_marker_count": 1723,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Arc Probe' matches the wiki ARC Probe. Instance names include 'Downed/Crashed/Landed Probe', which fits the wiki's crashed-probe variant (one panel). Some markers carry the Prospecting Probes bit (bit 1) or the Electromagnetic Storm bit.",
+   "top_instance_names": [
+    [
+     "Arc Probe",
+     51
+    ],
+    [
+     "Downed Probe",
+     20
+    ],
+    [
+     "Landed Probe",
+     8
+    ],
+    [
+     "ARC Probe",
+     7
+    ],
+    [
+     "Crashed Arc Probe - E Storm",
+     6
+    ],
+    [
+     "Crashed Arc Probe",
+     4
+    ],
+    [
+     "Fallen Probe",
+     3
+    ],
+    [
+     "Crashed Arc Probe Ruined Homestead",
+     1
+    ],
+    [
+     "Crashed Arc Probe [HB]",
+     1
+    ],
+    [
+     "Arc Probe [HB]",
+     1
+    ],
+    [
+     "Crashed Ark Probe [HB]",
+     1
+    ],
+    [
+     "Arc Probe near the Husk",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/bag",
+   "container": "Backpack",
+   "confidence": "likely",
+   "metaforge_legend_name": "Backpacks",
+   "metaforge_marker_count": 394,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "MetaForge's legend shows this key as 'Backpacks', and the most common instance names are 'Raider Backpack'/'Backpack'. That matches the wiki raider container Backpack. Some markers are labelled 'Suitcase' or 'Bag', and some lootAreas are zone names, so there is noise in community data.",
+   "top_instance_names": [
+    [
+     "Raider Backpack",
+     15
+    ],
+    [
+     "Backpack",
+     10
+    ],
+    [
+     "Bag",
+     6
+    ],
+    [
+     "Suitcase",
+     6
+    ],
+    [
+     "Raiders backpack",
+     4
+    ],
+    [
+     "Raider Bag",
+     3
+    ],
+    [
+     "Bags",
+     2
+    ],
+    [
+     "raider bag",
+     2
+    ],
+    [
+     "Worn Backpack",
+     1
+    ],
+    [
+     "Pole Bag",
+     1
+    ],
+    [
+     "Epic bag against the broken tree trunk",
+     1
+    ],
+    [
+     "under bridge",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/baron_husk",
+   "container": "Baron Husk",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Baron Husk",
+   "metaforge_marker_count": 7,
+   "metaforge_maps": [
+    "blue-gate",
+    "dam",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Baron Husk' = wiki Baron Husk. 7 markers (Blue Gate, Dam, Spaceport).",
+   "top_instance_names": [
+    [
+     "Baron Huask",
+     1
+    ],
+    [
+     "Baron Husk",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/base_container",
+   "container": null,
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Container",
+   "metaforge_marker_count": 13280,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Catch-all. The legend shows this key as just 'Container' (not 'Base Container'). It holds 13,280 markers with ~100 different instance names, mostly bulk-imported (they carry a sourceID): Transformer, Industrial Crate, Fuse Box, Server Rack, Wall Panel, Computer, Trash Bin, Tool Trolley, and so on. These are MetaForge's own prop names, not wiki container names. Only some match a wiki name 1:1. Use instance_name_breakdown to map single markers; everything else counts as a generic searchable container with unknown wiki identity. Confidence 'confirmed' applies to 'it is a catch-all', not to any single container.",
+   "instance_name_breakdown": [
+    {
+     "instance_name": "Transformer",
+     "count": 1208,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Industrial Crate",
+     "count": 1052,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Fuse Box",
+     "count": 1012,
+     "wiki_container": "Breaker Box / Small Breaker Box / Generator Fuse Box?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Server Rack",
+     "count": 979,
+     "wiki_container": "Server Rack",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Wall Panel",
+     "count": 736,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Computer",
+     "count": 696,
+     "wiki_container": "Computer",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Trash Bin",
+     "count": 531,
+     "wiki_container": "Outdoor Trash Can / Office Trash Can / Recycling Bin?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Tool Trolley",
+     "count": 494,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Tape Drive",
+     "count": 398,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Kitchen Cupboard",
+     "count": 378,
+     "wiki_container": "Residential Cabinet?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Control Panel",
+     "count": 346,
+     "wiki_container": "Control Panel",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Kitchen Counter",
+     "count": 345,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Utility Truck",
+     "count": 322,
+     "wiki_container": "Truck?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Generator",
+     "count": 302,
+     "wiki_container": "Mobile Generator?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Closet",
+     "count": 298,
+     "wiki_container": "Residential Closet?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Compressor Trailer",
+     "count": 257,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Waste Bin",
+     "count": 217,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Bus",
+     "count": 201,
+     "wiki_container": "Bus Side Trunk / Bus Rear Trunk?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Floodlight",
+     "count": 199,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Fridge",
+     "count": 198,
+     "wiki_container": "Refrigerator or Broken Fridge",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "TV Unit",
+     "count": 189,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Antenna",
+     "count": 175,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Cafe Cupboard",
+     "count": 168,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Shelf",
+     "count": 158,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Pressure Monitor",
+     "count": 151,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Museum Crate",
+     "count": 131,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Solar Panel",
+     "count": 118,
+     "wiki_container": "Solar Panel Box?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Dumpster",
+     "count": 105,
+     "wiki_container": "Dumpster",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Information Terminal",
+     "count": 103,
+     "wiki_container": "Terminal or Wall Terminal?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Seed Vault Console",
+     "count": 87,
+     "wiki_container": "Seed Vault?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Cash Register",
+     "count": 79,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Crate Cart",
+     "count": 77,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Security Crate",
+     "count": 73,
+     "wiki_container": "Black Crate?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Freezer",
+     "count": 64,
+     "wiki_container": "Refrigerator?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Coffee Machine",
+     "count": 62,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "ARC Side Panel",
+     "count": 44,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Rocket Parts",
+     "count": 44,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "SOS Booth",
+     "count": 39,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Suitcase",
+     "count": 32,
+     "wiki_container": "Suitcase",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Road Barrier",
+     "count": 32,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Shipping Container Drawer",
+     "count": 30,
+     "wiki_container": "Green Container Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Cabinet",
+     "count": 9,
+     "wiki_container": "Blue Cabinet / Medical Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Locker",
+     "count": 7,
+     "wiki_container": "Locker",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Electrical Cabinet",
+     "count": 6,
+     "wiki_container": "Electrical Cabinet",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Terminal",
+     "count": 1,
+     "wiki_container": "Terminal",
+     "confidence": "likely"
+    }
+   ],
+   "top_instance_names": [
+    [
+     "Transformer",
+     1208
+    ],
+    [
+     "Industrial Crate",
+     1052
+    ],
+    [
+     "Fuse Box",
+     1012
+    ],
+    [
+     "Server Rack",
+     979
+    ],
+    [
+     "Wall Panel",
+     736
+    ],
+    [
+     "Computer",
+     696
+    ],
+    [
+     "Trash Bin",
+     531
+    ],
+    [
+     "Tool Trolley",
+     494
+    ],
+    [
+     "Tape Drive",
+     398
+    ],
+    [
+     "Kitchen Cupboard",
+     378
+    ],
+    [
+     "Control Panel",
+     346
+    ],
+    [
+     "Kitchen Counter",
+     345
+    ]
+   ]
+  },
+  {
+   "marker": "containers/basket",
+   "container": "Wicker Basket",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Baskets",
+   "metaforge_marker_count": 331,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Baskets'. The wiki has one basket container, Wicker Basket. Instance names say 'Winter Fruit Basket'/'Basket'/'Candleberry Basket'. The dominant event masks are 576/320/2112 = Lush Blooms + Cold Snap on the per-map bit layouts, which matches the wiki's 'appears with Lush Blooms or Cold Snap'.",
+   "top_instance_names": [
+    [
+     "Winter Fruit Basket",
+     37
+    ],
+    [
+     "Basket",
+     35
+    ],
+    [
+     "Baskets",
+     6
+    ],
+    [
+     "Candleberry Basket",
+     3
+    ],
+    [
+     "Nature Basket",
+     3
+    ],
+    [
+     "basket",
+     2
+    ],
+    [
+     "Basket - Behind Exfil Building",
+     1
+    ],
+    [
+     "Basket near buried house",
+     1
+    ],
+    [
+     "Bascket",
+     1
+    ],
+    [
+     "damascus",
+     1
+    ],
+    [
+     "basket on back of truck",
+     1
+    ],
+    [
+     "Basket (Lush Bloom)",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/box",
+   "container": null,
+   "confidence": "unverified",
+   "metaforge_legend_name": "Boxes",
+   "metaforge_marker_count": 8,
+   "metaforge_maps": [
+    "blue-gate"
+   ],
+   "evidence": "Legend 'Boxes'. Only 8 markers, all on Blue Gate ('Gate Box', 'Pole Box', 'Raider Camp Box'); lootAreas say Industrial/Mechanical. No wiki container is named Box, and the evidence does not identify one.",
+   "top_instance_names": [
+    [
+     "2 Possible Boxes",
+     1
+    ],
+    [
+     "Gate Box",
+     1
+    ],
+    [
+     "Pole Box",
+     1
+    ],
+    [
+     "Raider Camp Box",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/breachable_container",
+   "container": null,
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Breachable Container",
+   "metaforge_marker_count": 415,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Catch-all for breachables. Legend 'Breachable Container', 415 markers. Instance names are mixed: Electrical Transformer, Cooler, Data Server, Technology Container, Industrial Trailer, Storage Box, Wooden Crate, Metal Crate, Harvester Wall Container, Server Rack, Engine Hood, and others. Several match wiki containers with Must Be Breached = Yes (Metal Crate, Server Rack, Car Hood, Electrical Cabinet, Control Panel). 'confirmed' means it is a generic bucket; any single marker's wiki identity is unverified.",
+   "also_matches": [
+    "Metal Crate",
+    "Server Rack",
+    "Electrical Cabinet",
+    "Control Panel",
+    "Car Hood",
+    "Truck",
+    "High Voltage Breaker Box",
+    "Power Distribution Box",
+    "Mechanical Cabinet",
+    "Heater",
+    "Harvester (wall containers)"
+   ],
+   "top_instance_names": [
+    [
+     "Breachable Container",
+     20
+    ],
+    [
+     "Electrical Transformer",
+     8
+    ],
+    [
+     "Cooler",
+     6
+    ],
+    [
+     "Data Server",
+     5
+    ],
+    [
+     "Technology Container",
+     4
+    ],
+    [
+     "Industrial Trailer",
+     4
+    ],
+    [
+     "Storage Box",
+     4
+    ],
+    [
+     "Wooden Crate",
+     4
+    ],
+    [
+     "Metal Crate",
+     3
+    ],
+    [
+     "Harvester Wall Container",
+     3
+    ],
+    [
+     "Server Rack",
+     2
+    ],
+    [
+     "Electrical Box",
+     2
+    ]
+   ]
+  },
+  {
+   "marker": "containers/car",
+   "container": "Car Hood",
+   "confidence": "likely",
+   "metaforge_legend_name": "Cars",
+   "metaforge_marker_count": 994,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Cars'. 941 of 994 markers are named 'Car Trunk' (bulk import), and lootAreas say 'Mechanical'. The wiki has no 'Car Trunk'. Its Car page says a car has a breachable Car Hood plus searchable seats, and Car Hood's loot type is Mechanical/Electrical. So a car marker most likely stands for Car Hood (plus seat loot). The trunk/hood naming gap remains.",
+   "top_instance_names": [
+    [
+     "Car Trunk",
+     941
+    ],
+    [
+     "Car",
+     32
+    ],
+    [
+     "Cars",
+     3
+    ],
+    [
+     "Van",
+     2
+    ],
+    [
+     "Parking",
+     1
+    ],
+    [
+     "White Van",
+     1
+    ],
+    [
+     "Container",
+     1
+    ],
+    [
+     "2 Buses",
+     1
+    ],
+    [
+     "Breachable Car - 100% light bulb spawn",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/combat_supplies",
+   "container": null,
+   "confidence": "likely",
+   "metaforge_legend_name": "Combat Supplies",
+   "metaforge_marker_count": 43,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Combat Supplies'. 35 of 43 markers carry event bit 14 (mask 16384/16385) = Close Scrutiny on Dam, Blue Gate, Buried City and Spaceport, the four maps that have Close Scrutiny. The wiki has no 'Combat Supplies' page (the title is missing). Third-party guides (keengamer, arcintel) describe them as Close Scrutiny supply clusters of ammo, healing and grenade boxes. Model them as a Close Scrutiny-only raider-supply spot, not a wiki container.",
+   "also_matches": [
+    "ARC Assessor (same condition)"
+   ],
+   "top_instance_names": [
+    [
+     "Combat supplies",
+     4
+    ],
+    [
+     "Combat Supplies",
+     3
+    ]
+   ]
+  },
+  {
+   "marker": "containers/deforester_husk",
+   "container": "Deforester Husk",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Deforester Husk",
+   "metaforge_marker_count": 4,
+   "metaforge_maps": [
+    "blue-gate"
+   ],
+   "evidence": "Legend 'Deforester Husk' = wiki Deforester Husk. 4 markers, Blue Gate only (the wiki says there are 3 puzzle sites on Blue Gate).",
+   "top_instance_names": [
+    [
+     "Final breaching spot",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/electrical_container",
+   "container": null,
+   "confidence": "unverified",
+   "metaforge_legend_name": null,
+   "metaforge_marker_count": 1,
+   "metaforge_maps": [
+    "spaceport"
+   ],
+   "evidence": "Not in the current MetaForge legend; probably a legacy key. Only 1 marker (Spaceport, 'PC'), which might be Computer. Suggest folding it into base_container.",
+   "also_matches": [
+    "Computer"
+   ],
+   "top_instance_names": [
+    [
+     "PC",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/frozen_raider_cache",
+   "container": "Raider Cache",
+   "confidence": "likely",
+   "metaforge_legend_name": "Frozen Raider Cache",
+   "metaforge_marker_count": 95,
+   "metaforge_maps": [
+    "pendola-pass"
+   ],
+   "evidence": "Legend 'Frozen Raider Cache'. 95 markers, Pendola Pass only. The wiki Raider Cache page says caches during Cold Snap lose their flora/sign and must be breached. A MetaForge guide says both frozen and normal caches exist on Pendola Pass, and that frozen ones open with the Raider Tool. So this is the frozen variant of Raider Cache (breach required). Its loot is assumed to match Raider Cache's 'higher quality during Cold Snap', but no source confirms that for Pendola.",
+   "top_instance_names": [
+    [
+     "Frozen Cache",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/hurricane_cache",
+   "container": "First Wave Cache",
+   "confidence": "likely",
+   "metaforge_legend_name": "Hurricane Cache",
+   "metaforge_marker_count": 404,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Hurricane Cache'. 382 of 404 markers carry event bit 12 (mask 4096/4097) = Hurricane. The wiki First Wave Cache page says First Wave Caches spawn during the Hurricane map modifier, and some community labels read 'First Wave Cache/Hurricane Cache'. Not 'confirmed' because the names differ and the wiki page is a stub.",
+   "top_instance_names": [
+    [
+     "Hurricane Cache",
+     80
+    ],
+    [
+     "hurricanecache",
+     7
+    ],
+    [
+     "Hurricane cache",
+     3
+    ],
+    [
+     "Hurricane Cashe",
+     3
+    ],
+    [
+     "Cache",
+     2
+    ],
+    [
+     "1st wave cache",
+     1
+    ],
+    [
+     "New Cache #2",
+     1
+    ],
+    [
+     "First Wave Cache/Hurricane Cache",
+     1
+    ],
+    [
+     "New Cache #3",
+     1
+    ],
+    [
+     "hurricane cache",
+     1
+    ],
+    [
+     "Train",
+     1
+    ],
+    [
+     "The Breach Hurricane Cache",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/industrial_container",
+   "container": null,
+   "confidence": "unverified",
+   "metaforge_legend_name": null,
+   "metaforge_marker_count": 1,
+   "metaforge_maps": [
+    "spaceport"
+   ],
+   "evidence": "Not in the current MetaForge legend; probably a legacy key. Only 1 marker (Spaceport, 'Drawers Tables'). Suggest folding it into base_container.",
+   "top_instance_names": [
+    [
+     "Drawers Tables",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/locker",
+   "container": "Locker",
+   "confidence": "likely",
+   "metaforge_legend_name": "Lockers",
+   "metaforge_marker_count": 5018,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Lockers', but it is partly a catch-all. Of 5,018 markers only 1,139 are named 'Locker'. The rest are drawer/cabinet props: Shipping Container Drawer 684, Medical Cabinet 627, Office Desk 600, Desk 378, Filing Cabinet 259, Medicine Drawer 253, Counter, Electrical Cabinet, Chest of Drawers, Medical Cart, Medical Workbench, Medical Locker, and 57 'Security Locker'. Map the 'Locker' instances to wiki Locker (red/green/blue; zone-dependent). The others are shown in instance_name_breakdown. Note that the 57 Security Locker instances conflict with security_breach.",
+   "instance_name_breakdown": [
+    {
+     "instance_name": "Locker",
+     "count": 1139,
+     "wiki_container": "Locker",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Shipping Container Drawer",
+     "count": 684,
+     "wiki_container": "Green Container Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Cabinet",
+     "count": 627,
+     "wiki_container": "Blue Cabinet / Medical Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Office Desk",
+     "count": 600,
+     "wiki_container": "White Office Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Desk",
+     "count": 378,
+     "wiki_container": "Residential Desk Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Filing Cabinet",
+     "count": 259,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medicine Drawer",
+     "count": 253,
+     "wiki_container": "Medical Drawer / White Medical Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Counter",
+     "count": 196,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Electrical Cabinet",
+     "count": 194,
+     "wiki_container": "Electrical Cabinet",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Chest of Drawers",
+     "count": 172,
+     "wiki_container": "Chiffonier Drawer / Residential Drawer?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Cart",
+     "count": 108,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Workbench",
+     "count": 89,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Locker",
+     "count": 72,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Security Locker",
+     "count": 57,
+     "wiki_container": "Security Locker",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Medical Console",
+     "count": 35,
+     "wiki_container": null,
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Seed Box",
+     "count": 29,
+     "wiki_container": "Seed Drawer Box?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Medical Security Locker",
+     "count": 14,
+     "wiki_container": "Security Locker?",
+     "confidence": "unverified"
+    },
+    {
+     "instance_name": "Red Lockers",
+     "count": 6,
+     "wiki_container": "Locker (Red)",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Red Locker",
+     "count": 3,
+     "wiki_container": "Locker (Red)",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Blue Lockers",
+     "count": 1,
+     "wiki_container": "Locker (Blue)",
+     "confidence": "likely"
+    },
+    {
+     "instance_name": "Green Lockers In Bathroom",
+     "count": 1,
+     "wiki_container": "Locker (Green)",
+     "confidence": "likely"
+    }
+   ],
+   "top_instance_names": [
+    [
+     "Locker",
+     1139
+    ],
+    [
+     "Shipping Container Drawer",
+     684
+    ],
+    [
+     "Medical Cabinet",
+     627
+    ],
+    [
+     "Office Desk",
+     600
+    ],
+    [
+     "Desk",
+     378
+    ],
+    [
+     "Filing Cabinet",
+     259
+    ],
+    [
+     "Medicine Drawer",
+     253
+    ],
+    [
+     "Counter",
+     196
+    ],
+    [
+     "Electrical Cabinet",
+     194
+    ],
+    [
+     "Chest of Drawers",
+     172
+    ],
+    [
+     "Medical Cart",
+     108
+    ],
+    [
+     "Medical Workbench",
+     89
+    ]
+   ]
+  },
+  {
+   "marker": "containers/med_crate",
+   "container": "Medical Bag",
+   "confidence": "likely",
+   "metaforge_legend_name": "Med Crate",
+   "metaforge_marker_count": 295,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Med Crate'. Community instance names repeatedly say 'Med Bag'/'Medical Bag' (for example, many Stella Montis 'Med Bag' labels), and lootAreas are mostly 'Medical'/'Raider'. That matches the wiki's raider container Medical Bag. Pendola Pass has med_crate markers, and 2.3.0 mentions a Medical Bag in Pendola Storm Huts. It is NOT the medical drawers: MetaForge files those under 'locker' (Medicine Drawer, Medical Cabinet).",
+   "top_instance_names": [
+    [
+     "Med Crate",
+     7
+    ],
+    [
+     "Medical Bag",
+     6
+    ],
+    [
+     "Robotic Sandbox A Battery Room Med Bag",
+     3
+    ],
+    [
+     "Md Bag",
+     1
+    ],
+    [
+     "Caja Medica",
+     1
+    ],
+    [
+     "Random 1st Floor Med Crate",
+     1
+    ],
+    [
+     "Sniper Tower Raider Camp",
+     1
+    ],
+    [
+     "Apartment Bus Med Crate",
+     1
+    ],
+    [
+     "Bus Med Crate",
+     1
+    ],
+    [
+     "med crate top of water tower",
+     1
+    ],
+    [
+     "Med Bag Bottom Floor",
+     1
+    ],
+    [
+     "Medical back, halfway up the tower",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/raider_cache",
+   "container": "Raider Cache",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Raider Cache",
+   "metaforge_marker_count": 3300,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Raider Cache' = wiki Raider Cache. Event masks include bit 3 (8/9) = Uncovered Caches and bit 9 (512/520) = Cold Snap on Dam/Blue Gate, which matches the wiki's condition notes. Most markers have mask null.",
+   "top_instance_names": [
+    [
+     "Raider Cache",
+     76
+    ],
+    [
+     "Raider cache",
+     9
+    ],
+    [
+     "Raider Cache [HB]",
+     6
+    ],
+    [
+     "raider cache",
+     4
+    ],
+    [
+     "Raiders Cache",
+     1
+    ],
+    [
+     "on top of husk",
+     1
+    ],
+    [
+     "Raider Cache (with Raider!)",
+     1
+    ],
+    [
+     "Raider cache in a rock",
+     1
+    ],
+    [
+     "Raider Cache - Cold Snap",
+     1
+    ],
+    [
+     "Next to the forest",
+     1
+    ],
+    [
+     "Raider Library First Floor Cache",
+     1
+    ],
+    [
+     "Raider Cache under Highway",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/rocketeer_husk",
+   "container": "Rocketeer Husk",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Rocketeer Husk",
+   "metaforge_marker_count": 271,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "Legend 'Rocketeer Husk' = wiki Rocketeer Husk. Common mask 16/144 includes bit 4 = Husk Graveyard. Some are labelled 'First Wave Rocketeer'.",
+   "top_instance_names": [
+    [
+     "Rocketeer Husk",
+     42
+    ],
+    [
+     "ARC Rocketeer Husk",
+     20
+    ],
+    [
+     "Arc Husk",
+     10
+    ],
+    [
+     "rocketeer husk",
+     3
+    ],
+    [
+     "Arc Rocketeer Husk",
+     2
+    ],
+    [
+     "First wave Rocketeer husk",
+     2
+    ],
+    [
+     "West Village Rocketeer Husk",
+     1
+    ],
+    [
+     "racketeer husk",
+     1
+    ],
+    [
+     "Husk",
+     1
+    ],
+    [
+     "First Wave Rocketeer",
+     1
+    ],
+    [
+     "Rocketeer husk",
+     1
+    ],
+    [
+     "Rocketeer Husk (at least 3 spawns)",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/security_breach",
+   "container": "Security Locker",
+   "confidence": "likely",
+   "metaforge_legend_name": "Security Breach",
+   "metaforge_marker_count": 109,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Security Breach' is the name of the perk the wiki says you need to breach a Security Locker. Community labels say 'Security Breach', '2 Security Lockers', 'Railyard Security Breach Locker'. But the bulk-imported markers in this category carry generic prop names (Weapons Rack 23, Tape Drive, Tool Trolley, Server Rack, Fuse Box...), so some may be perk-gated objects of other kinds. Also, since 1.7.0 Security Lockers spawn dynamically, so these markers are candidate spots, not fixed spawns. 57 'Security Locker' instances sit in the locker category instead.",
+   "top_instance_names": [
+    [
+     "Weapons Rack",
+     23
+    ],
+    [
+     "Security Breach",
+     7
+    ],
+    [
+     "Tape Drive",
+     5
+    ],
+    [
+     "Tool Trolley",
+     4
+    ],
+    [
+     "Server Rack",
+     3
+    ],
+    [
+     "Fuse Box",
+     3
+    ],
+    [
+     "Control Panel",
+     2
+    ],
+    [
+     "Underground Security Breach",
+     2
+    ],
+    [
+     "Wall Panel",
+     2
+    ],
+    [
+     "Computer",
+     2
+    ],
+    [
+     "Industrial Crate",
+     2
+    ],
+    [
+     "Trash Bin",
+     2
+    ]
+   ]
+  },
+  {
+   "marker": "containers/suitcase",
+   "container": "Suitcase",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Suitcases",
+   "metaforge_marker_count": 635,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Suitcases'; all 635 instance names are 'Suitcase', which matches the wiki Suitcase (whose contents are undocumented). 32 more 'Suitcase' instances are in base_container.",
+   "top_instance_names": [
+    [
+     "Suitcase",
+     635
+    ]
+   ]
+  },
+  {
+   "marker": "containers/utility_crate",
+   "container": "Grenade Tube",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Grenade Tube",
+   "metaforge_marker_count": 339,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "MetaForge's own legend shows key utility_crate as 'Grenade Tube', and instance names mostly say 'Grenade Tube'/'grenade case'. That matches the wiki raider container Grenade Tube.",
+   "top_instance_names": [
+    [
+     "Grenade Tube",
+     7
+    ],
+    [
+     "Utility Crate",
+     4
+    ],
+    [
+     "Utility Bag",
+     1
+    ],
+    [
+     "Grenade Case",
+     1
+    ],
+    [
+     "Bombs crate",
+     1
+    ],
+    [
+     "grenade tube under the floor",
+     1
+    ],
+    [
+     "Grenade tube in a buried truck",
+     1
+    ],
+    [
+     "roof nade case",
+     1
+    ],
+    [
+     "Roof nade case 2",
+     1
+    ],
+    [
+     "Grenade tube inside hollow broken highway piece",
+     1
+    ],
+    [
+     "Bag on second flor",
+     1
+    ],
+    [
+     "Grenade Tube Tree House",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/wasp_husk",
+   "container": "Wasp Husk",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Wasp Husk",
+   "metaforge_marker_count": 550,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Wasp Husk' = wiki Wasp Husk. Mask 16/144 includes bit 4 = Husk Graveyard.",
+   "top_instance_names": [
+    [
+     "Wasp Husk",
+     42
+    ],
+    [
+     "ARC Wasp Husk",
+     16
+    ],
+    [
+     "Arc Husk",
+     6
+    ],
+    [
+     "Wask Husk",
+     5
+    ],
+    [
+     "ARC Rocketeer Husk",
+     1
+    ],
+    [
+     "Wasp husk",
+     1
+    ],
+    [
+     "On Top of Roof",
+     1
+    ],
+    [
+     "Husk",
+     1
+    ],
+    [
+     "wasp husk",
+     1
+    ],
+    [
+     "First wave husk",
+     1
+    ],
+    [
+     "first wave husk",
+     1
+    ],
+    [
+     "husk",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "containers/weapon_case",
+   "container": "Weapon Case",
+   "confidence": "likely",
+   "metaforge_legend_name": "Weapon Case",
+   "metaforge_marker_count": 489,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Weapon Case' = wiki Weapon Case by name. But 61 bulk-imported markers are named 'Weapons Rack', and 23 more 'Weapons Rack' sit in security_breach. A rack may be a different object, so the category is not purely Weapon Case.",
+   "top_instance_names": [
+    [
+     "Weapons Rack",
+     61
+    ],
+    [
+     "Weapon Case",
+     23
+    ],
+    [
+     "Weapon Case (Residential Master Key required)",
+     3
+    ],
+    [
+     "Weapon Case - Hidden Bunker",
+     3
+    ],
+    [
+     "Rooftop Weapon Case",
+     2
+    ],
+    [
+     "Weapon Case (In the Cellar)",
+     1
+    ],
+    [
+     "Zip lane to down stare",
+     1
+    ],
+    [
+     "Weapon case on the inner-rim of the area",
+     1
+    ],
+    [
+     "Breach Room",
+     1
+    ],
+    [
+     "On top",
+     1
+    ],
+    [
+     "Key room crate",
+     1
+    ],
+    [
+     "On Top",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "locations/field_crate",
+   "container": "Field Depot Pneumatic Delivery System",
+   "confidence": "likely",
+   "metaforge_legend_name": "Field Crate",
+   "metaforge_marker_count": 535,
+   "metaforge_maps": [
+    "buried-city",
+    "dam",
+    "riven-tides",
+    "spaceport"
+   ],
+   "evidence": "MetaForge legend: 'Field Crate', under Locations. On the wiki the Field Crate is a heavy carryable box found near Field Depots, not a searchable container. Its reward comes from the Field Depot Pneumatic Delivery System after delivery. Markers are on Buried City, Dam, Riven Tides and Spaceport (the wiki says every map except Stella Montis). For a spawn model, treat the crate as a pickup that leads to the PDS reward pool.",
+   "top_instance_names": [
+    [
+     "Field Crate",
+     23
+    ],
+    [
+     "Field crate",
+     2
+    ],
+    [
+     "field crate",
+     2
+    ],
+    [
+     "Field Crate Spawn",
+     1
+    ],
+    [
+     "Library Field Crate",
+     1
+    ],
+    [
+     "first floor",
+     1
+    ],
+    [
+     "Field Crate (Buried Properties)",
+     1
+    ],
+    [
+     "Library 2nd floor sitting between benches",
+     1
+    ],
+    [
+     "Ground Parking garage on the sand",
+     1
+    ],
+    [
+     "L1 Library",
+     1
+    ],
+    [
+     "L2 Library - Reading Room",
+     1
+    ],
+    [
+     "sitting between table and cement planter",
+     1
+    ]
+   ]
+  },
+  {
+   "marker": "locations/supply_station",
+   "container": "Supply Drop",
+   "confidence": "confirmed",
+   "metaforge_legend_name": "Supply Call Station",
+   "metaforge_marker_count": 136,
+   "metaforge_maps": [
+    "blue-gate",
+    "buried-city",
+    "dam",
+    "pendola-pass",
+    "riven-tides",
+    "spaceport",
+    "stella-montis"
+   ],
+   "evidence": "Legend 'Supply Call Station' = the wiki 'Supply Call Station' (the Supply Station page redirects there). Using it calls in a Supply Drop. On Stella Montis the markers are 'Capsule Request Terminal', which the wiki ties to the Capsule Delivery Terminal container. So the container is Supply Drop, or Capsule Delivery Terminal on Stella Montis.",
+   "also_matches": [
+    "Capsule Delivery Terminal (Stella Montis)"
+   ],
+   "top_instance_names": [
+    [
+     "Supply Call Station",
+     8
+    ],
+    [
+     "Ancient Fort Supply Station",
+     1
+    ],
+    [
+     "Floodgates",
+     1
+    ],
+    [
+     "Power Generation Complex South Supply Call Station",
+     1
+    ],
+    [
+     "Supply",
+     1
+    ],
+    [
+     "Supply drop",
+     1
+    ],
+    [
+     "Supply Call on West container Yard",
+     1
+    ],
+    [
+     "Supply call station",
+     1
+    ],
+    [
+     "North of Shipping Warehouse Supply Call",
+     1
+    ],
+    [
+     "Med Bay Ground Floor Capsule Request Terminal",
+     1
+    ],
+    [
+     "Lobby Capsule Request Terminal",
+     1
+    ],
+    [
+     "Eastern Tunnel Supply Call Station",
+     1
+    ]
+   ]
+  }
+ ]
+}

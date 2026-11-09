@@ -20,7 +20,7 @@ fn medical_items_lean_on_med_crates() {
     let auto = auto_plan(&ds, &Profile::default(), &plan("buried-city", &["antiseptic"]));
     assert!(!auto.areas.is_empty(), "an area for antiseptic");
     let kinds: Vec<&str> = auto.areas.iter().flat_map(|a| &a.stops).filter(|s| !s.items.is_empty()).map(|s| s.name.as_str()).collect();
-    let med = kinds.iter().filter(|k| **k == "Med Crate").count();
+    let med = kinds.iter().filter(|k| **k == "Medical Bag").count();
     let cars = kinds.iter().filter(|k| **k == "Car").count();
     assert!(med > cars, "med crates {med} vs cars {cars}: {kinds:?}");
 }
@@ -93,6 +93,7 @@ fn farm_finder_ranks_across_maps() {
 /// The item page's sources: ARC parts lean on ARC containers, and each source is listed once.
 #[test]
 fn item_sources_rank_containers_once() {
+    // The Turbine Compressor comes from the ARC Turbine, not from husks.
     let ds = real();
     let sources = item_sources(&ds, "turbine-compressor");
     for s in sources.iter().take(8) {
@@ -101,6 +102,58 @@ fn item_sources_rank_containers_once() {
     assert!(!sources.is_empty());
     let ids: std::collections::BTreeSet<&str> = sources.iter().map(|s| s.id.as_str()).collect();
     assert_eq!(ids.len(), sources.len(), "each source once");
-    assert!(sources[0].group == "arc" || sources[0].id.contains("arc") || sources[0].id.contains("husk"), "top source {}", sources[0].id);
+    assert_eq!(sources[0].id, "arc/turbine", "top source");
+    assert!(!sources.iter().any(|s| s.id.contains("husk") && s.id != "containers/arc_husk"), "no specific husk drops it");
     assert!(sources.windows(2).all(|w| w[0].score >= w[1].score));
+}
+
+/// Every map is ranked, and a map with nothing for the item ranks below one that has it.
+#[test]
+fn suggests_maps_by_what_they_hold() {
+    let ds = real();
+    let mut p = plan("", &["antiseptic"]);
+    p.off = vec!["cat:quest".into(), "cat:craft".into(), "cat:project".into(), "cat:bench".into()];
+    let picks = suggest_maps(&ds, &Profile::default(), &p);
+    assert_eq!(picks.len(), ds.files.maps.len());
+    for pick in &picks {
+        println!("{} {} best={:?} here={:?} missing={:?}", pick.map_name, pick.score, pick.best.as_ref().map(|b| &b.name), pick.items_here, pick.items_missing);
+    }
+    assert!(picks[0].best.is_some(), "the top map has an area");
+    assert!(picks.windows(2).all(|w| w[0].score >= w[1].score));
+}
+
+/// With a primary objective, every area's loop goes through it and nearer areas rank first.
+#[test]
+fn side_areas_hug_the_primary_objective() {
+    let ds = real();
+    let base = plan("buried-city", &["antiseptic", "fabric", "rubber-parts"]);
+    let free = auto_plan(&ds, &Profile::default(), &base);
+    assert!(free.areas.len() >= 2);
+    // Put the objective on the last free area, so the ranking has to change.
+    let far = free.areas.last().unwrap();
+    let mut with = base.clone();
+    with.primary = Some(Primary { kind: "marker".into(), id: "x".into(), name: "Objective".into(), x: far.x, y: far.y, floors: None });
+    let auto = auto_plan(&ds, &Profile::default(), &with);
+    assert!(auto.primary.is_some());
+    assert!(auto.areas.iter().all(|a| a.stops.iter().any(|s| s.kind == "primary")), "every loop passes the objective");
+    assert!(auto.areas.iter().all(|a| a.detour.is_some()));
+    let first = &auto.areas[0];
+    let d = (first.x - far.x).hypot(first.y - far.y);
+    assert!(d < (free.areas[0].x - far.x).hypot(free.areas[0].y - far.y) + 1.0, "top area moved toward the objective");
+}
+
+/// A live condition changes the plan: Uncovered Caches makes Raider Caches count for more,
+/// and the plan says which conditions it counted.
+#[test]
+fn live_conditions_change_the_plan() {
+    let ds = real();
+    let mut p = plan("dam", &["light-ammo"]);
+    p.off = vec!["cat:quest".into(), "cat:craft".into(), "cat:project".into(), "cat:bench".into()];
+    let quiet = auto_plan(&ds, &Profile::default(), &p);
+    let busy = auto_plan_live(&ds, &Profile::default(), &p, &["Uncovered Caches".to_string()]);
+    assert!(quiet.conditions.is_empty());
+    assert_eq!(busy.conditions.first().map(|c| c.name.as_str()), Some("Uncovered Caches"));
+    let caches = |a: &RaidAuto| a.areas.iter().flat_map(|x| &x.stops).filter(|s| s.name == "Raider Cache").count();
+    assert!(caches(&busy) >= caches(&quiet), "caches {} vs {}", caches(&busy), caches(&quiet));
+    assert_ne!(quiet.areas, busy.areas, "the boost moves something");
 }

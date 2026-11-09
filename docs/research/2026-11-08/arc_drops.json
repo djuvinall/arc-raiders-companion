@@ -1,0 +1,3276 @@
+{
+  "retrieved": "2026-11-08",
+  "gamePatch": "2.4.1",
+  "rateLegend": "rate is set only where a source states it in words (guaranteed; rare = wiki's 'small chance'); otherwise null. No source publishes drop percentages. itemRarity is the item's own rarity tier from the wiki ItemGrid (Common/Uncommon/Rare/Epic/Legendary), NOT a drop chance. qty is the wiki Quantity column where present ('x' = unknown bound). confirmedBy lists other sources that name the same item.",
+  "sources": [
+    {
+      "id": "wiki-arc",
+      "url": "https://arcraiders.wiki/wiki/ARC?oldid=44539",
+      "rev": "44539",
+      "revTimestamp": "2026-11-09T00:00:59Z",
+      "note": "ARC overview page: per-ARC 'Notable drops' column (a curated subset, not a full pool)"
+    },
+    {
+      "id": "metaforge-arcs",
+      "url": "https://metaforge.app/api/arc-raiders/arcs?page=1&limit=100",
+      "rev": "API fetched 2026-11-08; per-ARC updated_at recorded in notes",
+      "note": "loot arrays carry item names only, no rates or quantities; 26 ARC records, no husks/probe/courier/harvester"
+    },
+    {
+      "id": "patch-2.3.0",
+      "url": "https://arcraiders.com/news/live-update-2-3-0",
+      "rev": "published 2026-10-27",
+      "note": "Items: Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can now drop in any major map condition; drop chance of that pool slightly lowered."
+    },
+    {
+      "id": "patch-2.4.x",
+      "url": "https://arcraiders.com/news/hotfix-2-4-1",
+      "rev": "2.4.0 (2026-11-03) and 2.4.1 (2026-11-05) checked",
+      "note": "No ARC loot changes in Store Update 2.4.0 or Hotfix 2.4.1. Store Updates 2.1.0 and 2.2.0 also checked: no ARC drop-table changes."
+    },
+    {
+      "id": "wiki-containers",
+      "url": "https://arcraiders.wiki/wiki/Containers?oldid=43934",
+      "rev": "43934",
+      "revTimestamp": "2026-10-28T12:42:39Z",
+      "note": "lists the ARC-related containers; no generic 'ARC Husk' exists"
+    },
+    {
+      "id": "wiki-wasp",
+      "url": "https://arcraiders.wiki/wiki/Wasp?oldid=44510",
+      "rev": "44510",
+      "revTimestamp": "2026-11-08T11:55:48Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-hornet",
+      "url": "https://arcraiders.wiki/wiki/Hornet?oldid=44512",
+      "rev": "44512",
+      "revTimestamp": "2026-11-08T11:57:15Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-firefly",
+      "url": "https://arcraiders.wiki/wiki/Firefly?oldid=44513",
+      "rev": "44513",
+      "revTimestamp": "2026-11-08T11:58:01Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-snitch",
+      "url": "https://arcraiders.wiki/wiki/Snitch?oldid=44514",
+      "rev": "44514",
+      "revTimestamp": "2026-11-08T11:59:25Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-spotter",
+      "url": "https://arcraiders.wiki/wiki/Spotter?oldid=44515",
+      "rev": "44515",
+      "revTimestamp": "2026-11-08T12:00:30Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-rocketeer",
+      "url": "https://arcraiders.wiki/wiki/Rocketeer?oldid=42073",
+      "rev": "42073",
+      "revTimestamp": "2026-10-09T18:21:09Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-vaporizer",
+      "url": "https://arcraiders.wiki/wiki/Vaporizer?oldid=42074",
+      "rev": "42074",
+      "revTimestamp": "2026-10-09T18:21:18Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-turbine",
+      "url": "https://arcraiders.wiki/wiki/ARC_Turbine?oldid=44477",
+      "rev": "44477",
+      "revTimestamp": "2026-11-06T04:26:39Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-pop",
+      "url": "https://arcraiders.wiki/wiki/Pop?oldid=44518",
+      "rev": "44518",
+      "revTimestamp": "2026-11-08T12:03:28Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-fireball",
+      "url": "https://arcraiders.wiki/wiki/Fireball?oldid=44519",
+      "rev": "44519",
+      "revTimestamp": "2026-11-08T12:04:07Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-comet",
+      "url": "https://arcraiders.wiki/wiki/Comet?oldid=43326",
+      "rev": "43326",
+      "revTimestamp": "2026-10-15T17:17:52Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-surveyor",
+      "url": "https://arcraiders.wiki/wiki/ARC_Surveyor?oldid=42064",
+      "rev": "42064",
+      "revTimestamp": "2026-10-09T18:19:42Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-tick",
+      "url": "https://arcraiders.wiki/wiki/Tick?oldid=42058",
+      "rev": "42058",
+      "revTimestamp": "2026-10-09T18:17:45Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-shredder",
+      "url": "https://arcraiders.wiki/wiki/Shredder?oldid=44050",
+      "rev": "44050",
+      "revTimestamp": "2026-10-31T04:59:00Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-skulker",
+      "url": "https://arcraiders.wiki/wiki/Skulker?oldid=43961",
+      "rev": "43961",
+      "revTimestamp": "2026-10-28T22:20:49Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-turret",
+      "url": "https://arcraiders.wiki/wiki/Turret?oldid=43431",
+      "rev": "43431",
+      "revTimestamp": "2026-10-20T20:22:48Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-sentinel",
+      "url": "https://arcraiders.wiki/wiki/Sentinel?oldid=42062",
+      "rev": "42062",
+      "revTimestamp": "2026-10-09T18:19:06Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-hydra",
+      "url": "https://arcraiders.wiki/wiki/Hydra?oldid=44520",
+      "rev": "44520",
+      "revTimestamp": "2026-11-08T12:05:54Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-bastion",
+      "url": "https://arcraiders.wiki/wiki/Bastion?oldid=43346",
+      "rev": "43346",
+      "revTimestamp": "2026-10-16T12:55:49Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-bombardier",
+      "url": "https://arcraiders.wiki/wiki/Bombardier?oldid=44521",
+      "rev": "44521",
+      "revTimestamp": "2026-11-08T12:06:47Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-leaper",
+      "url": "https://arcraiders.wiki/wiki/Leaper?oldid=44212",
+      "rev": "44212",
+      "revTimestamp": "2026-10-31T10:55:34Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-bully",
+      "url": "https://arcraiders.wiki/wiki/Bully?oldid=44482",
+      "rev": "44482",
+      "revTimestamp": "2026-11-06T22:25:28Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-queen",
+      "url": "https://arcraiders.wiki/wiki/Queen?oldid=44522",
+      "rev": "44522",
+      "revTimestamp": "2026-11-08T12:08:50Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-matriarch",
+      "url": "https://arcraiders.wiki/wiki/Matriarch?oldid=44523",
+      "rev": "44523",
+      "revTimestamp": "2026-11-08T12:12:35Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-reclaimer",
+      "url": "https://arcraiders.wiki/wiki/ARC_Reclaimer?oldid=44517",
+      "rev": "44517",
+      "revTimestamp": "2026-11-08T12:02:13Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-frigate",
+      "url": "https://arcraiders.wiki/wiki/ARC_Frigate?oldid=44537",
+      "rev": "44537",
+      "revTimestamp": "2026-11-08T22:11:46Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-wasp-husk",
+      "url": "https://arcraiders.wiki/wiki/Wasp_Husk?oldid=35035",
+      "rev": "35035",
+      "revTimestamp": "2026-05-16T15:58:28Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-rocketeer-husk",
+      "url": "https://arcraiders.wiki/wiki/Rocketeer_Husk?oldid=37542",
+      "rev": "37542",
+      "revTimestamp": "2026-06-19T10:58:20Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-baron-husk",
+      "url": "https://arcraiders.wiki/wiki/Baron_Husk?oldid=35012",
+      "rev": "35012",
+      "revTimestamp": "2026-05-16T15:14:01Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-deforester-husk",
+      "url": "https://arcraiders.wiki/wiki/Deforester_Husk?oldid=35013",
+      "rev": "35013",
+      "revTimestamp": "2026-05-16T15:16:24Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-probe",
+      "url": "https://arcraiders.wiki/wiki/ARC_Probe?oldid=42079",
+      "rev": "42079",
+      "revTimestamp": "2026-10-09T18:24:57Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-courier",
+      "url": "https://arcraiders.wiki/wiki/ARC_Courier?oldid=42876",
+      "rev": "42876",
+      "revTimestamp": "2026-10-11T22:31:28Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-arc-assessor",
+      "url": "https://arcraiders.wiki/wiki/ARC_Assessor?oldid=44511",
+      "rev": "44511",
+      "revTimestamp": "2026-11-08T11:56:04Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-harvester",
+      "url": "https://arcraiders.wiki/wiki/Harvester?oldid=44508",
+      "rev": "44508",
+      "revTimestamp": "2026-11-08T11:37:26Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    },
+    {
+      "id": "wiki-harvester-payload",
+      "url": "https://arcraiders.wiki/wiki/Harvester_Payload?oldid=43362",
+      "rev": "43362",
+      "revTimestamp": "2026-10-16T18:29:52Z",
+      "note": "page Loot section, read via api.php action=parse prop=wikitext"
+    }
+  ],
+  "arcs": [
+    {
+      "name": "Wasp",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Wasp",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Light Ammo",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "Wasp Driver",
+          "rate": null,
+          "source": "wiki-wasp",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Flying combat drone. Destroy, then scavenge the chassis. XP: destroy +100, scavenge +200. MetaForge record updated 2025-11-04.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Synthetic Resin, ARC Thermo Lining, Simple Gun Parts."
+    },
+    {
+      "name": "Hornet",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Hornet",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Medium Ammo",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "Hornet Driver",
+          "rate": null,
+          "source": "wiki-hornet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Flying combat drone (stun rounds). XP: destroy +150, scavenge +250. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Performance Steel, ARC Synthetic Resin."
+    },
+    {
+      "name": "Firefly",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Firefly",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Chemicals",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "Firefly Burner",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Synthesized Fuel",
+          "rate": null,
+          "source": "wiki-firefly",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "Flying flamethrower drone. XP: destroy +150, scavenge +250. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki internal: ARC overview lists ARC Performance Steel, ARC Coolant, ARC Thermo Lining but the Firefly page does not. Wiki page lists, MetaForge does not: ARC Synthetic Resin, Synthesized Fuel."
+    },
+    {
+      "name": "Snitch",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Snitch",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Snitch Scanner",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Sensors",
+          "rate": null,
+          "source": "wiki-snitch",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Recon drone that loudly calls ARC reinforcements; since 1.42.0 it can call a Rocketeer or a Firefly+Hornet pair. Kill it fast. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Thermo Lining."
+    },
+    {
+      "name": "Spotter",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Spotter",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Spotter Relay",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Sensors",
+          "rate": null,
+          "source": "wiki-spotter",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Recon drone paired with a Bombardier; reveals Raiders for its mortar. A destroyed pair respawns; they fly away when the Bombardier dies. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Synthetic Resin, ARC Thermo Lining, Sensors."
+    },
+    {
+      "name": "Rocketeer",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Rocketeer",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Electrical Components",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Heavy Gun Parts",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Launcher Ammo",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Rocketeer Driver",
+          "rate": null,
+          "source": "wiki-rocketeer",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Large flying drone. Chassis (+600 XP) and each thruster (+500 XP) are scavenged separately. Patch 1.33.0: drops Launcher Ammo instead of Heavy Ammo. MetaForge record updated 2026-06-28.",
+      "disputes": "Wiki page lists, MetaForge does not: Electrical Components."
+    },
+    {
+      "name": "Vaporizer",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Vaporizer",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Electrical Components",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Energy Clip",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Heavy Gun Parts",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Vaporizer Regulator",
+          "rate": null,
+          "source": "wiki-vaporizer",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Large flying drone with energy shield. Chassis +600 XP, each thruster +500 XP. Added 1.22.0. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Circuitry."
+    },
+    {
+      "name": "ARC Turbine",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [
+        "Turbine"
+      ],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Turbine",
+      "drops": [
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "Launcher Ammo",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Medium Gun Parts",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Turbine Compressor",
+          "rate": null,
+          "source": "wiki-arc-turbine",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Large hover drone; descends in groups of three around 16-12 minutes remaining and lays a minefield. Core +700 XP, each shell +200 XP. Patch 2.2.0 removed Turbine spawns from standard sessions and most minor map conditions; none during ARC Frigate. Since 1.36.0 Turbine parts no longer drop from Couriers. MetaForge record updated 2026-09-30.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Coolant, ARC Motion Core, ARC Synthetic Resin, ARC Thermo Lining."
+    },
+    {
+      "name": "Pop",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Pop",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Crude Explosives",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Pop Trigger",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-pop",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Rolling explosive ball. Scavenge ring +100 XP. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Coolant."
+    },
+    {
+      "name": "Fireball",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Fireball",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Crude Explosives",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Fireball Burner",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-fireball",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Rolling flamethrower ball. Scavenge core +200 XP. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Coolant, ARC Thermo Lining."
+    },
+    {
+      "name": "Comet",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Comet",
+      "drops": [
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Crude Explosives",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Comet Igniter",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Explosive Compound",
+          "rate": null,
+          "source": "wiki-comet",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Electrical Components",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        }
+      ],
+      "notes": "Rolling self-destruct ball. Wiki: the Comet Igniter only comes from a Comet that did not blow itself up. Removed from standard Dam Battlegrounds sessions in 1.26.0. MetaForge record updated 2026-06-29.",
+      "disputes": "MetaForge lists, wiki does not: Electrical Components."
+    },
+    {
+      "name": "ARC Surveyor",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [
+        "Surveyor",
+        "Rollbot"
+      ],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Surveyor",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Mechanical Components",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Uncommon"
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "Sensors",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Surveyor Vault",
+          "rate": null,
+          "source": "wiki-arc-surveyor",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Vita Spray Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Barricade Kit Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Extended Medium Mag III Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Heavy Gun Parts Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Extended Barrel III Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Padded Stock Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "Vita Shot Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        }
+      ],
+      "notes": "Unarmed armored rolling ball that flees fast. 'Rollbot' redirects to ARC Surveyor on the wiki and MetaForge's id for it is 'rollbot', so they are the same ARC. Core +300 XP, each shell +100 XP. MetaForge record updated 2026-09-30.",
+      "disputes": "MetaForge lists, wiki does not: Vita Spray Blueprint, Barricade Kit Blueprint, Extended Medium Mag III Blueprint, Heavy Gun Parts Blueprint, Extended Barrel III Blueprint, Padded Stock Blueprint, Vita Shot Blueprint. Wiki page lists, MetaForge does not: ARC Coolant, ARC Performance Steel, Mechanical Components."
+    },
+    {
+      "name": "Tick",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Tick",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-tick",
+          "itemRarity": "Common"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-tick",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Tick Pod",
+          "rate": null,
+          "source": "wiki-tick",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-tick",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-tick",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Small leaping hexapod that latches on. Scavenge +100 XP. MetaForge record updated 2025-10-08.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Flex Rubber, ARC Powercell, ARC Thermo Lining."
+    },
+    {
+      "name": "Shredder",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Shredder",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Shotgun Ammo",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Mechanical Components",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-shredder"
+        },
+        {
+          "item": "Shredder Gyro",
+          "rate": null,
+          "source": "wiki-shredder",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Data Module",
+          "rate": null,
+          "source": "wiki-shredder"
+        }
+      ],
+      "notes": "Ground hover drone, close-quarters shrapnel. No longer Stella Montis only. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Data Module, ARC Synthetic Resin, ARC Thermo Lining, Mechanical Components."
+    },
+    {
+      "name": "Skulker",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Skulker",
+      "drops": [
+        {
+          "item": "Heavy Ammo",
+          "rate": null,
+          "source": "wiki-skulker",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Skulker Targeter",
+          "rate": null,
+          "source": "wiki-skulker",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-skulker",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-skulker",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-skulker",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Data Module",
+          "rate": null,
+          "source": "wiki-skulker"
+        }
+      ],
+      "notes": "Small hover drone with a heavy-ammo tail turret; the Skulker Targeter is in the stinger/turret. Added 2.0; wiki page is a stub. MetaForge record updated 2026-09-30.",
+      "disputes": "MetaForge has this ARC but its loot list is empty."
+    },
+    {
+      "name": "Turret",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Turret",
+      "drops": [
+        {
+          "item": "Light Ammo",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Common"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-turret",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Stationary indoor turret. Has no unique part. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Powercell, ARC Synthetic Resin, ARC Thermo Lining."
+    },
+    {
+      "name": "Sentinel",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Sentinel",
+      "drops": [
+        {
+          "item": "Heavy Ammo",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Simple Gun Parts",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Uncommon"
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Medium Gun Parts",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Sentinel Firing Core",
+          "rate": null,
+          "source": "wiki-sentinel",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Long-range sniper turret on rooftops/ledges; weak point is the rear canister. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Flex Rubber, Medium Gun Parts, Simple Gun Parts."
+    },
+    {
+      "name": "Hydra",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Hydra",
+      "drops": [
+        {
+          "item": "Light Ammo",
+          "rate": null,
+          "source": "wiki-hydra",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-hydra",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-hydra",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Multi-turret ARC (found in the Frigate Cargo Hold). Wiki splits loot: main debris = Light Ammo, ARC Powercell, ARC Alloy; turret debris = Light Ammo, ARC Alloy. No unique part. Added 2.0; wiki page is a stub. MetaForge record updated 2026-09-23.",
+      "disputes": "MetaForge has this ARC but its loot list is empty."
+    },
+    {
+      "name": "Bastion",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Bastion",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Medium Ammo",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Mechanical Components",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-bastion"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Medium Gun Parts",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Conductive Coupler",
+          "rate": null,
+          "source": "wiki-bastion"
+        },
+        {
+          "item": "Bastion Cell",
+          "rate": null,
+          "source": "wiki-bastion",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Heavy Gun Parts",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "Heavy gatling hexapod. Core, shell and each leg scavenged separately (+250 XP each). Usually escorted by Hornets and Wasps. MetaForge record updated 2025-11-04.",
+      "disputes": "Wiki internal: ARC overview lists Heavy Gun Parts but the Bastion page does not. Wiki page lists, MetaForge does not: ARC Conductive Coupler, ARC Flex Rubber, ARC Performance Steel."
+    },
+    {
+      "name": "Bombardier",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Bombardier",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Mechanical Components",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Heavy Gun Parts",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Launcher Ammo",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Bombardier Cell",
+          "rate": null,
+          "source": "wiki-bombardier",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Medium Gun Parts",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        }
+      ],
+      "notes": "Mortar hexapod paired with Spotters. Core, shell and legs scavenged separately (+300 XP each). MetaForge record updated 2026-06-29.",
+      "disputes": "MetaForge lists, wiki does not: Medium Gun Parts. Wiki page lists, MetaForge does not: ARC Flex Rubber, ARC Motion Core, Heavy Gun Parts."
+    },
+    {
+      "name": "Leaper",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [
+        "Bison"
+      ],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Leaper",
+      "drops": [
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Mechanical Components",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Explosive Compound",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Leaper Pulse Unit",
+          "rate": null,
+          "source": "wiki-leaper",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        }
+      ],
+      "notes": "Agile quadruped with leap and shockwave. It was called Bison until the Server Slam test; the wiki redirects Bison to Leaper and MetaForge's id is 'bison'. Eye +600 XP, each leg +500 XP. MetaForge record updated 2025-11-04.",
+      "disputes": "MetaForge lists, wiki does not: ARC Powercell, ARC Circuitry."
+    },
+    {
+      "name": "Bully",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Bully",
+      "drops": [
+        {
+          "item": "Shotgun Ammo",
+          "rate": null,
+          "source": "wiki-bully",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-bully",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-bully"
+        },
+        {
+          "item": "Launcher Ammo",
+          "rate": null,
+          "source": "wiki-bully",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Bully Fragmenter",
+          "rate": null,
+          "source": "wiki-bully",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Heavy Gun Parts",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "Dog-like quadruped with shotgun and cluster bombs. Head/body +500 XP, each leg +200 XP. Added 2.0; wiki page is a stub and its loot list is marked 'More...'. MetaForge record updated 2026-09-30.",
+      "disputes": "Wiki internal: ARC overview lists Heavy Gun Parts but the Bully page does not. MetaForge has this ARC but its loot list is empty."
+    },
+    {
+      "name": "Queen",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Queen",
+      "drops": [
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced Electrical Components",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced Mechanical Components",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Complex Gun Parts",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Magnetic Accelerator",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Epic",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Queen Reactor",
+          "rate": null,
+          "source": "wiki-queen",
+          "itemRarity": "Legendary",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Giant hexapod (map condition; also guards the Harvester). Main debris (core) pool has everything listed; small debris lacks Advanced Electrical Components, Advanced Mechanical Components, ARC Flex Rubber and Complex Gun Parts. Core +1000 XP, each leg +500 XP. MetaForge record updated 2025-12-09.",
+      "disputes": "Wiki page lists, MetaForge does not: Complex Gun Parts."
+    },
+    {
+      "name": "Matriarch",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Matriarch",
+      "drops": [
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced Electrical Components",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Advanced Mechanical Components",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-matriarch"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Insulated Coupler",
+          "rate": null,
+          "source": "wiki-matriarch"
+        },
+        {
+          "item": "Complex Gun Parts",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Magnetic Accelerator",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Matriarch Reactor",
+          "rate": null,
+          "source": "wiki-matriarch",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Aphelion Blueprint",
+          "rate": null,
+          "source": "metaforge-arcs",
+          "uncertain": "MetaForge only, not on wiki"
+        }
+      ],
+      "notes": "Giant hexapod (Matriarch map condition only); summons ARC and has an energy shield. Main debris has everything listed; small debris lacks Advanced Electrical Components, Advanced Mechanical Components, ARC Insulated Coupler and Complex Gun Parts. MetaForge record updated 2026-06-29.",
+      "disputes": "MetaForge lists, wiki does not: Aphelion Blueprint. Wiki page lists, MetaForge does not: ARC Coolant, ARC Insulated Coupler, Advanced Electrical Components, Advanced Mechanical Components, Complex Gun Parts."
+    },
+    {
+      "name": "ARC Reclaimer",
+      "kind": "enemy",
+      "breach": false,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Reclaimer",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-reclaimer"
+        },
+        {
+          "item": "Heavy Ammo",
+          "rate": null,
+          "source": "wiki-arc-reclaimer",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Light Ammo",
+          "rate": null,
+          "source": "wiki-arc-reclaimer",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Medium Ammo",
+          "rate": null,
+          "source": "wiki-arc-reclaimer",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Shotgun Ammo",
+          "rate": null,
+          "source": "wiki-arc-reclaimer",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-arc-reclaimer"
+        }
+      ],
+      "notes": "Frigate transport drone; climb on and disrupt it with the Raider Tool to ride it to the ARC Frigate. 0 XP. Added 2.0. Not in MetaForge.",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "ARC Frigate",
+      "kind": "frigate",
+      "breach": null,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Frigate",
+      "drops": [
+        {
+          "item": "ARC Data Module",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "Frigate Diagnostic Node",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "Frigate Inductor",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "ARC Operation map condition. Board it, destroy the Power Cores, undo 4 latches and breach 2 circular latches to drop the Frigate Cargo (primary loot). Interior containers hold mid-tier ARC loot with a small chance of Amplification Modules, Frigate Inductors and ARC Data. The Cargo has a much higher frequency of Frigate Diagnostic Nodes and Amplification Modules. Frigate Cannon drops are '?' on the wiki. Item names here come only from the ARC overview; the Frigate page names no exact item list. MetaForge record updated 2026-09-30.",
+      "disputes": "MetaForge has this ARC but its loot list is empty."
+    },
+    {
+      "name": "Wasp Husk",
+      "kind": "husk",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Wasp_Husk",
+      "drops": [
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged Wasp Driver",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Light Ammo",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Wasp Driver",
+          "rate": null,
+          "source": "wiki-wasp-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        }
+      ],
+      "notes": "Static husk; must be breached. +400 XP. Wiki chance column is all 'x%' (unknown).",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "Rocketeer Husk",
+      "kind": "husk",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Rocketeer_Husk",
+      "drops": [
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged Rocketeer Driver",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Launcher Ammo",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-5+?"
+        },
+        {
+          "item": "Rocketeer Driver",
+          "rate": null,
+          "source": "wiki-rocketeer-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Heavy Ammo",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "Static husk; must be breached. +700 XP. Wiki marks the whole table '*Data is not confirmed, WIP*'.",
+      "disputes": "Wiki internal: ARC overview lists Heavy Ammo but the Rocketeer Husk page does not. No MetaForge record; wiki is the only source. Patch 1.33.0 switched the live Rocketeer from Heavy Ammo to Launcher Ammo; the patch does not mention the husk."
+    },
+    {
+      "name": "Baron Husk",
+      "kind": "husk",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Baron_Husk",
+      "drops": [
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-10"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-3+",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-2"
+        },
+        {
+          "item": "Burned ARC Circuitry",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged ARC Motion Core",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged ARC Powercell",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Degraded ARC Rubber",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Dried-Out ARC Resin",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Impure ARC Coolant",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Rusty ARC Steel",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Tattered ARC Lining",
+          "rate": null,
+          "source": "wiki-baron-husk",
+          "qty": "2-x"
+        }
+      ],
+      "notes": "Static husk; must be breached; infobox says trapped. +500 XP. Wiki: drops confirmed, ranges not.",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "Deforester Husk",
+      "kind": "husk",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Deforester_Husk",
+      "drops": [
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Advanced Electrical Components",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-3(+?)"
+        },
+        {
+          "item": "Advanced Mechanical Components",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-2(+?)",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "3-x"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "2-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-4(+?)"
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Burned ARC Circuitry",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged ARC Powercell",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Degraded ARC Rubber",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "1-x"
+        },
+        {
+          "item": "Impure ARC Coolant",
+          "rate": null,
+          "source": "wiki-deforester-husk",
+          "qty": "2-3(+?)"
+        }
+      ],
+      "notes": "Blue Gate puzzle husk (3 sites). Needs two ARC Powercells per husk inserted to open, with timed fire hazards; infobox breach=Yes, trapped. Infobox search XP 0, overview says +200. Wiki: drops confirmed, ranges not, there may be other items.",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "ARC Probe",
+      "kind": "probe",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Probe",
+      "drops": [
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-probe",
+          "itemRarity": "Common",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-arc-probe",
+          "itemRarity": "Uncommon",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-arc-probe",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-probe",
+          "itemRarity": "Rare",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-arc-probe",
+          "itemRarity": "Rare"
+        }
+      ],
+      "notes": "Lands to collect samples, then leaves. Breaching makes it beep and signal nearby ARC (calls ARC); trapped after a failed breach. A full probe opens 3 panels; a crashed probe opens only 1. +700 XP.",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "ARC Courier",
+      "kind": "courier",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Courier",
+      "drops": [
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-2+?"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-2+?"
+        },
+        {
+          "item": "Burned ARC Circuitry",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged Hornet Driver",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Damaged Wasp Driver",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Fireball Burner",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Hornet Driver",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Pop Trigger",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Sentinel Firing Core",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-2+?",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Skulker Targeter",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Spotter Relay",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-2+?"
+        },
+        {
+          "item": "Surveyor Vault",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Vaporizer Regulator",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        },
+        {
+          "item": "Bully Fragmenter",
+          "rate": null,
+          "source": "wiki-arc-courier",
+          "qty": "1-x"
+        }
+      ],
+      "notes": "Breachable; loot is mostly ARC parts, including damaged parts. +700 XP. Since 1.36.0 no Turbine parts. Wiki: drops confirmed, ranges and chances not. ARC Flex Rubber, ARC Performance Steel, ARC Synthetic Resin, Damaged ARC Powercell, Degraded ARC Rubber, Dried-Out ARC Resin and Impure ARC Coolant are commented out of the wiki table and excluded here.",
+      "disputes": "No MetaForge record; wiki is the only source."
+    },
+    {
+      "name": "ARC Assessor",
+      "kind": "assessor",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/ARC_Assessor",
+      "drops": [
+        {
+          "item": "Dolabra Blueprint",
+          "rate": "rare",
+          "source": "wiki-arc-assessor",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-assessor",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-arc-assessor",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "Advanced Electrical Components",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-arc-assessor",
+          "confirmedBy": [
+            "metaforge-arcs"
+          ]
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-arc-assessor"
+        },
+        {
+          "item": "Assessor Matrix",
+          "rate": null,
+          "source": "wiki-arc-assessor",
+          "confirmedBy": [
+            "wiki-arc",
+            "metaforge-arcs"
+          ]
+        }
+      ],
+      "notes": "Comes down during the Close Scrutiny ARC Operation. Loot is in breachable containers around it; breaching calls down a squadron of ARC. +200 XP. Added 1.22.0. MetaForge record updated 2026-06-29.",
+      "disputes": "Wiki page lists, MetaForge does not: ARC Coolant, ARC Flex Rubber, ARC Motion Core, ARC Performance Steel, ARC Synthetic Resin, ARC Thermo Lining, Advanced ARC Powercell, Advanced Electrical Components, Dolabra Blueprint. Patch 2.3.0: the Dolabra blueprint can now drop in any major map condition, so it is no longer Assessor-specific; the wiki still describes a 'small chance' here."
+    },
+    {
+      "name": "Harvester",
+      "kind": "harvester",
+      "breach": true,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Harvester",
+      "drops": [
+        {
+          "item": "Equalizer Blueprint",
+          "rate": null,
+          "source": "wiki-harvester",
+          "note": "puzzle reward: wiki says 1-3 blueprints are guaranteed, each one Equalizer or Jupiter, so neither specific blueprint is guaranteed",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "Jupiter Blueprint",
+          "rate": null,
+          "source": "wiki-harvester",
+          "note": "puzzle reward: wiki says 1-3 blueprints are guaranteed, each one Equalizer or Jupiter, so neither specific blueprint is guaranteed",
+          "confirmedBy": [
+            "wiki-arc"
+          ]
+        },
+        {
+          "item": "ARC Powercell",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        },
+        {
+          "item": "ARC Alloy",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "Burned ARC Circuitry",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "Impure ARC Coolant",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "Advanced ARC Powercell",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "ARC Circuitry",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "ARC Coolant",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        },
+        {
+          "item": "ARC Flex Rubber",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        },
+        {
+          "item": "ARC Motion Core",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        },
+        {
+          "item": "ARC Performance Steel",
+          "rate": null,
+          "source": "wiki-harvester"
+        },
+        {
+          "item": "ARC Synthetic Resin",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        },
+        {
+          "item": "ARC Thermo Lining",
+          "rate": null,
+          "source": "wiki-harvester",
+          "uncertain": "marked '???' in wiki source"
+        }
+      ],
+      "notes": "Map-condition structure guarded by a Queen. Breachable containers on the upper level (fusion cores, ARC materials); insert 3 fusion cores and shoot 12 yellow targets to open the centre containers. Hazards: fire discharge, and after insertion a Queen-driven electrical surge. Not in MetaForge.",
+      "disputes": "No MetaForge record; wiki is the only source. Wiki says the puzzle containers guarantee 1-3 Equalizer or Jupiter blueprints. Patch 2.3.0 lets Equalizer and Jupiter drop in any major map condition and slightly lowered that pool's drop chance; the patch does not say whether the Harvester guarantee still holds."
+    },
+    {
+      "name": "Harvester Payload",
+      "kind": "harvester",
+      "breach": null,
+      "aliases": [],
+      "wikiUrl": "https://arcraiders.wiki/wiki/Harvester_Payload",
+      "drops": [
+        {
+          "item": "ARC Insulated Coupler",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "ARC Conductive Coupler",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "ARC Plated Coupler",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        },
+        {
+          "item": "Emperor Gateway Conduit Blueprint",
+          "rate": null,
+          "source": "wiki-arc",
+          "uncertain": "only in ARC overview 'Notable drops', not on the ARC's own page"
+        }
+      ],
+      "notes": "Falls from the sky when an Emperor Beacon is activated; falling debris can hurt you. Some payload containers need breaching and some can be searched directly, so breach is mixed (null). Wiki page is a stub. Added 2.0.",
+      "disputes": "No MetaForge record; wiki is the only source. Items come only from the ARC overview's 'Notable drops'; the Harvester Payload page (stub) lists none."
+    }
+  ],
+  "notFound": [
+    "ARC Husk (generic): no such wiki page (API missingtitle), not on the Containers page, not in MetaForge.",
+    "Rollbot: not a separate ARC; it is ARC Surveyor.",
+    "Bison: not a separate ARC; it is the Leaper's old name.",
+    "Fallen Emperor: in the ARC page husk table with drops '?'; a Pendola Pass dungeon with no item list on the wiki; omitted.",
+    "ARC Orbiter: lore/round-timer ARC, not lootable; omitted.",
+    "ARC Frigate Cannon: drops '?' on the wiki; folded into ARC Frigate notes."
+  ]
+}

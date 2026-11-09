@@ -32,6 +32,8 @@ pub struct DatasetFiles {
     pub version: DatasetVersion,
     pub notes: Notes,
     pub project_tasks: ProjectTasks,
+    pub containers: Vec<Container>,
+    pub conditions: Vec<MapCondition>,
 }
 
 #[derive(Debug, Default)]
@@ -91,6 +93,14 @@ impl Dataset {
             project_tasks: match read("project_tasks.json") {
                 Ok(_) => parse(read, "project_tasks.json")?,
                 Err(_) => ProjectTasks::default(),
+            },
+            containers: match read("containers.json") {
+                Ok(_) => parse(read, "containers.json")?,
+                Err(_) => Vec::new(),
+            },
+            conditions: match read("conditions.json") {
+                Ok(_) => parse(read, "conditions.json")?,
+                Err(_) => Vec::new(),
             },
         };
         Self::from_files(files)

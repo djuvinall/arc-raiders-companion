@@ -42,7 +42,7 @@ embedded!(
     "items.json", "recipes.json", "workbenches.json", "weapon_mods.json", "maps.json",
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
     "loot_areas.json", "map_markers.json", "version.json", "changelog.json", "notes.json",
-    "project_tasks.json",
+    "project_tasks.json", "containers.json", "conditions.json",
 );
 
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
@@ -310,8 +310,15 @@ fn route_plan(state: State<AppState>) -> RoutePlan {
 }
 
 #[tauri::command]
-fn raid_auto(state: State<AppState>, plan: RaidPlan) -> raid::RaidAuto {
-    raid::auto_plan(&state.dataset, &state.profile.lock().expect("profile lock"), &plan)
+/// `live` names the conditions on the plan's map now, from the event schedule.
+fn raid_auto(state: State<AppState>, plan: RaidPlan, live: Option<Vec<String>>) -> raid::RaidAuto {
+    raid::auto_plan_live(&state.dataset, &state.profile.lock().expect("profile lock"), &plan, &live.unwrap_or_default())
+}
+
+/// Every map ranked for a plan's wants and quest steps, best first.
+#[tauri::command(async)]
+fn suggest_maps(state: State<AppState>, plan: RaidPlan, live: Option<std::collections::BTreeMap<String, Vec<String>>>) -> Vec<raid::MapPick> {
+    raid::suggest_maps_live(&state.dataset, &state.profile.lock().expect("profile lock"), &plan, &live.unwrap_or_default())
 }
 
 #[tauri::command]
@@ -657,7 +664,7 @@ fn main() {
             skill_tree, skill_plan_state, save_skill_plan, delete_skill_plan, set_default_skill_plan,
             encode_skill_plan, decode_skill_plan, weapon_slots, weapon_sheet, weapon_compare,
             save_weapon_build, delete_weapon_build, map_list, map_pois, map_markers, marker_counts, live_events, route_plan,
-            raid_auto, farm_spots, save_raid_plan, delete_raid_plan,
+            raid_auto, suggest_maps, farm_spots, save_raid_plan, delete_raid_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, uncommit_resource, reopen_project_stage, set_project_objective, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update, send_report,
