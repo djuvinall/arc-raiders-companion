@@ -153,6 +153,24 @@ fn found_in(ds: &Dataset, item: &Item) -> Vec<FoundIn> {
     }).collect()
 }
 
+/// The loot areas' maps merged, so a map with spots from two areas shows once.
+fn found_maps(found: &[FoundIn]) -> Vec<MapPresence> {
+    let mut out: Vec<MapPresence> = Vec::new();
+    for presence in found.iter().flat_map(|f| &f.maps) {
+        match out.iter_mut().find(|m| m.map.id == presence.map.id) {
+            Some(m) => {
+                m.poi_count += presence.poi_count;
+                m.places.extend(presence.places.iter().cloned());
+                m.places.sort();
+                m.places.dedup();
+            }
+            None => out.push(presence.clone()),
+        }
+    }
+    out.sort_by(|a, b| b.poi_count.cmp(&a.poi_count).then_with(|| a.map.name.cmp(&b.map.name)));
+    out
+}
+
 /// Where a key's door is on one map: marker indexes into that map's marker list.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct DoorPresence {
@@ -298,6 +316,10 @@ pub struct ItemDetail {
     pub breakdown: Vec<RecipeView>,
     pub used_in: UsedIn,
     pub found_in: Vec<FoundIn>,
+    /// Container types and ARCs that can hold it, best chance first.
+    pub sources: Vec<crate::raid::ItemSource>,
+    /// Each map once, with every named spot from all its loot areas.
+    pub found_maps: Vec<MapPresence>,
     /// Keys only: the doors it opens.
     pub opens: Vec<DoorPresence>,
     /// Weapon mods only.
@@ -344,6 +366,8 @@ pub fn item_detail(ds: &Dataset, id: &str) -> Option<ItemDetail> {
         crafting: recipes(&item.recipe_ids),
         breakdown: recipes(&item.recycle_ids),
         used_in: calc::used_in(ds, id),
+        found_maps: found_maps(&found_in(ds, &item)),
+        sources: crate::raid::item_sources(ds, id),
         found_in: found_in(ds, &item),
         opens: key_doors(ds, &item),
         mod_info: mod_info(ds, &item),

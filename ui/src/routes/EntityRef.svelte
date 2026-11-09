@@ -4,6 +4,11 @@
 
   let { kind, id }: { kind: string; id: string } = $props();
   let page = $state<EntityPage | null>(null);
+  // Entity kinds as dataset files, for the Report window.
+  const FILES: Record<string, string> = {
+    workbench: "workbenches", "loot-area": "loot_areas", map: "maps", trader: "traders",
+    arc: "arcs", quest: "quests", project: "projects",
+  };
   let error = $state("");
 
   $effect(() => {
@@ -14,12 +19,12 @@
 {#if error}
   <p class="error">{error}</p>
 {:else if page}
-  <div class="page">
+  <div class="page" data-report={FILES[kind] ? `${FILES[kind]}/${id}` : undefined} data-report-label={page.name}>
     <h2>{page.name}</h2>
     <p class="subtitle">{page.subtitle}</p>
     <div class="sections">
       {#each page.sections as section}
-        <section class="panel">
+        <section class="panel" data-report-label={section.title}>
           <h3 class="section-title">{section.title}</h3>
           {#each section.text as line}<p class="text">{line}</p>{/each}
           {#each section.links as link}<LinkRow {link} />{/each}

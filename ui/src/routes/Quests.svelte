@@ -1,7 +1,7 @@
 <script lang="ts">
   import QuestParty from "../lib/components/QuestParty.svelte";
   import QuestTree from "../lib/components/QuestTree.svelte";
-  import { completeImpliedQuests, completeQuestChain, exportProfile, importProfile, linkHref, mapList, questList, questProgress, setQuestObjective, STEP_KINDS, setQuestState, type GameMap, type QuestRow } from "../lib/api";
+  import { completeImpliedQuests, completeQuestChain, completeQuestsBefore, exportProfile, importProfile, linkHref, mapList, questList, questProgress, setQuestObjective, STEP_KINDS, setQuestState, type GameMap, type QuestRow } from "../lib/api";
 
   // Positions are wide apart, so the graph scrolls rather than shrinking out of legibility.
   const GRAPH_SCALE = 0.32;
@@ -106,6 +106,42 @@
     await load();
   }
 
+  const doneBefore = (q: QuestRow) => undoable(async () => {
+    const n = await completeQuestsBefore(q.quest.id);
+    return `Marked ${n} ${n === 1 ? "quest" : "quests"} before ${q.quest.name} done. ${q.quest.name} is tracked.`;
+  });
+
+  // Picking the quests you have in game: tick them, then Track. The game only offers a quest
+  // once everything before it is done, so offer to mark those done too.
+  let picking = $state(false);
+  let picked = $state<string[]>([]);
+  let askFill = $state(0);
+
+  function pick(id: string) {
+    picked = picked.includes(id) ? picked.filter((p) => p !== id) : [...picked, id];
+  }
+
+  async function trackPicked() {
+    const ids = picked.filter((id) => quests.find((q) => q.quest.id === id)?.status !== "done");
+    await undoable(async () => {
+      for (const id of ids) await setQuestState(id, true, false);
+      return `Tracking ${ids.length} ${ids.length === 1 ? "quest" : "quests"}.`;
+    });
+    picked = [];
+    picking = false;
+    askFill = implied;
+  }
+
+  async function track(q: QuestRow) {
+    await setState(true, false);
+    if (!q.open) askFill = implied;
+  }
+
+  async function confirmFill() {
+    askFill = 0;
+    await fillIn();
+  }
+
   const doneChain = (q: QuestRow) => undoable(async () => {
     await completeQuestChain(q.quest.id);
     return `Marked ${q.quest.name} and everything before it done.`;
@@ -134,10 +170,20 @@
         {#each Object.keys(COLORS) as s}<option value={s}>{s}</option>{/each}
       </select>
       <span class="dim">{visible.length} of {quests.length}</span>
+      {#if view === "list"}
+        <button class="button small" class:primary={picking} onclick={() => { picking = !picking; picked = []; }}>
+          {picking ? "Cancel" : "Pick my current quests"}
+        </button>
+      {/if}
     </div>
 
     <div class="slot">
-    {#if implied}
+    {#if picking}
+      <div class="implied" role="status">
+        <span>Tick every quest you have open in game, then track them all at once. {picked.length} picked.</span>
+        <button class="button primary" disabled={!picked.length} onclick={trackPicked}>Track {picked.length || ""}</button>
+      </div>
+    {:else if implied}
       <div class="implied" role="status">
         <span>
           Your {active} active {active === 1 ? "quest means" : "quests mean"} {implied} earlier
@@ -151,11 +197,12 @@
     </div>
 
     {#if view === "friends"}
-      <QuestParty {maps} {selectedId} onselect={(id) => (selectedId = id)} />
+      <QuestParty {maps} {selectedId} onselect={(id) => (selectedId = id)} onchange={load} />
     {:else if view === "list"}
       <div class="list">
         {#each visible as q (q.quest.id)}
-          <button class="row" class:active={selectedId === q.quest.id} onclick={() => (selectedId = q.quest.id)}>
+          <button class="row" class:picking class:active={selectedId === q.quest.id} onclick={() => (picking ? pick(q.quest.id) : (selectedId = q.quest.id))}>
+            {#if picking}<input type="checkbox" tabindex="-1" aria-label="Pick {q.quest.name}" checked={picked.includes(q.quest.id)} disabled={q.status === "done"} />{/if}
             <i style:background={COLORS[q.status]}></i>
             <strong>{q.quest.name}</strong>
             <span class="dim">{q.quest.trader?.replace("-", " ") ?? ""}</span>
@@ -187,16 +234,17 @@
     {/if}
   </div>
 
-  <aside class="panel">
+  <aside class="panel" data-report={selected ? `quests/${selected.quest.id}` : undefined} data-report-label={selected?.quest.name}>
     {#if selected}
-      <h2>{selected.quest.name}</h2>
+      <h2 data-report="quests/{selected.quest.id}/name" data-report-label="Name">{selected.quest.name}</h2>
       <p class="dim">
-        {selected.quest.trader?.replace("-", " ") ?? "No trader"} · {selected.status}
-        {#if selected.quest.xp}· {selected.quest.xp.toLocaleString()} XP{/if}
+        <span data-report="quests/{selected.quest.id}/trader" data-report-label="Trader">{selected.quest.trader?.replace("-", " ") ?? "No trader"}</span> · {selected.status}
+        {#if selected.quest.xp}· <span data-report="quests/{selected.quest.id}/xp" data-report-label="XP">{selected.quest.xp.toLocaleString()} XP</span>{/if}
       </p>
       {#if selected.maps.length}<p class="dim small">{selected.maps.map(mapName).join(", ")}</p>{/if}
 
       <h3 class="section-title">Objectives</h3>
+      <div data-report-label="Objectives">
       {#if map}
         {#each openHere as o (o.id)}
           <label class="objective">
@@ -211,6 +259,7 @@
       {:else}
         <p class="dim small">No objectives listed.</p>
       {/if}
+      </div>
 
       {#if selected.needed_for.length}
         <h3 class="section-title">Needed for</h3>
@@ -239,12 +288,15 @@
         {#if selected.status === "done"}
           <button class="button dark" onclick={() => setState(false, false)}>Reset</button>
         {:else}
-          <button class="button" onclick={() => setState(selected?.status !== "active", false)}>
-            {selected.status === "active" ? "Stop tracking" : "Track"}
-          </button>
+          {#if selected.status === "active"}
+            <button class="button" onclick={() => setState(false, false)}>Stop tracking</button>
+          {:else}
+            <button class="button" onclick={() => selected && track(selected)}>Track</button>
+          {/if}
           <button class="button primary" onclick={() => setState(true, true)}>Mark done</button>
         {/if}
         {#if selected.status !== "done" && !selected.open}
+          <button class="button dark" title="Marks every earlier quest done and tracks this one" onclick={() => selected && doneBefore(selected)}>I'm on this one: all before it done</button>
           <button class="button dark" onclick={() => selected && doneChain(selected)}>Done, with all before it</button>
         {/if}
       </div>
@@ -254,7 +306,50 @@
   </aside>
 </div>
 
+<svelte:window onkeydowncapture={(e) => { if (askFill && e.key === "Escape") { e.preventDefault(); e.stopPropagation(); askFill = 0; } }} />
+
+{#if askFill}
+  <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
+  <div class="scrim" onclick={() => (askFill = 0)}>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div class="dialog panel" role="dialog" aria-modal="true" aria-label="Earlier quests" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+      <h3 class="section-title">Mark earlier quests done?</h3>
+      <p>
+        The game only offers a quest once everything before it is finished, so the {askFill} earlier
+        {askFill === 1 ? "quest is" : "quests are"} already done. Mark {askFill === 1 ? "it" : "them"} done here too?
+      </p>
+      <p class="dim small">You can undo this.</p>
+      <div class="actions">
+        <button class="button" onclick={() => (askFill = 0)}>Not now</button>
+        <button class="button primary" onclick={confirmFill}>Mark {askFill} done</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 22;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 14vh;
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: min(480px, 92vw);
+  }
+  .dialog .actions {
+    justify-content: flex-end;
+  }
+  .row.picking {
+    grid-template-columns: 16px 12px 1fr 90px 50px;
+  }
   .page {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;

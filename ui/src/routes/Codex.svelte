@@ -37,8 +37,8 @@
     {/each}
   </div>
 
-  {#if activeId === "blueprints" && active}
-    <CodexImport collection={active} onchange={load} />
+  {#if active}
+    {#key active.id}<CodexImport collection={active} onchange={load} />{/key}
   {/if}
 
   <div class="filters">

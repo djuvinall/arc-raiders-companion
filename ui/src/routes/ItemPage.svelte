@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    getItem, getProfile, itemVerdict, linkHref, setStash, toggleFound, toggleTrackedItem,
+    getItem, getProfile, itemVerdict, linkHref, mapList, setStash, toggleFound, toggleTrackedItem,
     type ItemDetail, type Link, type RecipeView, type Verdict,
   } from "../lib/api";
   import Icon from "../lib/components/Icon.svelte";
@@ -14,10 +14,15 @@
   let error = $state("");
   let tracked = $state(false);
   let found = $state(false);
+  // Blueprints marked found in the Codex, by hand or from a screenshot.
+  let learned = $state<string[]>([]);
   let baseline = $state<ItemDetail | null>(null);
   let verdict = $state<Verdict | null>(null);
   let inStash = $state(0);
   let benches = $state<Record<string, number>>({});
+  let mapNames = $state<Record<string, string>>({});
+  mapList().then((list) => (mapNames = Object.fromEntries(list.map((m) => [m.id, m.name]))));
+  const mapName = (id: string) => mapNames[id] ?? id;
 
   async function refreshVerdict() {
     verdict = await itemVerdict(id);
@@ -39,6 +44,7 @@
   getProfile().then((p) => {
     tracked = p.tracked_item_ids.includes(id);
     found = p.blueprints_found.includes(id);
+    learned = p.blueprints_found;
     inStash = p.stash[id] ?? 0;
     benches = p.workbenches;
   });
@@ -173,7 +179,7 @@
   <p class="error">{error}</p>
 {:else if detail}
   {@const item = detail.item}
-  <div class="page">
+  <div class="page" data-report="items/{item.id}" data-report-label={item.name}>
     <aside class="side">
       <div class="tooltip">
         <div class="art" class:blueprint={item.category === "blueprint"}><Icon url={item.icon} name={item.name} size={112} /></div>
@@ -182,10 +188,10 @@
             <svg viewBox="0 0 16 16" width="14" height="14"><path d={glyphPath(item.category)} fill="currentColor" /></svg>
           </span>
           <span class="tag">{typeLabel(item)}</span>
-          {#if item.rarity}<span class="tag">{item.rarity}</span>{/if}
+          {#if item.rarity}<span class="tag" data-report="items/{item.id}/rarity" data-report-label="Rarity">{item.rarity}</span>{/if}
         </div>
-        <h2>{item.name}</h2>
-        {#if item.description}<p class="description">{item.description}</p>{/if}
+        <h2 data-report="items/{item.id}/name" data-report-label="Name">{item.name}</h2>
+        {#if item.description}<p class="description" data-report="items/{item.id}/description" data-report-label="Description">{item.description}</p>{/if}
         {#if detail.mod_slots.length}
           <div class="mod-slots">
             {#each detail.mod_slots as slot (slot.note)}
@@ -197,20 +203,20 @@
           <p class="compat">Compatible with: {detail.mod_info.compatible.join(", ")}</p>
         {/if}
         <!-- Mods' flavor text repeats an effect listed below, and weapons' the armor penetration row. -->
-        {#if item.flavor_text && !detail.mod_info && !isWeapon}<p class="flavor" class:callout={item.category === "augment"}>{item.flavor_text}</p>{/if}
+        {#if item.flavor_text && !detail.mod_info && !isWeapon}<p class="flavor" class:callout={item.category === "augment"} data-report="items/{item.id}/flavor_text" data-report-label="Flavor text">{item.flavor_text}</p>{/if}
 
         <div class="rows">
           {#if item.ammo_type}<div class="row"><span>Ammo Type</span><b class="ammo">{#if detail.ammo?.icon}<Icon url={detail.ammo.icon} name={detail.ammo.name} size={20} />{/if}{item.ammo_type.replace(/ ammo$/i, "")} Ammo</b></div>{/if}
           {#each infoRows as [key, value]}
             {@const d = delta(key, value)}
-            <div class="row">
+            <div class="row" data-report="items/{item.id}/stats/{key}" data-report-label={STAT_LABELS[key]}>
               <span>{STAT_LABELS[key]}</span>
               <b>{shown(key, value)}{#if d}<span class="delta" class:down={d < 0}>{d > 0 ? "+" : ""}{d}</span>{/if}</b>
             </div>
           {/each}
           {#each lines as line}<div class="row"><span>{line}</span></div>{/each}
           {#each detail.mod_info?.effects ?? [] as effect}<div class="row"><span>{effect}</span></div>{/each}
-          {#if item.stack_size !== null && item.stack_size > 1}<div class="row"><span>Stack size</span><b>{item.stack_size}</b></div>{/if}
+          {#if item.stack_size !== null && item.stack_size > 1}<div class="row" data-report="items/{item.id}/stack_size" data-report-label="Stack size"><span>Stack size</span><b>{item.stack_size}</b></div>{/if}
           {#if item.stencil}
             <div class="row"><span>Source</span><b>{item.stencil.source}</b></div>
             <div class="row"><span>Stencil Parts</span><b>{item.stencil.parts} per weapon</b></div>
@@ -260,13 +266,13 @@
             <small>in stash</small>
           </label>
           {#if item.weight_kg !== null}
-            <span class="cell" title="Weight">
+            <span class="cell" title="Weight" data-report="items/{item.id}/weight_kg" data-report-label="Weight">
               <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M6 3a2 2 0 0 1 4 0v1h2.2l2.3 10H1.5L3.8 4H6zm1 0v1h2V3a1 1 0 0 0-2 0z" fill="currentColor" /></svg>
               {item.weight_kg.toFixed(1)}
             </span>
           {/if}
           {#if item.value !== null}
-            <span class="cell" title="Value">
+            <span class="cell" title="Value" data-report="items/{item.id}/value" data-report-label="Sell value">
               <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M8 2v12" stroke="currentColor" stroke-width="1.6" /></svg>
               {item.value.toLocaleString()}
             </span>
@@ -337,7 +343,10 @@
                   </a>
                 {/each}
                 {#if recipe.blueprint}
-                  <a class="chip blueprint" href="#/item/{recipe.blueprint.id}">{recipe.blueprint.name}</a>
+                  <a class="chip blueprint" class:learned={learned.includes(recipe.blueprint.id)} href="#/item/{recipe.blueprint.id}"
+                    title={learned.includes(recipe.blueprint.id) ? "Marked found in your Codex" : "Not marked found in your Codex"}>
+                    {recipe.blueprint.name}{learned.includes(recipe.blueprint.id) ? " ✓ learned" : ""}
+                  </a>
                 {:else if recipe.requires_blueprint}
                   <span class="chip blueprint">Blueprint required</span>
                 {/if}
@@ -374,7 +383,7 @@
       {#if detail.note}
         <section class="panel">
           <h3 class="section-title">Where to find</h3>
-          <p class="note">{detail.note.where}</p>
+          <p class="note" data-report-label="Where to find">{detail.note.where}</p>
           <p class="sub">{detail.note.source}</p>
         </section>
       {/if}
@@ -393,26 +402,47 @@
         </section>
       {/if}
 
-      {#if detail.found_in.length}
-        <section class="panel">
+      {#if detail.found_in.length || detail.sources.length}
+        {@const common = detail.sources.filter((s) => s.chance !== "unlikely")}
+        {@const rare = detail.sources.filter((s) => s.chance === "unlikely")}
+        {@const listed = new Set(detail.sources.map((s) => s.name.toLowerCase()))}
+        {@const mapsHere = detail.found_maps.length
+          ? detail.found_maps
+          : [...new Set(common.flatMap((s) => s.maps))].map((m) => ({ map: { kind: "map", id: m, name: mapName(m), icon: null, qty: null, note: null }, poi_count: 0, places: [] as string[] }))}
+        <section class="panel" data-report-label="Found in">
           <h3 class="section-title">Found in</h3>
           <p class="sub"><a href="#/raid/farm/{item.id}">Best places to farm it</a>, across every map.</p>
-          {#each detail.found_in as found}
-            <div class="area">
-              <LinkRow link={found.area} />
-              {#if found.maps.length === 0}
-                <p class="sub indent">No mapped spots yet.</p>
-              {/if}
-              {#each found.maps as presence}
-                <p class="indent">
-                  <a href="#/maps/{presence.map.id}/find/{item.id}" title="Show where on the map">{presence.map.name}</a>
+          {#if detail.sources.length}
+            <h4 class="minor">Look in</h4>
+            {#each common as source (source.id)}
+              <p class="source">
+                <span>{source.name}</span>
+                <span class="chance {source.chance}">{source.chance}</span>
+                <span class="sub">{source.maps.length} {source.maps.length === 1 ? "map" : "maps"}</span>
+              </p>
+            {/each}
+            {#if rare.length}
+              <p class="sub">{common.length ? "Rarely" : "Only rarely"}: {rare.map((s) => s.name).join(", ")}</p>
+            {/if}
+            <p class="sub">Chances are the app's estimate from container type, area and rarity. The game publishes no drop rates.</p>
+          {/if}
+          {#if mapsHere.length}
+            <h4 class="minor">Maps</h4>
+            {#each mapsHere as presence (presence.map.id)}
+              <p class="indent">
+                <a href="#/maps/{presence.map.id}/find/{item.id}" title="Show where on the map">{presence.map.name}</a>
+                {#if presence.poi_count}
+                  {@const places = presence.places.filter((p) => !listed.has(p.toLowerCase()))}
                   <span class="sub">
-                    {presence.poi_count} {presence.poi_count === 1 ? "spot" : "spots"}: {presence.places.slice(0, 5).join(", ")}{presence.places.length > 5 ? "…" : ""}
+                    {presence.poi_count} {presence.poi_count === 1 ? "spot" : "spots"}{places.length ? `: ${places.slice(0, 6).join(", ")}${places.length > 6 ? "…" : ""}` : ""}
                   </span>
-                </p>
-              {/each}
-            </div>
-          {/each}
+                {/if}
+              </p>
+            {/each}
+          {/if}
+          {#if detail.found_in.length}
+            <p class="sub">Loot {detail.found_in.length === 1 ? "area" : "areas"}: {detail.found_in.map((f) => f.area.name).join(", ")}</p>
+          {/if}
         </section>
       {/if}
 
@@ -785,6 +815,9 @@
   .blueprint {
     color: var(--yellow);
   }
+  .blueprint.learned {
+    color: var(--teal);
+  }
   .stale {
     color: var(--text-dim);
   }
@@ -800,6 +833,39 @@
   }
   .indent {
     margin: 2px 0 4px 8px;
+  }
+  .minor {
+    margin: 10px 0 4px;
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .source {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 64px;
+    max-width: 440px;
+    align-items: center;
+    gap: 10px;
+    margin: 2px 0 2px 8px;
+  }
+  .source .sub {
+    margin: 0;
+    text-align: right;
+  }
+  .chance {
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    text-transform: capitalize;
+  }
+  .chance.likely {
+    background: var(--teal);
+    color: #0b0b0f;
+  }
+  .chance.possible {
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
   }
   .indent a {
     color: var(--teal);

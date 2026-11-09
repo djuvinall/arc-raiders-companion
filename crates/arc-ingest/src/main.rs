@@ -6,6 +6,7 @@
 //!   arc-ingest sync [--write]   same diff, and write dataset/data with --write
 
 mod arcs;
+mod corrections;
 mod fetch;
 mod guns;
 mod http;
@@ -543,6 +544,8 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
     apply_notes(&mut out.files)?;
     apply_project_tasks(&mut out.files)?;
+    let fixes = corrections::load(&root.join("dataset/overlays/corrections"))?;
+    corrections::apply(&mut out.files, &fixes)?;
     let (_, steam) = newest_fixture(root, "steam")?;
     let notes = arc_core::patches::parse_news(&serde_json::to_vec(&steam)?)?;
     out.files.version.game_patch = arc_core::patches::latest_version(&notes);

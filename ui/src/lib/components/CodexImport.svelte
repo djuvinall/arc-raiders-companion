@@ -9,6 +9,7 @@
   let replace = $state(false);
 
   const LOW = 0.35;
+  const noun = $derived(collection.title.toLowerCase());
 
   async function read(file: Blob | null | undefined) {
     if (!file) return;
@@ -18,7 +19,7 @@
     try {
       const results = await scanCodex(file, $state.snapshot(collection.entries));
       rows = results.map((r) => ({ ...r, pick: r.entry?.id ?? "" }));
-      if (!rows.length) message = "No learned blueprints found. Use a full screenshot of the Blueprints tab in the game's Codex.";
+      if (!rows.length) message = `No learned ${noun} found. Use a full screenshot of the ${collection.title} tab in the game's Codex.`;
     } catch (e) {
       message = String(e);
     }
@@ -35,6 +36,9 @@
   const adds = $derived(chosen.filter((id) => !marked.includes(id)));
   const removes = $derived(marked.filter((id) => !chosen.includes(id)));
   const unsure = $derived(rows.filter((r) => r.confidence < LOW).length);
+  // What the screenshot doesn't show: with the whole tab in view, these are the ones still to find.
+  const missing = $derived(rows.length ? collection.entries.filter((e) => !chosen.includes(e.id)) : []);
+  const short = (name: string) => name.replace(/ (Blueprint|Stencil|Design)$/, "");
 
   async function apply() {
     await setFound(adds, replace ? removes : []);
@@ -49,7 +53,7 @@
 <section class="panel">
   <h3 class="section-title">Import from a screenshot</h3>
   <p class="dim small">
-    Screenshot the Blueprints tab in the game's Codex, then press Ctrl+V here or pick the file.
+    Screenshot the {collection.title} tab in the game's Codex, then press Ctrl+V here or pick the file.
     It's read on this PC and nothing is uploaded. You review the result before anything changes.
   </p>
   <label class="button dark">
@@ -60,7 +64,7 @@
 
   {#if rows.length}
     <p class="small">
-      Found {rows.length} learned blueprints: {adds.length} new, {removes.length} marked here but not in the screenshot.
+      Found {rows.length} learned {noun}: {adds.length} new, {removes.length} marked here but not in the screenshot.
       {#if unsure}<strong>{unsure} look-alikes need a check</strong>, outlined in yellow.{/if}
     </p>
     <div class="grid">
@@ -69,11 +73,18 @@
           <img src={row.crop} alt="" width="56" height="56" />
           <select class="field" aria-label="Blueprint {i + 1}" bind:value={row.pick}>
             <option value="">Skip this tile</option>
-            {#each collection.entries as e (e.id)}<option value={e.id}>{e.name.replace(" Blueprint", "")}</option>{/each}
+            {#each collection.entries as e (e.id)}<option value={e.id}>{short(e.name)}</option>{/each}
           </select>
         </div>
       {/each}
     </div>
+    {#if missing.length}
+      <p class="small">
+        <strong>Not in this screenshot ({missing.length}):</strong>
+        {#each missing as e, i (e.id)}<a href="#/item/{e.id}">{short(e.name)}</a>{i < missing.length - 1 ? ", " : ""}{/each}
+      </p>
+      <p class="dim small">If the screenshot shows the whole tab, these are the ones you haven't found yet.</p>
+    {/if}
     <label class="check"><input type="checkbox" bind:checked={replace} /> Also clear the {removes.length} not in the screenshot</label>
     <button class="button primary" disabled={!adds.length && !(replace && removes.length)} onclick={apply}>Apply</button>
   {/if}

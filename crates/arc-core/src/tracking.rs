@@ -191,6 +191,25 @@ pub fn party_plan(ds: &Dataset, profile: &Profile, friend: &Friend) -> PartyPlan
     PartyPlan { friend: friend.name.clone(), together, you_catch_up, friend_catch_up, maps }
 }
 
+/// Ticks a quest done (or not) for a friend by hand, between code swaps. Done also
+/// means everything before it, as in the game.
+pub fn set_friend_quest(ds: &Dataset, friend: &mut Friend, quest_id: &str, done: bool) {
+    if !done {
+        friend.done.retain(|q| q != quest_id);
+        return;
+    }
+    let mut waiting = vec![quest_id.to_string()];
+    while let Some(id) = waiting.pop() {
+        let Some(quest) = ds.files.quests.iter().find(|q| q.id == id) else { continue };
+        if friend.done.contains(&id) {
+            continue;
+        }
+        friend.active.retain(|q| *q != id);
+        friend.done.push(id);
+        waiting.extend(quest.prerequisites.iter().map(|p| p.quest_id.clone()));
+    }
+}
+
 /// Quests before any active one. The game only offers a quest once everything before it
 /// is complete, so these must already be done.
 pub fn implied_done(ds: &Dataset, profile: &Profile) -> Vec<String> {
@@ -220,6 +239,19 @@ pub fn complete_chain(ds: &Dataset, profile: &mut Profile, quest_id: &str) {
         profile.quests.entry(id).or_default().done = true;
         waiting.extend(quest.prerequisites.iter().map(|p| p.quest_id.clone()));
     }
+}
+
+/// Marks everything before a quest done and tracks the quest itself, for "I'm on this one".
+/// Returns how many earlier quests changed.
+pub fn complete_before(ds: &Dataset, profile: &mut Profile, quest_id: &str) -> usize {
+    let Some(quest) = ds.files.quests.iter().find(|q| q.id == quest_id) else { return 0 };
+    let before = profile.quests.values().filter(|p| p.done).count();
+    for p in &quest.prerequisites {
+        complete_chain(ds, profile, &p.quest_id);
+    }
+    let progress = profile.quests.entry(quest_id.to_string()).or_default();
+    progress.done = false;
+    profile.quests.values().filter(|p| p.done).count().saturating_sub(before)
 }
 
 /// A requirement reads "Outpost level 4"; it's met once the tracked level reaches that.

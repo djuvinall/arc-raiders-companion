@@ -55,6 +55,21 @@ export interface FoundIn {
   maps: { map: Link; poi_count: number; places: string[] }[];
 }
 
+export interface ItemSource {
+  id: string;
+  name: string;
+  group: string;
+  chance: "likely" | "possible" | "unlikely";
+  score: number;
+  maps: string[];
+}
+
+export interface MapPresence {
+  map: Link;
+  poi_count: number;
+  places: string[];
+}
+
 export interface UsedIn {
   recipes: { recipe_id: string; output_item_id: string | null; output_name: string | null; output_icon: string | null; qty: number }[];
   projects: { project_id: string; project_name: string; stage: number; qty: number }[];
@@ -81,6 +96,10 @@ export interface ItemDetail {
   breakdown: RecipeView[];
   used_in: UsedIn;
   found_in: FoundIn[];
+  /** Container types and ARCs that can hold it, best chance first. */
+  sources: ItemSource[];
+  /** Each map once, with every named spot from all its loot areas. */
+  found_maps: MapPresence[];
   /** Keys only: the doors it opens, as indexes into each map's markers. */
   opens: { map: Link; markers: number[]; places: string[] }[];
   /** Weapon mods only: guns that take it and its effects in the game's wording. */
@@ -650,6 +669,8 @@ export const setWorkbenchLevel = (id: string, level: number, useStash: boolean) 
 export const toggleTrackedBench = (id: string) => invoke<void>("toggle_tracked_bench", { id });
 export const completeImpliedQuests = () => invoke<number>("complete_implied_quests");
 export const completeQuestChain = (questId: string) => invoke<void>("complete_quest_chain", { questId });
+/** Marks everything before a quest done and tracks the quest itself; returns how many changed. */
+export const completeQuestsBefore = (questId: string) => invoke<number>("complete_quests_before", { questId });
 export const openMini = () => invoke<void>("open_mini");
 export const getEntity = (kind: string, id: string) => invoke<EntityPage>("get_entity", { kind, id });
 export const getProfile = () => invoke<Profile>("get_profile");
@@ -687,6 +708,9 @@ export const setQuestState = (questId: string, tracked: boolean, done: boolean) 
 export const questShareCode = (name: string) => invoke<string>("quest_share_code", { name });
 export const addFriend = (code: string) => invoke<string>("add_friend", { code });
 export const removeFriend = (name: string) => invoke<void>("remove_friend", { name });
+/** Ticks a friend's quest by hand; `me` also marks it done for you. */
+export const setFriendQuest = (name: string, questId: string, done: boolean, me = false) =>
+  invoke<void>("set_friend_quest", { name, questId, done, me });
 export const partyPlan = (name: string) => invoke<PartyPlan>("party_plan", { name });
 
 export const projectList = () => invoke<ProjectView[]>("project_list");
@@ -713,6 +737,22 @@ export const checkAppUpdate = () => invoke<string | null>("check_app_update");
 export const installAppUpdate = () => invoke<void>("install_app_update");
 export const checkDataUpdate = () => invoke<string | null>("check_data_update");
 export const restartApp = () => invoke<void>("restart_app");
+
+export interface ReportInput {
+  kind: "incorrect" | "suggestion";
+  data_ref: string | null;
+  label: string | null;
+  page: string | null;
+  selected: string | null;
+  suggestion: string | null;
+  comment: string | null;
+}
+export interface ReportSent {
+  issue: number;
+  issue_url: string;
+  pr_url: string | null;
+}
+export const sendReport = (input: ReportInput) => invoke<ReportSent>("send_report", { input });
 
 export const stencilShots = (stencilId: string) => invoke<Record<string, string>>("stencil_shots", { stencilId });
 export const saveStencilShot = (stencilId: string, gunId: string, image: string) =>

@@ -330,11 +330,13 @@
             </button>
           {/each}
         {:else if selected}
+          <div data-report="skills/{selected.id}" data-report-label={selected.name}>
           <h3>{selected.name}</h3>
           <p class="meta">
-            {selected.branch} · {rank(selected.id)}/{selected.max_rank ?? "? (unconfirmed)"}
+            {selected.branch} · {rank(selected.id)}/<span data-report="skills/{selected.id}/max_rank" data-report-label="Max rank">{selected.max_rank ?? "? (unconfirmed)"}</span>
           </p>
-          <p>{selected.description}</p>
+          <p data-report="skills/{selected.id}/description" data-report-label="Description">{selected.description}</p>
+          </div>
           {#if selected.details}<p class="meta">{selected.details}</p>{/if}
         {:else}
           <p class="meta">Click a skill to add a point, right-click to remove one.</p>

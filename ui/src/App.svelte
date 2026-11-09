@@ -2,6 +2,7 @@
   import { overview, type Overview } from "./lib/api";
   import BottomBar from "./lib/components/BottomBar.svelte";
   import QuickSearch from "./lib/components/QuickSearch.svelte";
+  import ReportMenu from "./lib/components/ReportMenu.svelte";
   import TopBar from "./lib/components/TopBar.svelte";
   import UpdateBanner from "./lib/components/UpdateBanner.svelte";
   import { checkForUpdates } from "./lib/updates.svelte";
@@ -91,6 +92,7 @@
   <Mini />
 {:else}
 <QuickSearch />
+<ReportMenu />
 <div class="shell">
   <TopBar {...titles} canGoBack={parts[0] !== "home"} active={TABS.includes(parts[0]) ? parts[0] : "items"} />
   <div><UpdateBanner /></div>

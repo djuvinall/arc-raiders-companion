@@ -180,6 +180,47 @@ fn modelled(category: &str) -> bool {
     category.starts_with("nature/") || category.starts_with("arc/") || POOLS.iter().any(|(c, _)| *c == category)
 }
 
+/// One kind of place an item can come from: a container type or an ARC.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct ItemSource {
+    /// The marker category, as `containers/locker` or `arc/hornet`.
+    pub id: String,
+    pub name: String,
+    /// `containers`, `arc`, `nature` or `locations`.
+    pub group: String,
+    /// `likely`, `possible` or `unlikely`, in the best case: inside one of the item's loot areas.
+    pub chance: &'static str,
+    pub score: f64,
+    /// Maps with at least one of these.
+    pub maps: Vec<String>,
+}
+
+/// Everything the spawn model says can hold an item, best chance first. Same scores as the
+/// raid planner, so the item page and a plan never disagree.
+pub fn item_sources(ds: &Dataset, item_id: &str) -> Vec<ItemSource> {
+    let Some(item) = ds.item(item_id) else { return Vec::new() };
+    let w = Wanted { item, qty: 1, tags: tags(ds, item) };
+    let zoned = if w.tags.iter().any(|t| !t.starts_with("cat:")) { ZONE_BONUS } else { 1.0 };
+    let mut out: Vec<ItemSource> = ds.files.markers.categories.iter().enumerate().filter_map(|(i, c)| {
+        let base = affinity(&c.id, &w);
+        if base == 0.0 {
+            return None;
+        }
+        // ARC drops and plants don't depend on the zone around them.
+        let zone = if c.id.starts_with("arc/") || c.id.starts_with("nature/") { 1.0 } else { zoned };
+        let score = base * zone * rarity_factor(item.rarity);
+        let maps: Vec<String> = ds.files.maps.iter()
+            .filter(|m| ds.files.markers.maps.get(&m.id).is_some_and(|list| list.iter().any(|mk| usize::from(mk.0) == i)))
+            .map(|m| m.id.clone())
+            .collect();
+        (!maps.is_empty()).then(|| ItemSource {
+            id: c.id.clone(), name: c.name.clone(), group: c.group.clone(), chance: chance(score), score, maps,
+        })
+    }).collect();
+    out.sort_by(|a, b| b.score.total_cmp(&a.score).then_with(|| a.name.cmp(&b.name)));
+    out
+}
+
 /// The label a score reads as.
 pub fn chance(score: f64) -> &'static str {
     if score >= LIKELY {

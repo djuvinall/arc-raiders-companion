@@ -29,12 +29,12 @@
 
   {#if selected}
     {@const arc = selected.arc}
-    <section class="panel detail">
+    <section class="panel detail" data-report="arcs/{arc.id}" data-report-label={arc.name}>
       <div class="head">
         <Icon url={arc.icon} name={arc.name} size={96} />
         <div>
           <h2>{arc.name}</h2>
-          <p class="dim">{arc.hp ? `${arc.hp.toLocaleString()} health` : "Health not listed"}{arc.armor ? ` · ${arc.armor} armor` : ""}</p>
+          <p class="dim"><span data-report="arcs/{arc.id}/hp" data-report-label="Health">{arc.hp ? `${arc.hp.toLocaleString()} health` : "Health not listed"}</span>{#if arc.armor} · <span data-report="arcs/{arc.id}/armor" data-report-label="Armor">{arc.armor} armor</span>{/if}</p>
           {#if selected.threat}<span class="threat {selected.threat.toLowerCase()}">{selected.threat} threat</span>{/if}
         </div>
       </div>
@@ -42,26 +42,26 @@
       <div class="facts">
         <div>
           <h3 class="section-title">Weak points</h3>
-          {#each arc.weak_points as point}<p class="point">{point}</p>{:else}<p class="dim">Not listed.</p>{/each}
+          {#each arc.weak_points as point, i}<p class="point" data-report="arcs/{arc.id}/weak_points/{i}" data-report-label="Weak point">{point}</p>{:else}<p class="dim">Not listed.</p>{/each}
         </div>
         {#if arc.attack || arc.ability}
           <div>
             <h3 class="section-title">Attacks</h3>
-            {#if arc.attack}<p>{arc.attack}</p>{/if}
-            {#if arc.ability}<p class="dim">{arc.ability}</p>{/if}
+            {#if arc.attack}<p data-report="arcs/{arc.id}/attack" data-report-label="Attack">{arc.attack}</p>{/if}
+            {#if arc.ability}<p class="dim" data-report="arcs/{arc.id}/ability" data-report-label="Ability">{arc.ability}</p>{/if}
           </div>
         {/if}
       </div>
 
       {#if selected.strategy.length}
         <h3 class="section-title">Strategy</h3>
-        <ul class="strategy">
+        <ul class="strategy" data-report-label="Strategy">
           {#each selected.strategy as line}<li>{line}</li>{/each}
         </ul>
       {/if}
       {#if arc.tips}
         <h3 class="section-title">Field notes</h3>
-        <p>{arc.tips}</p>
+        <p data-report="arcs/{arc.id}/tips" data-report-label="Field notes">{arc.tips}</p>
       {/if}
       {#if arc.armor === "Heavy" && selected.counters.length}
         <h3 class="section-title">Guns that punch through</h3>

@@ -89,3 +89,18 @@ fn farm_finder_ranks_across_maps() {
     assert!(maps.len() >= 2, "more than one map: {maps:?}");
     assert!(spots.windows(2).all(|w| w[0].value >= w[1].value));
 }
+
+/// The item page's sources: ARC parts lean on ARC containers, and each source is listed once.
+#[test]
+fn item_sources_rank_containers_once() {
+    let ds = real();
+    let sources = item_sources(&ds, "turbine-compressor");
+    for s in sources.iter().take(8) {
+        println!("{} {} {:.2} {:?}", s.name, s.chance, s.score, s.maps);
+    }
+    assert!(!sources.is_empty());
+    let ids: std::collections::BTreeSet<&str> = sources.iter().map(|s| s.id.as_str()).collect();
+    assert_eq!(ids.len(), sources.len(), "each source once");
+    assert!(sources[0].group == "arc" || sources[0].id.contains("arc") || sources[0].id.contains("husk"), "top source {}", sources[0].id);
+    assert!(sources.windows(2).all(|w| w[0].score >= w[1].score));
+}

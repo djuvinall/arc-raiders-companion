@@ -178,7 +178,7 @@
   </aside>
 
   {#if project}
-    <section class="detail">
+    <section class="detail" data-report="projects/{project.id}" data-report-label={project.name}>
       <h2>{project.name}</h2>
       {#if project.paused}
         <p class="dim">Temporarily paused in the game. Stages are shown for planning.</p>

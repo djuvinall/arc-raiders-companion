@@ -751,3 +751,34 @@ fn mission_stages_finish_when_their_steps_do() {
     assert_eq!(set_project_objective(&ds, &mut p, "souls-offering", &task.objective_root, false), 4);
     assert!(p.projects["souls-offering"].objectives_done.is_empty(), "the root unticks every step");
 }
+
+/// "I'm on this quest": everything before it is done, and it stays active.
+#[test]
+fn complete_before_keeps_the_quest_active() {
+    let ds = real();
+    let quest = ds.files.quests.iter().find(|q| !q.prerequisites.is_empty()).unwrap();
+    let mut profile = Profile::default();
+    let changed = complete_before(&ds, &mut profile, &quest.id);
+    assert!(changed >= quest.prerequisites.len());
+    assert!(profile.quests.get(&quest.id).is_some_and(|p| !p.done), "the quest itself is active");
+    for p in &quest.prerequisites {
+        assert!(profile.quests.get(&p.quest_id).is_some_and(|q| q.done));
+    }
+    let rows = quest_rows(&ds, &profile);
+    assert_eq!(rows.iter().find(|r| r.quest.id == quest.id).unwrap().status, "active");
+    assert!(implied_done(&ds, &profile).is_empty());
+}
+
+/// Ticking a friend's quest also ticks what comes before it; unticking only that one.
+#[test]
+fn friend_quests_tick_by_hand() {
+    let ds = real();
+    let quest = ds.files.quests.iter().find(|q| !q.prerequisites.is_empty()).unwrap();
+    let mut friend = Friend { name: "Sam".into(), done: vec![], active: vec![quest.id.clone()] };
+    set_friend_quest(&ds, &mut friend, &quest.id, true);
+    assert!(friend.done.contains(&quest.id) && friend.active.is_empty());
+    assert!(quest.prerequisites.iter().all(|p| friend.done.contains(&p.quest_id)));
+    set_friend_quest(&ds, &mut friend, &quest.id, false);
+    assert!(!friend.done.contains(&quest.id));
+    assert!(quest.prerequisites.iter().all(|p| friend.done.contains(&p.quest_id)));
+}

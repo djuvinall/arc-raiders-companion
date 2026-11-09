@@ -4,6 +4,7 @@
 mod data_update;
 mod feeds;
 mod icons;
+mod report;
 mod shots;
 mod updates;
 
@@ -140,6 +141,11 @@ fn toggle_tracked_bench(state: State<AppState>, id: String) -> CommandResult<()>
 #[tauri::command]
 fn complete_implied_quests(state: State<AppState>) -> CommandResult<usize> {
     with_profile(&state, |p| tracking::complete_implied(&state.dataset, p))
+}
+
+#[tauri::command]
+fn complete_quests_before(state: State<AppState>, quest_id: String) -> CommandResult<usize> {
+    with_profile(&state, |p| tracking::complete_before(&state.dataset, p, &quest_id))
 }
 
 #[tauri::command]
@@ -389,6 +395,19 @@ fn add_friend(state: State<AppState>, code: String) -> CommandResult<String> {
     Ok(name)
 }
 
+/// Ticks a friend's quest by hand; `me` also marks it done for this player.
+#[tauri::command]
+fn set_friend_quest(state: State<AppState>, name: String, quest_id: String, done: bool, me: bool) -> CommandResult<()> {
+    with_profile(&state, |p| {
+        if let Some(friend) = p.friends.iter_mut().find(|f| f.name == name) {
+            tracking::set_friend_quest(&state.dataset, friend, &quest_id, done);
+        }
+        if me && done {
+            tracking::complete_chain(&state.dataset, p, &quest_id);
+        }
+    })
+}
+
 #[tauri::command]
 fn remove_friend(state: State<AppState>, name: String) -> CommandResult<()> {
     with_profile(&state, |p| p.friends.retain(|f| f.name != name))
@@ -483,6 +502,12 @@ fn dataset_changelog(state: State<AppState>) -> Vec<ChangelogEntry> {
 #[tauri::command]
 fn app_version(app: AppHandle) -> String {
     app.package_info().version.to_string()
+}
+
+/// Files a player's report on the data repository through the relay.
+#[tauri::command(async)]
+fn send_report(app: AppHandle, state: State<AppState>, input: report::ReportInput) -> CommandResult<report::ReportSent> {
+    report::send(&state.dataset.files, &app.package_info().version.to_string(), input)
 }
 
 #[tauri::command(async)]
@@ -635,10 +660,10 @@ fn main() {
             raid_auto, farm_spots, save_raid_plan, delete_raid_plan,
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, uncommit_resource, reopen_project_stage, set_project_objective, set_project_tracked, collection_list, toggle_found, patch_notes,
-            dataset_changelog, export_profile, import_profile, app_version, check_data_update,
+            dataset_changelog, export_profile, import_profile, app_version, check_data_update, send_report,
             home_view, set_found, set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
-            toggle_tracked_bench, complete_quest_chain, complete_implied_quests, open_mini,
-            restart_app, quest_share_code, add_friend, remove_friend, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
+            toggle_tracked_bench, complete_quest_chain, complete_quests_before, complete_implied_quests, open_mini,
+            restart_app, quest_share_code, add_friend, remove_friend, set_friend_quest, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
             updates::check_app_update, updates::install_app_update
         ])
         .run(tauri::generate_context!())
