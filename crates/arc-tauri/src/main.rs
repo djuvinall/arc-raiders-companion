@@ -616,10 +616,21 @@ fn decode_skill_plan(code: String) -> CommandResult<SkillPlan> {
 }
 
 fn load_profile(path: &PathBuf) -> Profile {
-    let mut profile: Profile = std::fs::read(path)
-        .ok()
-        .and_then(|bytes| serde_json::from_slice(&bytes).ok())
-        .unwrap_or_default();
+    let bytes = std::fs::read(path).ok();
+    let parsed = bytes.as_deref().map(serde_json::from_slice::<Profile>);
+    let mut profile = match parsed {
+        Some(Ok(profile)) => profile,
+        // A profile this build can't read (say, saved by a newer one) is kept beside it, never
+        // overwritten by the next save.
+        Some(Err(e)) => {
+            let stamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_secs());
+            let keep = path.with_file_name(format!("profile-unreadable-{stamp}.json"));
+            let _ = std::fs::copy(path, &keep);
+            eprintln!("profile.json couldn't be read ({e}); kept a copy at {}", keep.display());
+            Profile::default()
+        }
+        None => Profile::default(),
+    };
     // The Trigger Nade blueprint was once listed twice; keep a mark made on the duplicate.
     let found = &mut profile.blueprints_found;
     if found.iter().any(|id| id == "trigger-nade-blueprint-2") {

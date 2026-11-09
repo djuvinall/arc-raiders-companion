@@ -30,7 +30,9 @@ pub fn load(dir: &Path, embedded: &dyn Fn(&str) -> Result<String>) -> Result<(Da
     let read = read_from(dir);
     let shipped = embedded("version.json").ok().and_then(|t| dataset_version(&t));
     let downloaded = read("version.json").ok().and_then(|t| dataset_version(&t));
-    if downloaded > shipped {
+    // A download made by an older build may lack files added since; use it only when whole.
+    let whole = FILES.iter().all(|name| dir.join(name).is_file());
+    if downloaded > shipped && whole {
         if let (Ok(dataset), Ok(changelog)) = (Dataset::load_with(&read), read("changelog.json")) {
             return Ok((dataset, changelog));
         }
@@ -104,5 +106,14 @@ mod tests {
         let broken = copy_with_version("2998-01-01");
         std::fs::write(broken.join("items.json"), "[{\"unknown\": true}]").unwrap();
         assert_ne!(loaded_version(&broken), "2998-01-01");
+    }
+
+    /// An older build downloaded without containers.json; that copy must not hide the
+    /// shipped containers from the planner.
+    #[test]
+    fn a_download_missing_a_file_falls_back_to_the_shipped_data() {
+        let partial = copy_with_version("2997-01-01");
+        std::fs::remove_file(partial.join("containers.json")).unwrap();
+        assert_ne!(loaded_version(&partial), "2997-01-01");
     }
 }

@@ -197,11 +197,14 @@ fn found_maps(found: &[FoundIn]) -> Vec<MapPresence> {
     for presence in found.iter().flat_map(|f| &f.maps) {
         match out.iter_mut().find(|m| m.map.id == presence.map.id) {
             Some(m) => {
-                m.poi_count += presence.poi_count;
+                // A spot in two loot areas counts once.
+                m.poi_ids.extend(presence.poi_ids.iter().cloned());
+                m.poi_ids.sort();
+                m.poi_ids.dedup();
+                m.poi_count = m.poi_ids.len();
                 m.places.extend(presence.places.iter().cloned());
                 m.places.sort();
                 m.places.dedup();
-                m.poi_ids.extend(presence.poi_ids.iter().cloned());
             }
             None => out.push(presence.clone()),
         }

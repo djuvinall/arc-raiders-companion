@@ -166,6 +166,9 @@
   // The spots the item page counted: an ARC part shows only its own ARCs' spawns.
   const spotIds = $derived(new Set(finding?.found_in.flatMap((f) => f.maps.flatMap((m) => m.poi_ids)) ?? []));
   const spots = $derived(pois.filter((p) => spotIds.has(p.id)));
+  // With no tagged spots anywhere (say, a part only a Queen drops), show its sources' markers.
+  const sourceList = $derived(spotIds.size ? [] : (finding?.sources ?? []).filter((s) => s.chance !== "unlikely"));
+  const sourceIds = $derived(new Set(sourceList.map((s) => s.id)));
   const areaName = (id: string) => finding?.found_in.find((f) => f.area.id === id)?.area.name ?? id.replace("-", " ");
 
   // Where the item can be, plus exits for planning the way out.
@@ -182,7 +185,10 @@
     const doors = new Set(doorsHere?.markers ?? []);
     set.markers.forEach(([index, x, y, z, label], i) => {
       const category = set!.categories[index];
-      if (doors.has(i) && category && onFloor(z)) {
+      if (category && sourceIds.has(category.id) && onFloor(z)) {
+        const chance = sourceList.find((s) => s.id === category.id)?.chance ?? "";
+        out.push({ key: `s${i}`, x, y, icon: category.id, group: category.group, title: `${label?.trim() || category.name}: ${chance}`, label: showLabels ? label?.trim() || category.name : null });
+      } else if (doors.has(i) && category && onFloor(z)) {
         const name = label?.trim() || category.name;
         out.push({ key: `d${i}`, x, y, icon: category.id, group: category.group, title: `Opens: ${name}`, label: showLabels ? name : null });
       } else if (category?.id === "locations/extraction" && onFloor(z)) {
@@ -194,7 +200,9 @@
   // Keys: the doors they open, beside any loot spots.
   const doorsHere = $derived(finding?.opens.find((o) => o.map.id === current?.id) ?? null);
   const doorCount = (mapId: string) => finding?.opens.find((o) => o.map.id === mapId)?.markers.length ?? 0;
-  const spotCount = (mapId: string) => (finding?.found_in.reduce((sum, f) => sum + (f.maps.find((m) => m.map.id === mapId)?.poi_count ?? 0), 0) ?? 0) + doorCount(mapId);
+  const spotCount = (mapId: string) => sourceList.length
+    ? sourceList.filter((s) => s.maps.includes(mapId)).length + doorCount(mapId)
+    : (finding?.found_in.reduce((sum, f) => sum + (f.maps.find((m) => m.map.id === mapId)?.poi_count ?? 0), 0) ?? 0) + doorCount(mapId);
   const areaCounts = $derived(findAreas.map((a) => ({ name: areaName(a), count: spots.filter((p) => p.loot_areas.includes(a)).length })).filter((a) => a.count));
 
   // Quest pins name their quest; the rest are named by their type.
@@ -298,7 +306,10 @@
               <p class="small">Opens doors on {finding.opens.map((o) => o.map.name).join(", ")}, not here.</p>
             {/if}
           {/if}
-          {#if findAreas.length}
+          {#if sourceList.length}
+            <p class="small">Comes from {sourceList.map((s) => s.name).join(", ")}. Their markers are shown{floors.length ? " on this floor" : ""}.</p>
+            <p class="small dim">The numbers on the map buttons count how many of these are on each map. Exits are shown for planning the way out.</p>
+          {:else if findAreas.length}
             <p class="small">Found in {findAreas.map(areaName).join(", ")} areas.</p>
             <p class="small"><strong>{spots.length}</strong> {spots.length === 1 ? "spot" : "spots"} on {current?.name ?? "this map"}{floors.length ? ` (${findPoints.filter((p) => p.group === "containers").length} on this floor)` : ""}.</p>
             {#each areaCounts as area (area.name)}<p class="small dim">{area.name}: {area.count}</p>{/each}

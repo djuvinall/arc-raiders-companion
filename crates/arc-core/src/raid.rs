@@ -219,7 +219,8 @@ pub fn item_sources(ds: &Dataset, item_id: &str) -> Vec<ItemSource> {
                 notes.push("Breach to open".to_string());
             }
             if !box_.conditions.is_empty() {
-                notes.push(format!("During {}", box_.conditions.join(" or ")));
+                let when = if box_.group == "condition" { "During" } else { "More during" };
+                notes.push(format!("{when} {}", box_.conditions.join(" or ")));
             }
         } else if c.id.starts_with("arc/") {
             notes.push("Drops when destroyed".to_string());
@@ -279,7 +280,7 @@ struct Spot<'a> {
 fn live_on<'a>(ds: &'a Dataset, map_id: &str, live: &[String]) -> Vec<&'a MapCondition> {
     ds.files.conditions.iter()
         .filter(|c| c.maps.iter().any(|m| m == map_id))
-        .filter(|c| live.iter().any(|l| l.eq_ignore_ascii_case(&c.name) || l.to_lowercase().contains(&c.name.to_lowercase())))
+        .filter(|c| live.iter().any(|l| l.trim().eq_ignore_ascii_case(&c.name)))
         .collect()
 }
 
@@ -550,7 +551,7 @@ fn search(
     // Quest stops are centres too: a quest step alone can make an area worth the trip.
     let points: Vec<(f64, f64)> = centres.iter().map(|&c| (spots[c].x, spots[c].y))
         .chain(quest_stops.iter().map(|q| (q.x, q.y))).collect();
-    let mut scored: Vec<(f64, f64, (f64, f64))> = points.iter().map(|&(cx, cy)| {
+    let mut scored: Vec<(f64, f64, f64, (f64, f64))> = points.iter().map(|&(cx, cy)| {
         let mut sums = vec![0.0; wants.len()];
         for n in grid.near(cx, cy).filter(|&n| dist((cx, cy), (spots[n].x, spots[n].y)) <= radius) {
             for (sum, v) in sums.iter_mut().zip(&spots[n].scores) {
@@ -560,17 +561,18 @@ fn search(
         let loot: f64 = sums.iter().zip(&targets).map(|(s, t)| (s / t).min(1.0)).sum::<f64>() / wants.len().max(1) as f64;
         let quests = quest_grid.near(cx, cy).filter(|&q| dist((cx, cy), (quest_stops[q].x, quest_stops[q].y)) <= radius).count();
         let depth = sums.iter().zip(&targets).map(|(s, t)| s / t).sum::<f64>() / wants.len().max(1) as f64;
-        let near = detour_factor(primary, (cx, cy), radius);
-        ((loot + (quests as f64 * QUEST_STOP_VALUE).min(3.0)) * near, depth, (cx, cy))
+        let value = loot + (quests as f64 * QUEST_STOP_VALUE).min(3.0);
+        // Ranked on value against the detour to the primary; shown as the plain value.
+        (value * detour_factor(primary, (cx, cy), radius), value, depth, (cx, cy))
     }).collect();
     // Areas that cover the same share rank by how deep their chances go.
-    scored.sort_by(|a, b| b.0.total_cmp(&a.0).then(b.1.total_cmp(&a.1)));
+    scored.sort_by(|a, b| b.0.total_cmp(&a.0).then(b.2.total_cmp(&a.2)));
 
     let map_name = ds.files.maps.iter().find(|m| m.id == map_id).map_or(map_id, |m| m.name.as_str()).to_string();
     let mut areas: Vec<TargetArea> = Vec::new();
     let mut taken: Vec<(f64, f64)> = Vec::new();
-    for (value, depth, at) in scored {
-        if areas.len() >= settings.areas.clamp(1, 8) as usize || value <= 0.0 {
+    for (rank, value, depth, at) in scored {
+        if areas.len() >= settings.areas.clamp(1, 8) as usize || rank <= 0.0 {
             break;
         }
         if taken.iter().any(|t| dist(*t, at) < radius * 2.0) {
@@ -614,7 +616,9 @@ fn area(
         .map(|q| quest_stops[q].clone()));
     let detour = primary.map(|p| (dist(at, (p.x, p.y)) - radius).max(0.0).round());
     if let Some(p) = primary {
-        stops.retain(|s| s.key != p.key);
+        // A quest step or marker picked as the primary is the same place as its own stop.
+        let same = |s: &Stop| s.key == p.key || p.key.strip_prefix("primary:") == Some(s.key.as_str()) || dist((s.x, s.y), (p.x, p.y)) < 1.0;
+        stops.retain(|s| !same(s));
         stops.insert(0, p.clone());
     }
     let centre = if stops.is_empty() {

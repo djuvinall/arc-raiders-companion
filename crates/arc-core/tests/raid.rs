@@ -140,6 +140,38 @@ fn side_areas_hug_the_primary_objective() {
     let first = &auto.areas[0];
     let d = (first.x - far.x).hypot(first.y - far.y);
     assert!(d < (free.areas[0].x - far.x).hypot(free.areas[0].y - far.y) + 1.0, "top area moved toward the objective");
+    // The detour only ranks areas; what an area covers is shown as is.
+    for a in &auto.areas {
+        if let Some(same) = free.areas.iter().find(|f| (f.x - a.x).abs() < 1.0 && (f.y - a.y).abs() < 1.0) {
+            assert!((same.value - a.value).abs() < 0.02, "value {} vs {}", a.value, same.value);
+        }
+    }
+}
+
+/// A quest step picked as the primary is one stop, not that step twice.
+#[test]
+fn a_quest_step_primary_is_one_stop() {
+    let ds = real();
+    let quest = ds.files.pois.iter().find(|p| p.quest_id.is_some() && p.map_id == "dam").unwrap();
+    let mut profile = Profile::default();
+    profile.quests.insert(quest.quest_id.clone().unwrap(), QuestProgress::default());
+    let base = plan("dam", &["fabric"]);
+    let free = auto_plan(&ds, &profile, &base);
+    let q = free.quest_stops.iter().find(|s| s.key == quest.id).cloned().unwrap();
+    let mut with = base.clone();
+    with.primary = Some(Primary { kind: "quest".into(), id: q.key.clone(), name: q.name.clone(), x: q.x, y: q.y, floors: q.floors });
+    let auto = auto_plan(&ds, &profile, &with);
+    for a in &auto.areas {
+        let here = a.stops.iter().filter(|s| (s.x - q.x).abs() < 1.0 && (s.y - q.y).abs() < 1.0).count();
+        assert!(here <= 1, "area {} visits the step {here} times", a.label);
+    }
+}
+
+/// An unset primary isn't written, so a profile saved here still opens in v0.6.1.
+#[test]
+fn an_unset_primary_is_not_saved() {
+    let p = plan("dam", &[]);
+    assert!(!serde_json::to_string(&p).unwrap().contains("primary"));
 }
 
 /// A live condition changes the plan: Uncovered Caches makes Raider Caches count for more,

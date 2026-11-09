@@ -118,6 +118,7 @@
   let askFill = $state(0);
 
   function pick(id: string) {
+    if (quests.find((q) => q.quest.id === id)?.status === "done") return;
     picked = picked.includes(id) ? picked.filter((p) => p !== id) : [...picked, id];
   }
 

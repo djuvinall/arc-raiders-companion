@@ -433,8 +433,9 @@ pub struct MapMarker(pub u16, pub f64, pub f64, pub Option<u32>, pub Option<Stri
 
 /// A loot container type as the raid planner models it, one per map marker type.
 /// Built from `overlays/containers_overlay.json` and `overlays/arc_loot.json`.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+// Newer data may add fields; this build reads what it knows.
+#[serde(default)]
 pub struct Container {
     /// The map marker type, as `containers/med_crate`.
     pub marker: String,
@@ -465,8 +466,9 @@ pub struct Container {
 }
 
 /// A map condition (event) and how it changes loot, for the raid planner.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+// Newer data may add fields; this build reads what it knows.
+#[serde(default)]
 pub struct MapCondition {
     pub name: String,
     /// Embark's major/minor tag; None when the official tracker doesn't list it.
@@ -482,22 +484,25 @@ pub struct MapCondition {
     pub confidence: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+// Newer data may add fields; this build reads what it knows.
+#[serde(default)]
 pub struct MarkerBoost {
     pub marker: String,
     pub factor: f64,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+// Newer data may add fields; this build reads what it knows.
+#[serde(default)]
 pub struct PoolWeight {
     pub tag: String,
     pub weight: f64,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+// Newer data may add fields; this build reads what it knows.
+#[serde(default)]
 pub struct ContainerItem {
     pub item_id: String,
     /// On the container's own page and not flagged, or backed by a second source.
@@ -900,6 +905,7 @@ pub struct RaidPlan {
     pub notes: String,
     /// What the raid is mainly for. Side areas are then picked by what they give
     /// against how far they are from it.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary: Option<Primary>,
 }
 
