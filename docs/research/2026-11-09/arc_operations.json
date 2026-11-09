@@ -1,0 +1,475 @@
+{
+  "retrieved": "2026-11-09",
+  "patch": "2.4.1 (Hotfix 2.4.1, 2026-11-05; Store Update 2.4.0, 2026-11-03). Neither touches any operation or boss event.",
+  "method": "Every claim was checked against arcraiders.wiki (revision ids noted), official patch notes and news on arcraiders.com, the official tracker at arcraiders.com/map-conditions, and dated third-party guides. MetaForge returned HTTP 403 on every page tried (event timers, 2.2.0 patch article), so nothing here is sourced from MetaForge. The fandom wiki returned HTTP 402 and was not used. Nothing here has been checked in game. Gear advice is what guides recommend, not a tested minimum.",
+  "confidence_scale": {
+    "sourced": "Stated by an official source, or by the wiki and at least one independent guide that agree.",
+    "conflicting": "Sources disagree; the conflict is described in the entry's conflicts list.",
+    "unverified": "One non-official source only, or inferred. Use with a label."
+  },
+
+  "definition": {
+    "official_term": "ARC Operation",
+    "definition": "Embark introduced ARC Operations with the Flashpoint update (1.22.0, 2026-03-31) as a new type of major map condition. Each one is a map-wide ARC event built around a single large objective, with reduced ambient loot so the objective is the main reward source.",
+    "how_they_start": "Scheduled, not triggered or queued. They are map conditions on the official rotation: one-hour slots per map, with regional schedules since 1.42.0 (server region selector on the tracker). You pick the map while the condition is live. In-game countdowns appear only 60 minutes before a condition starts (since 1.33.0). Inside the raid, the operation's centrepiece arrives on its own (the Frigate about 1 to 2 minutes in; Assessors are called down by Surveyors).",
+    "operations_as_of_2_4_1": ["Close Scrutiny (ARC Assessor)", "ARC Frigate"],
+    "shared_traits": [
+      "Major condition on the official tracker (prior research 2026-11-08 from the tracker's embedded data).",
+      "Tagged 'ARC Operation' and 'No Free Loadout' on the wiki.",
+      "Decreased overall loot value; key-locked rooms are open (Close Scrutiny) or loot rooms disabled (Frigate).",
+      "Since 2.3.0 the Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprints can drop in any major condition, operations included."
+    ],
+    "how_operations_differ_from_other_conditions": {
+      "summary": "Ordinary major conditions change the whole map (weather, darkness, loot value) and you loot as usual. Minor boss conditions (Harvester, Matriarch) add one fixed encounter to an otherwise normal raid. ARC Operations replace the normal loot loop: ambient loot drops, and the reward sits in one ARC objective that draws every squad on the map.",
+      "Night Raid": "Major, not an operation. Higher loot rarity and more keys, more and rarer ARC, fewer Return Points, no Raider Hatches. No Free Loadout since 1.33.0. Maps: Dam Battlegrounds, Buried City, Spaceport, The Blue Gate, Stella Montis, Riven Tides (wiki, edited 2026-10-11).",
+      "Cold Snap": "Weather condition: snow, damaging cold, reduced vision; loot value up; Candleberries harvestable. Added 1.7.0, removed 1.11.0, returned 1.15.0. Not on the official tracker on 2026-11-08/09. Pendola Pass has its own harder version, Flash Freeze.",
+      "Electromagnetic Storm": "Major weather condition: lightning (telegraphed by a blue glow) damages and stuns Raiders and ARC; more crashed Probes and Couriers; Fossilized Lightning; fewer Return Points, no Raider Hatches. Maps: Dam Battlegrounds, Spaceport, The Blue Gate.",
+      "Hurricane": "Major weather condition since 1.17.0: wind, debris that damages shields, reduced sight and hearing, First Wave Caches, higher-threat ARC. Maps: Dam Battlegrounds, Buried City, Spaceport, The Blue Gate. Flashpoint lore says the Close Scrutiny operation followed a hurricane.",
+      "Harvester": "Minor condition, not tagged ARC Operation. Fixed structure guarded by a Queen. See entry.",
+      "Matriarch": "Minor condition, not tagged ARC Operation. A roaming boss fight. See entry.",
+      "ARC Frigate": "Is an ARC Operation (wiki tag; major on tracker). See entry."
+    },
+    "sources": [
+      {"url": "https://arcraiders.com/news/flashpoint-content-update", "retrieved": "2026-11-09", "revision_or_date": "2026-03-30"},
+      {"url": "https://arcraiders.com/news/patch-notes-1-22-0", "retrieved": "2026-11-09", "revision_or_date": "2026-03-31"},
+      {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"},
+      {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+      {"url": "https://beebom.com/arc-raiders-patch-notes-update-1-33-0/", "retrieved": "2026-11-09", "revision_or_date": "2026-06-16"},
+      {"url": "https://arcraiders.wiki/wiki/Night_Raid", "retrieved": "2026-11-09", "revision_or_date": "edited 2026-10-11 19:26"},
+      {"url": "https://arcraiders.wiki/wiki/Electromagnetic_Storm", "retrieved": "2026-11-09", "revision_or_date": "edited 2026-08-04 19:47"},
+      {"url": "https://arcraiders.wiki/wiki/Hurricane", "retrieved": "2026-11-09", "revision_or_date": "edited 2026-05-20 08:56"},
+      {"url": "https://arcraiders.wiki/wiki/Cold_Snap", "retrieved": "2026-11-09", "revision_or_date": "edited 2026-08-12 02:42"},
+      {"url": "docs/research/2026-11-08/maps.json (official tracker types and 1.42.0 regional schedules)", "retrieved": "2026-11-08", "revision_or_date": "project research, tracker data 2026-11-08"}
+    ],
+    "confidence": "sourced",
+    "conflicts": [
+      "Embark calls operations 'major map conditions'. The tracker page shows no labels; the major/minor split comes from its embedded data (prior research), and today's view grouped conditions into the same two unlabelled rows.",
+      "Third-party guides disagree on rotation length (one hour vs 30 to 90 minutes). The official tracker shows one-hour slots."
+    ]
+  },
+
+  "operations": [
+    {
+      "id": "close_scrutiny",
+      "name": "Close Scrutiny",
+      "kind": "ARC Operation",
+      "tracker_type": "major",
+      "centrepiece": "ARC Assessor",
+      "introduced": {"patch": "1.22.0", "name": "Flashpoint", "date": "2026-03-31"},
+      "maps": ["Dam Battlegrounds", "Buried City", "Spaceport", "The Blue Gate"],
+      "maps_note": "Not on Stella Montis (indoor). Riven Tides (added 1.26.0) and Pendola Pass (2.0) are not listed on the wiki page.",
+      "schedule": {
+        "how_often": "Unknown as a frequency. It is on the official hourly rotation; on 2026-11-09 its next slot was 12:00 to 13:00 (selected region) on Dam Battlegrounds. The wiki schedule section is empty.",
+        "start": "Scheduled map condition; you queue the map while it is live."
+      },
+      "map_effects": ["No active locked doors (key rooms open; puzzle rooms stay shut)", "Decreased overall loot value", "Increased ARC loot", "No Free Loadout (since 1.33.0)", "Shredders can appear (added to all maps in 1.22.0; on Dam only in certain conditions)"],
+      "phases": [
+        "Surveyors, escorted by Vaporizers, scan the map and call Assessors down. Each Assessor is marked by a tall red beam visible across the map.",
+        "The Assessor lands. Its pylons pump in rhythm and it cycles through active pylons clockwise, extending a platform at each one.",
+        "Breach a pylon while its platform is out (only one segment can be worked at a time). The first breach attempt on a pylon makes noise and calls an aggravated ARC swarm; a failed attempt does not spawn more on retry.",
+        "A fully breached pylon keeps its platform out and is deactivated; loot it.",
+        "Leave the area; the swarm stays."
+      ],
+      "objectives": "None set by the game. The goal is breaching Assessor pylons for their loot.",
+      "time_limits": {
+        "pylon": "About 5 minutes from touchdown. After that an un-deactivated pylon's red beam blinks, then the pylon ejects and launches into the sky (lost).",
+        "match": "No change to match length found."
+      },
+      "enemies": {
+        "escort": ["Surveyor", "Vaporizer"],
+        "breach_swarm": ["Vaporizer", "Rocketeer", "Firefly", "Hornet", "Wasp"],
+        "ambient": ["Shredder"],
+        "assessor": "Unarmed; it does not attack."
+      },
+      "mechanics_and_weak_points": [
+        "The Assessor is a breachable container, not a fight: it is unarmed and has no health or weak points listed. The 'weak point' is the pylon whose platform is currently extended.",
+        "Each Assessor has three breachable sections (wiki infobox; KeenGamer and Insider Gaming say three probes).",
+        "Vaporizers are the real threat: aerial, heavy laser, usually in groups. 2.0 adjusted the Vaporizer's multi-target laser so it can be dodged."
+      ],
+      "rewards": {
+        "guaranteed": "None found.",
+        "assessor_loot_chance": ["Assessor Matrix", "Dolabra Blueprint (small chance)", "ARC Powercell", "Advanced ARC Powercell", "ARC Alloy", "ARC Circuitry", "ARC Coolant", "ARC Flex Rubber", "ARC Motion Core", "ARC Performance Steel", "ARC Synthetic Resin", "ARC Thermo Lining", "Advanced Electrical Components"],
+        "search_xp": 200,
+        "other": "Since 2.3.0 the Dolabra, Bobcat, Equalizer, Jupiter, Tempest and Vulcano blueprint pool can drop in any major condition. Flashpoint's High-Gain Antenna player project took materials from the operation (that project's status now is unknown)."
+      },
+      "team_size": "No source gives a number. Guides assume a squad: one player breaching while others hold Vaporizers and swarm off. Unverified.",
+      "recommended_gear": {
+        "weapon_class": "Anti-armour plus a close-range option. KeenGamer: Anvil primary, Hullcracker secondary, shotgun or SMG for Shredders. games.gg: Dolabra (energy shotgun) or Canto (SMG, medium ammo).",
+        "ammo": "Medium ammo is easiest to sustain (games.gg); launcher ammo if using a Hullcracker. No counts given.",
+        "shields": "Not specified by any source.",
+        "augments": "Not specified by any source.",
+        "utility": "Smoke Grenade or Li'l Smoke Grenade before breaching and before looting; Lure Grenade thrown away from your escape route; Photoelectric Cloak to walk out (wiki). Wolf Pack for swarms, Surge Coil for area denial (KeenGamer). Healing for sustained damage."
+      },
+      "what_to_expect": {
+        "pvp": "Ambient loot is cut, so the Assessors are the only real loot source and every squad converges on the red beams. Guides call it a PvPvE hotspot. No Free Loadout means other players carry real kits.",
+        "extraction": "No Return Point or hatch changes found. You leave a breach with a live swarm on you.",
+        "routing": "Assessor positions are visible map-wide (red beams), so routes can be planned to them after landing. Fixed landing points are not documented."
+      },
+      "common_mistakes": [
+        "Breaching before clearing at least two groups of Vaporizers (games.gg).",
+        "Breaching in the open without smoke or cover.",
+        "Waiting too long: pylons eject about 5 minutes after touchdown.",
+        "Running to distant Combat Supply markers, which are usually looted already.",
+        "Not putting the Assessor Matrix in a safe pocket.",
+        "Bringing too little healing."
+      ],
+      "patch_history": [
+        {"patch": "1.22.0", "date": "2026-03-31", "change": "Close Scrutiny, ARC Assessor and Vaporizer added (official)."},
+        {"patch": "1.33.0", "date": "2026-06-16", "change": "Free loadouts disabled for Night Raid and Close Scrutiny, announced as a three-week test (Beebom summary of official notes). The wiki still tags it No Free Loadout as of 2026-10-11."},
+        {"patch": "2.0", "date": "2026-10-08", "change": "Vaporizer multi-target laser made dodgeable; explosive damage reworked (more vs armour plates, less vs weak points)."},
+        {"patch": "2.3.0", "date": "2026-10-27", "change": "Six legendary/epic blueprints can drop in any major condition; that pool's chance slightly lowered."}
+      ],
+      "sources": [
+        {"url": "https://arcraiders.wiki/wiki/Close_Scrutiny", "retrieved": "2026-11-09", "revision_or_date": "oldid 42845, edited 2026-10-11 19:25"},
+        {"url": "https://arcraiders.wiki/wiki/Assessor", "retrieved": "2026-11-09", "revision_or_date": "oldid 44511, edited 2026-11-08 11:56"},
+        {"url": "https://arcraiders.com/news/flashpoint-content-update", "retrieved": "2026-11-09", "revision_or_date": "2026-03-30"},
+        {"url": "https://arcraiders.com/news/patch-notes-1-22-0", "retrieved": "2026-11-09", "revision_or_date": "2026-03-31"},
+        {"url": "https://gamesbeat.com/arc-raiders-gets-a-big-flashpoint-free-update-as-arc-threat-escalates/", "retrieved": "2026-11-09", "revision_or_date": "2026-03-30, updated 2026-07-03"},
+        {"url": "https://insider-gaming.com/close-scrutiny-map-condition-in-arc-raiders-arc-operations-explained/", "retrieved": "2026-11-09", "revision_or_date": "2026-03-31"},
+        {"url": "https://www.keengamer.com/articles/guides/arc-raiders-close-scrutiny-map-condition-guide/", "retrieved": "2026-11-09", "revision_or_date": "2026-04-07"},
+        {"url": "https://games.gg/zh-CN/arc-raiders/guides/arc-raiders-close-scrutiny-指南击败-assessor-并生存/", "retrieved": "2026-11-09", "revision_or_date": "updated 2026-06-09 (localised copy; English version not retrieved)"},
+        {"url": "https://beebom.com/arc-raiders-patch-notes-update-1-33-0/", "retrieved": "2026-11-09", "revision_or_date": "2026-06-16"},
+        {"url": "https://arcraiders.com/news/frozen-trail-2-0-update", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+        {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"}
+      ],
+      "confidence": "conflicting",
+      "conflicts": [
+        "Free Loadout: 1.33.0 announced a three-week test; the wiki still lists 'No Free Loadout' and the 2.0 Frigate has the same tag. No official note making it permanent was found. Check in game.",
+        "The wiki says 'pylons' that cycle clockwise; guides say 'three probes activated one at a time'. Likely the same thing; the count of Assessors per raid is not documented anywhere.",
+        "The Flashpoint news says Assessors carry loot inside; the wiki says loot is in breachable containers outside the Assessor. Both mean you breach to loot.",
+        "Insider Gaming (launch day) called the Dolabra Blueprint the Assessor's reward; the wiki lists it as a small chance, and since 2.3.0 it can drop in any major condition."
+      ]
+    },
+
+    {
+      "id": "arc_frigate",
+      "name": "ARC Frigate",
+      "kind": "ARC Operation",
+      "tracker_type": "major",
+      "centrepiece": "ARC Frigate (a flying ship you board and sabotage; it cannot be destroyed)",
+      "introduced": {"patch": "2.0", "name": "Frozen Trail", "date": "2026-10-08"},
+      "maps": ["Dam Battlegrounds", "Buried City", "Spaceport", "The Blue Gate", "Riven Tides", "Pendola Pass"],
+      "maps_note": "Not on Stella Montis. On 2026-11-09 the tracker had it on Dam Battlegrounds (09:00) then Spaceport (10:00).",
+      "schedule": {
+        "how_often": "Unknown as a frequency. Hourly rotation on the official tracker; it appeared in two consecutive slots on 2026-11-09. Wiki schedule section empty.",
+        "start": "Scheduled map condition. In raid, the Frigate arrives about 1 to 2 minutes in. Since 2.3.0 you can ping it from long range while it is still entering the area."
+      },
+      "match_length": "35 minutes (5 minutes added), per wiki.",
+      "map_effects": ["Loot rooms disabled; locked doors inactive", "Decreased overall loot value", "Raider Hatches unusable", "ARC Turbines do not spawn; surface ARC greatly reduced", "No Free Loadout"],
+      "phases": [
+        "Boarding: ARC Reclaimers descend to the ground. Climb one and use Disrupt to ride it up to the Frigate's Landing. Do not try to climb from the ground; stay out from under the ship's turrets.",
+        "Exterior (Landing, Lower Atrium, Upper Atrium, Top Deck): destroy the exterior Power Cores. Shoot yellow components to open doors and platforms. A Grappling Hook or Snap Hook skips the Lower Atrium elevator. Top Deck wind pushes Raiders toward fire traps until that side's cores are destroyed; rear rooms burn while their core is up. The Top Deck front entrances open only once all accessible cores are down.",
+        "Cargo Hold (transition): the two Lower Atrium cores power the Cargo. Some buttons must be held by two or more players at once.",
+        "Interior (two mirrored rooms and a central turbine room): turbine-room fog drains health; shooting yellow components clears fog in that section and slows the nearest fan. Clear all ARC, since survivors can jeopardise the Cargo release.",
+        "Cargo release: destroy every remaining Power Core, undo the four Cargo latches, then breach two circular latches. The Cargo drops to the ground.",
+        "Exit: stand on the Cargo as it drops to ride it down safely (wiki, Beebom), loot it on the ground, then walk to a normal extraction. Since 2.2.0 riders are no longer ejected or burned during the descent, and crushing applies only at the landing point."
+      ],
+      "objectives": "Sabotage: destroy the Power Cores and release the Cargo. The follow-up quest (per Beebom) asks to destroy 3 Power Cores, loot the Cargo and destroy 3 Hydras.",
+      "time_limits": "None found for the puzzle beyond the 35-minute raid.",
+      "enemies": {
+        "main": ["Hydra (stationary three-section turret; activates in waves as areas clear or cores are exposed; six on the Top Deck)"],
+        "support": ["Rocketeer", "Vaporizer", "Firefly", "Hornet", "Wasp"],
+        "landing": ["ARC Reclaimer"],
+        "frigate_itself": "Dual autocannon barrage, warned by an audio cue and blue lasers."
+      },
+      "mechanics_and_weak_points": [
+        "Power Cores are glowing orange targets and need a lot of ARC armour penetration (guides).",
+        "Yellow components open doors, platforms and fans; they are shot, not interacted with.",
+        "Hydra: guides recommend high-penetration weapons (Hullcracker, Equalizer) against its backplate and front armour. 2.2.0 raised Hydra base damage and fixed its close-range accuracy. A 2.0 known issue let Hydras see and shoot through walls in Cargo (no damage).",
+        "Since 2.1.0 opening Frigate hatches deals burning damage over time.",
+        "Since 2.3.0 visual hatches show puzzle progress, with clearer audio for core vents and hatches."
+      ],
+      "rewards": {
+        "guaranteed": "None found.",
+        "containers": "Mid-tier ARC loot, small chance of Amplification Modules, Frigate Inductor and ARC Data.",
+        "cargo": "Higher odds of Frigate Diagnostic Node and Amplification Modules, plus other Amplification parts. One of three places with Amplified Weapon parts (with the Fallen Emperor and Harvester Payloads).",
+        "loot_depth": "Since 2.3.0, areas further in roll higher-tier rewards.",
+        "other": "Research items for Outpost research points (Beebom). Amplification Modules come in Mk. I to Mk. V (KeenGamer). Major-condition blueprint pool applies (2.3.0)."
+      },
+      "team_size": "Full squad of three recommended. KeenGamer says three Raiders are needed for the levers; the wiki says some buttons need two or more players. Solo players can board and loot by cooperating with strangers aboard.",
+      "recommended_gear": {
+        "weapon_class": "One heavy-ammo weapon (Bettina or Anvil) plus an anti-armour weapon (Hullcracker, Jupiter or Equalizer).",
+        "ammo": "Heavy plus energy or launcher ammo; far more than a normal loot run, enough for the whole sequence, not just the first Hydra.",
+        "shields": "Medium Shield (Beebom); several Shield Rechargers.",
+        "augments": "Looting Mk. 3 Survivor for extra slots (Beebom). No other source names one.",
+        "utility": "Grappling Hook (preferred) or Snap Hook; Barricades; Wolf Pack or Trigger 'Nade; Defibrillator for squads; Herbal Bandages, Vita Shot or Sterilized Bandage."
+      },
+      "what_to_expect": {
+        "pvp": "Every squad on the map boards the same ship. Gunfire gives away positions, so ARC fights turn into PvP, and temporary allies become competitors once the Cargo is exposed. No Free Loadout raises everyone's stakes.",
+        "extraction": "No Raider Hatches. You leave the Frigate on the Cargo or by Reclaimer, then cross a map with greatly reduced surface ARC to a normal extraction. Fixed Cargo drop points exist (moved on Pendola Pass in 2.1.0) but are not documented.",
+        "routing": "It pulls the whole lobby to one moving point early (1 to 2 minutes in) and holds them for most of a 35-minute raid. Surface loot is weak; the Cargo landing spot is the second hotspot."
+      },
+      "common_mistakes": [
+        "Splitting up instead of moving together.",
+        "Filling your bag before the Cargo.",
+        "Standing under the ship near its turrets.",
+        "Stacking the whole squad behind one piece of cover against Hydras.",
+        "Ignoring Rocketeers and Vaporizers during Hydra fights.",
+        "Leaving ARC alive in the Interior before the Cargo release.",
+        "Selling Amplification Modules you cannot use yet."
+      ],
+      "patch_history": [
+        {"patch": "2.0", "date": "2026-10-08", "change": "Added with Pendola Pass, Hydra, Amplified Weapons and Outpost."},
+        {"patch": "2.1.0", "date": "2026-10-13", "change": "Hatches burn when opened; Cargo collision smoothed; Cargo drop no longer causes unintended knockouts; spawns moved closer to the action; Pendola Pass Cargo drop points moved."},
+        {"patch": "2.2.0", "date": "2026-10-20", "change": "No ejection or burning during Cargo descent; crushing only at landing; entry sequence optimised; Cargo hold memory fixes; Hydra damage up and close-range fix. Known issue: Reclaimers sometimes fail to dock."},
+        {"patch": "2.3.0", "date": "2026-10-27", "change": "Exact-location pings and long-range ping on arrival; deeper areas give higher-tier loot; progress hatches and audio cues; collision fixes; new cargo gate; lighting."}
+      ],
+      "sources": [
+        {"url": "https://arcraiders.wiki/wiki/Frigate", "retrieved": "2026-11-09", "revision_or_date": "oldid 44537, edited 2026-11-08 22:11"},
+        {"url": "https://arcraiders.com/news/frozen-trail-2-0-update", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://arcraiders.com/news/store-update-2-1-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-13"},
+        {"url": "https://arcraiders.com/news/store-update-2-2-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-20"},
+        {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+        {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"},
+        {"url": "https://beebom.com/arc-raiders-frigate-guide/", "retrieved": "2026-11-09", "revision_or_date": "updated 2026-10-09"},
+        {"url": "https://www.keengamer.com/articles/guides/arc-raiders-frigate-guide-farming-amplification-modules/", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://www.thesixthaxis.com/2026/09/23/everything-we-know-about-arc-raiders-frozen-trail-pendola-pass-the-arc-frigate-weapon-amplification-more/", "retrieved": "2026-11-09", "revision_or_date": "2026-09-23 (pre-release preview)"}
+      ],
+      "confidence": "conflicting",
+      "conflicts": [
+        "Power Core count: the wiki says 18 in one place and 20 accessible in another. Guides give no total.",
+        "How you leave: the wiki and Beebom say ride the dropping Cargo down; KeenGamer (launch day) says retrace to the Reclaimer and descend, and calls jumping off a mistake. Both may work; the Cargo ride was made safe in 2.2.0.",
+        "Players needed: KeenGamer says three for the levers; the wiki says two or more for some buttons.",
+        "Classification: the wiki tags it ARC Operation and the tracker lists it as major, but Embark's 2.0 notes only call it a new map condition. TheSixthAxis (preview) called it a 'world event'.",
+        "Hydra location: the preview said Hydra was Pendola Pass only; the wiki says Hydras appear on the Frigate (all its maps) and at the Pendola Pass Emperor. The wiki is newer."
+      ]
+    },
+
+    {
+      "id": "harvester",
+      "name": "Harvester",
+      "kind": "Minor map condition (boss structure). Not tagged ARC Operation.",
+      "tracker_type": "minor",
+      "centrepiece": "Harvester structure at a fixed location, guarded by the Queen",
+      "introduced": {"patch": "unknown", "date": "unknown; a guide dated 2025-11-06 already covers it, so it predates 1.2.0 (2025-11-13) and was likely in at release (2025-10-30). Not confirmed."},
+      "maps": ["Dam Battlegrounds", "Spaceport", "The Blue Gate"],
+      "maps_note": "Wiki infobox. Dam Battlegrounds location: south-east of the Power Generation Complex near the Red Lakes (one guide). On 2026-11-09 the tracker had it on Dam Battlegrounds at 10:00.",
+      "schedule": {
+        "how_often": "Unknown as a frequency. Hourly rotation; wiki schedule empty.",
+        "start": "Scheduled condition; the Harvester is already on the map when the raid starts."
+      },
+      "phases": [
+        "Get past the Queen. She patrols; watch her for about 30 seconds for a window, or use a cloak, zipline or smoke. Killing her is optional.",
+        "Enter through a ground-level vent (three entrances; three more exits up top). One guide says prying a vent starts a 45-second timer before fire.",
+        "Gather three fusion cores: breach containers on the upper level; one spawns on the ground in the centre.",
+        "Open the chambers at the base of the central pillar and insert all three cores in quick succession.",
+        "Survive the defences: Fire Discharge (yellow light and sound warning, vent doors open, ejects inserted cores) and, once cores are in, the Queen's Electrical Surge (drains shield and stuns, cannot kill; unequipping your shield negates it; doors do not open first). Destroying all yellow targets on one side stops the core on the perpendicular side being ejected next discharge.",
+        "Destroy the 12 pulsating yellow targets (about 100 damage in total; melee works). Defences stop.",
+        "Three loot containers drop from the central pillar. Loot and leave."
+      ],
+      "objectives": "Complete the core sequence and loot the central containers.",
+      "time_limits": "None listed on the wiki. One guide gives a 45-second vent timer and about 3 seconds of alarm before flames.",
+      "enemies": {
+        "boss": "Queen (about 23,000 HP, wiki estimate; heavy armour). Becomes hostile to Raiders inside once cores are inserted.",
+        "queen_attacks": ["Mortar Fire (2 to 5 mortars; ground burns 2 seconds after impact)", "Laser Beam (leaves hot ground)", "Ground Slam / EMP Pulse at close range", "Fires into the Harvester node, electrocuting everyone inside"],
+        "other": "Rocketeers are mentioned around the Queen fight (allthings.how)."
+      },
+      "mechanics_and_weak_points": [
+        "Queen weak points: leg joints and the core; break a leg joint to drop the Head Core, then burst it.",
+        "Since 2.0 the Dolabra can destroy the yellow weak points inside the Harvester (fix).",
+        "Since 2.0 the Queen's higher-tier loot sits on the leg pieces, not the leg armour plates."
+      ],
+      "rewards": {
+        "guaranteed": "Wiki: 1 to 3 blueprints, always Equalizer Blueprint or Jupiter Blueprint, from the central containers. Contested; see conflicts.",
+        "containers_chance": ["ARC Powercell", "Advanced ARC Powercell", "ARC Alloy", "Burned ARC Circuitry", "Impure ARC Coolant", "ARC Circuitry", "ARC Coolant", "ARC Flex Rubber", "ARC Motion Core", "ARC Performance Steel", "ARC Synthetic Resin", "ARC Thermo Lining"],
+        "queen_loot": ["Queen Reactor", "Advanced ARC Powercell", "Advanced Electrical Components", "Advanced Mechanical Components", "Complex Gun Parts", "Magnetic Accelerator", "ARC Alloy", "ARC Circuitry", "ARC Coolant", "ARC Flex Rubber", "ARC Motion Core", "ARC Performance Steel", "ARC Synthetic Resin", "ARC Thermo Lining"],
+        "queen_xp": "Destroy +1,000; core +1,000; leg +500",
+        "solo_note": "A solo player gets all three central containers (arcraidershub)."
+      },
+      "team_size": "Squad recommended; solo is possible but hard (arcraidershub). The Queen kill guide plans for a trio.",
+      "recommended_gear": {
+        "weapon_class": "Puzzle only: anything; a melee tool for the yellow targets. Queen kill: Hullcracker primary, Anvil, Tempest or a medium-ammo rifle secondary (allthings.how, Nov 2025).",
+        "ammo": "Queen kill: about 200 to 250 Hullcracker rounds total, or 70 to 100 per player in a trio (allthings.how, pre-2.0 explosive rework, so likely out of date).",
+        "shields": "Unequip the shield before the Electrical Surge. Shield rechargers for the Queen fight.",
+        "augments": "Not specified by any source.",
+        "utility": "Smoke grenades and a cloak to slip past the Queen; Wolf Pack or Shock grenades for Rocketeers; barricades; Snap Hook or ziplines; Raider Hatch Key for a guaranteed exit; bandages and defibs."
+      },
+      "what_to_expect": {
+        "pvp": "Completion makes a sound that carries across the map and draws players to the Harvester. Other squads may wait for you to finish.",
+        "extraction": "Plan the exit before looting. Store the Queen Reactor in a safe pocket.",
+        "routing": "Fixed location per map, so it can be pinned in a route. Does not pull players in by mechanics, but the sound and the blueprint draw them."
+      },
+      "common_mistakes": [
+        "Fighting the Queen when you only want the blueprints.",
+        "Finishing a task when the fire alarm sounds instead of getting out.",
+        "Not knowing the vent exits.",
+        "Leaving your shield on for the Electrical Surge."
+      ],
+      "patch_history": [
+        {"patch": "1.13.0", "date": "2026-01-27", "change": "Queen icon updated."},
+        {"patch": "2.0", "date": "2026-10-08", "change": "Dolabra can hit the yellow weak points inside; Jupiter damage propagation fixed; Queen high-tier loot moved to leg pieces; explosive damage reworked."},
+        {"patch": "2.3.0", "date": "2026-10-27", "change": "Equalizer and Jupiter blueprints can also drop in any major condition (pool chance slightly lowered)."}
+      ],
+      "sources": [
+        {"url": "https://arcraiders.wiki/wiki/Harvester", "retrieved": "2026-11-09", "revision_or_date": "oldid 44508, edited 2026-11-08 11:37"},
+        {"url": "https://arcraiders.wiki/wiki/Queen", "retrieved": "2026-11-09", "revision_or_date": "oldid 44522, edited 2026-11-08 12:08"},
+        {"url": "https://arcraidershub.com/guides/raiding-the-harvester-guide", "retrieved": "2026-11-09", "revision_or_date": "undated"},
+        {"url": "https://allthings.how/arc-raiders-queen-kill-guide-spawns-loadouts-tactics-loot", "retrieved": "2026-11-09", "revision_or_date": "updated 2025-11-06"},
+        {"url": "https://arcraiders.com/news/frozen-trail-2-0-update", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://insider-gaming.com/complete-arc-raiders-frozen-trail-2-0-update-patch-notes/", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+        {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"}
+      ],
+      "confidence": "conflicting",
+      "conflicts": [
+        "Maps: the wiki infobox lists three maps but its intro says 'each map'; some guides say any map at random. The tracker and prior research support the three.",
+        "Guaranteed blueprints: the wiki says 1 to 3, always Equalizer or Jupiter; several guides say the Equalizer is rarer and repeat runs are needed. Both can be true (guaranteed count, uneven split). Unverified in game.",
+        "Cloak name: the wiki (Close Scrutiny page) says Photoelectric Cloak; arcraidershub says Prophetic Cloak. Item name unconfirmed.",
+        "2.0 loot move: the official summary says Queen/Matriarch high-tier loot moved 'from the armour to the leg pieces'; Insider Gaming says 'from the leg armour plates to the leg pieces'. Same intent; wording differs.",
+        "Queen ammo numbers predate the 2.0 explosive rework (less damage to weak points), so they are probably low now."
+      ]
+    },
+
+    {
+      "id": "matriarch",
+      "name": "Matriarch",
+      "kind": "Minor map condition (roaming boss). Not tagged ARC Operation.",
+      "tracker_type": "minor",
+      "centrepiece": "Matriarch, a large ARC that appears only during its condition",
+      "introduced": {"patch": "1.2.0", "name": "Welcome to the North Line", "date": "2025-11-13"},
+      "maps": ["Dam Battlegrounds", "Spaceport", "The Blue Gate"],
+      "maps_note": "On 2026-11-09 the tracker had it on The Blue Gate at 10:00. Spawn points are not listed; good fight spots: Spaceport Control Tower A6 and the Launch Towers, Dam Battlegrounds Electrical Substation, Blue Gate roof of Reinforced Reception.",
+      "schedule": {
+        "how_often": "Unknown as a frequency. Hourly rotation; wiki schedule empty.",
+        "start": "Scheduled condition; the Matriarch is on the map from the start."
+      },
+      "phases": [
+        "Phase 1, long range: missile barrages. Stay in hard cover; break faceplates or leg joints.",
+        "Phase 2, rush: she advances on the squad and adds flashbang capsules.",
+        "Phase 3, swarm: she summons ARC (Bastions, Bombardiers, Leapers, Rocketeers as main defence, plus Fireballs, Hornets, Wasps, Ticks). Once armour is off, burst the exposed core.",
+        "Throughout: an Energy Shield absorbs projectiles and throwables for about a minute; only shots from inside it hit. Hold fire or step inside.",
+        "Loot the main and small debris; leave."
+      ],
+      "phases_note": "The three-phase split comes from one guide (KeenGamer, Nov 2025). The wiki lists attacks and abilities without phases.",
+      "objectives": "Optional kill for loot.",
+      "time_limits": "None found.",
+      "enemies": {
+        "boss": "Matriarch (about 23,000 HP, wiki estimate; heavy armour)",
+        "attacks": ["Missile Swarm (3 to 6 homing missiles; the main damage)", "Leg Stomp (knockdown and about 2 s stun)", "Gas Capsule (blocks sight, drains stamina)", "Flashbang Capsule", "Energy Shield", "Summon ARC"],
+        "adds": ["Bastion", "Bombardier", "Leaper", "Rocketeer", "Fireball", "Hornet", "Wasp", "Tick"]
+      },
+      "mechanics_and_weak_points": [
+        "Weak points: core (exposed after breaking faceplates) and leg joints.",
+        "Since 2.0 she can use all her ranged attacks again (fix), and her higher-tier loot is on the leg pieces.",
+        "Since 2.3.0 the Grappling Hook works inside her active shield."
+      ],
+      "rewards": {
+        "guaranteed": "None found.",
+        "loot": ["Matriarch Reactor", "Advanced ARC Powercell", "Advanced Electrical Components", "Advanced Mechanical Components", "ARC Alloy", "ARC Circuitry", "ARC Coolant", "ARC Flex Rubber", "ARC Insulated Coupler", "ARC Motion Core", "ARC Performance Steel", "ARC Synthetic Resin", "ARC Thermo Lining", "Complex Gun Parts", "Magnetic Accelerator"],
+        "xp": "Destroy +1,000; core +1,000; leg +500",
+        "use": "Matriarch Reactor is used for the Aphelion (KeenGamer)."
+      },
+      "team_size": "Squad: one on adds, one on Hullcracker burst, the rest steady damage from cover (KeenGamer). Solo is described as possible with the right kit by some guides.",
+      "recommended_gear": {
+        "weapon_class": "Hullcracker (launcher) for burst; Anvil, Venator or a sustained rifle (KeenGamer names 'Combat Mk. 3 Aggressive' build) as backup; one guide pairs Hullcracker with Equalizer.",
+        "ammo": "Launcher ammo, 144+ (KeenGamer, pre-2.0 explosive rework).",
+        "shields": "Heavy Shield; about 10 Surge Shield Rechargers.",
+        "augments": "Combat Mk. 3 (Aggressive) per KeenGamer. No other source.",
+        "utility": "Wolf Packs for adds; Snap Hook; Barricades; about 10 Herbal Bandages."
+      },
+      "what_to_expect": {
+        "pvp": "No source covers PvP specifically. The fight is long and loud in the open, so third parties are likely. Unverified.",
+        "extraction": "Extract promptly after looting (KeenGamer).",
+        "routing": "Roaming, not fixed; route to the cover spots above. Does not lock or unlock anything."
+      },
+      "common_mistakes": [
+        "Standing in the open during missile barrages.",
+        "Staying in gas clouds or near flashbangs.",
+        "Kiting in predictable lines (missiles home).",
+        "Leaving elite adds alive.",
+        "Shooting into the shield instead of healing and repositioning.",
+        "Hanging around after looting."
+      ],
+      "patch_history": [
+        {"patch": "1.2.0", "date": "2025-11-13", "change": "Added."},
+        {"patch": "1.13.0", "date": "2026-01-27", "change": "Icon changed."},
+        {"patch": "2.0", "date": "2026-10-08", "change": "All ranged attacks restored; high-tier loot moved to leg pieces; explosive rework."},
+        {"patch": "2.1.0", "date": "2026-10-13", "change": "Vaulting on Matriarch remains stabilised."},
+        {"patch": "2.2.0", "date": "2026-10-20", "change": "Known issue: Grappling Hook cannot be thrown inside her shield."},
+        {"patch": "2.3.0", "date": "2026-10-27", "change": "Grappling Hook works inside her shield."}
+      ],
+      "sources": [
+        {"url": "https://arcraiders.wiki/wiki/Matriarch", "retrieved": "2026-11-09", "revision_or_date": "oldid 44523, edited 2026-11-08 12:12"},
+        {"url": "https://arcraiders.wiki/wiki/Matriarch_(map_condition)", "retrieved": "2026-11-09", "revision_or_date": "oldid 35968, edited 2026-05-20 08:54"},
+        {"url": "https://www.keengamer.com/articles/guides/arc-raiders-how-to-defeat-the-matriarch-boss-easily/", "retrieved": "2026-11-09", "revision_or_date": "2025-11-17"},
+        {"url": "https://arcraiders.com/news/frozen-trail-2-0-update", "retrieved": "2026-11-09", "revision_or_date": "2026-10-08"},
+        {"url": "https://arcraiders.com/news/store-update-2-1-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-13"},
+        {"url": "https://arcraiders.com/news/store-update-2-2-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-20"},
+        {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+        {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"}
+      ],
+      "confidence": "conflicting",
+      "conflicts": [
+        "Weak points: the wiki says skip the legs and break faceplates for the core; KeenGamer has teammates shoot leg joints to slow her. Both list leg joints as a weak point.",
+        "Gear guides are from November 2025, before the 2.0 explosive rework that cut explosive damage to weak points. Hullcracker ammo counts are probably out of date.",
+        "Solo viability differs between guides."
+      ]
+    },
+
+    {
+      "id": "redirection_fallen_emperor",
+      "name": "Redirection (and the Fallen Emperor)",
+      "kind": "Minor map condition, Pendola Pass only. Not tagged ARC Operation, but raid-within-a-raid for routing.",
+      "tracker_type": "minor",
+      "introduced": {"patch": "2.0", "name": "Frozen Trail", "date": "2026-10-08"},
+      "maps": ["Pendola Pass"],
+      "schedule": {
+        "how_often": "Unknown as a frequency; on 2026-11-09 it had the 09:00 and 11:00 slots on Pendola Pass.",
+        "start": "Scheduled condition."
+      },
+      "phases": [
+        "Emperor Beacons activate across the map. Loot one and deploy it to call a Harvester Payload down to your position.",
+        "Payloads fall with debris that damages anyone under it. Wait for it to stop, walk up, breach (some can be searched straight away)."
+      ],
+      "condition_effects": ["No Flash Freeze", "Emperor Relays active", "Falling Debris"],
+      "fallen_emperor": "A permanent dungeon/key room on Pendola Pass with randomly alternating puzzle rooms, entered mainly with an Emperor Gateway Conduit. Not condition-gated as far as the wiki says. Hydras guard it (Frigate wiki page). One of three sources of Amplified Weapon parts.",
+      "time_limits": "None found.",
+      "enemies": "Not documented for Redirection.",
+      "rewards": {
+        "guaranteed": "None found.",
+        "payload": "ARC materials and parts (no item list on the wiki). Emperor Gateway Conduit blueprint drops from Payloads (prior research); 2.3.0 reduced the Emperor Key blueprint chance from Redirection pods and added a small chance of ARC parts and high-tier ARC loot.",
+        "emperor": "Since 2.3.0, containers near the Emperor entrance roll lower tiers and deeper ones higher."
+      },
+      "team_size": "Not documented.",
+      "recommended_gear": "Not documented by any source found.",
+      "what_to_expect": {
+        "pvp": "Not documented. Beacons pull a Payload to a known spot, which other players can see fall. Unverified.",
+        "routing": "Beacons let you choose where the loot lands, so a route can end near an extraction (Ballistic Gondola on Pendola Pass)."
+      },
+      "common_mistakes": ["Standing under falling debris."],
+      "patch_history": [
+        {"patch": "2.0", "date": "2026-10-08", "change": "Redirection, Fallen Emperor and Harvester Payload added."},
+        {"patch": "2.2.0", "date": "2026-10-20", "change": "Emperor platform sync, killbox, boundary and stuck-spot fixes."},
+        {"patch": "2.3.0", "date": "2026-10-27", "change": "Emperor Key blueprint chance from Redirection pods reduced, ARC loot added; Emperor loot deeper-is-better; exploit prevention."}
+      ],
+      "sources": [
+        {"url": "https://arcraiders.wiki/wiki/Redirection", "retrieved": "2026-11-09", "revision_or_date": "oldid 42795, edited 2026-10-11 18:53"},
+        {"url": "https://arcraiders.wiki/wiki/Harvester_Payload", "retrieved": "2026-11-09", "revision_or_date": "oldid 43362, edited 2026-10-16 18:29 (stub)"},
+        {"url": "https://arcraiders.wiki/wiki/Fallen_Emperor", "retrieved": "2026-11-09", "revision_or_date": "oldid 44496, edited 2026-11-07 22:40 (stub)"},
+        {"url": "https://arcraiders.wiki/wiki/Pendola_Pass", "retrieved": "2026-11-09", "revision_or_date": "oldid 44506, edited 2026-11-08 11:22"},
+        {"url": "https://arcraiders.com/news/store-update-2-2-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-20"},
+        {"url": "https://arcraiders.com/news/live-update-2-3-0", "retrieved": "2026-11-09", "revision_or_date": "2026-10-27"},
+        {"url": "https://arcraiders.com/map-conditions", "retrieved": "2026-11-09", "revision_or_date": "live, viewed 2026-11-09"}
+      ],
+      "confidence": "unverified",
+      "conflicts": [
+        "Key naming: 2.3.0 says 'Emperor Key' blueprint; the wiki names the key 'Emperor Gateway Conduit'. Probably the same item.",
+        "The Pendola Pass wiki page lists 'ARC Operation' separately from 'ARC Frigate' in its conditions, which could mean a Pendola-specific operation not documented elsewhere. Nothing else supports that."
+      ]
+    }
+  ],
+
+  "not_found": [
+    "No other ARC Operation as of 2.4.1. The Flashpoint news implied more would come; Frozen Trail added only the Frigate.",
+    "No source gives how often any condition comes up (per day or per week). The tracker only shows the next slot per condition.",
+    "No source gives a minimum gear tier. All gear in this file is guide recommendation.",
+    "Augments are almost never named in guides.",
+    "Number of Assessors per Close Scrutiny raid, and their landing points.",
+    "Frigate route over each map and its Cargo drop points.",
+    "Whether the 1.33.0 free loadout ban on Close Scrutiny was made permanent (the wiki and the Frigate tag imply it is still in force).",
+    "When the Harvester and Queen were added (evidence says by 2025-11-06).",
+    "A 'Queen' condition of its own does not exist; the Queen only appears at the Harvester.",
+    "MetaForge (403) and the fandom wiki (402) could not be read."
+  ]
+}

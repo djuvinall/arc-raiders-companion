@@ -1011,3 +1011,126 @@ impl Default for Profile {
         }
     }
 }
+
+/// An ARC Operation, boss or payload event: a guide plus what the route planner needs.
+/// Built from `overlays/operations_overlay.json`. Every field defaults, so newer data with
+/// extra fields still loads.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct Operation {
+    pub id: String,
+    pub name: String,
+    /// `operation`, `boss` or `event`.
+    pub kind: String,
+    /// Its name in `conditions.json` and the event schedule.
+    pub condition: String,
+    pub introduced: String,
+    pub maps: Vec<String>,
+    pub summary: String,
+    pub starts: String,
+    pub map_effects: Vec<String>,
+    pub steps: Vec<OpStep>,
+    /// ARC ids.
+    pub enemies: Vec<String>,
+    pub enemy_notes: Vec<String>,
+    pub rewards: Vec<OpReward>,
+    pub reward_notes: Vec<String>,
+    pub team: OpTeam,
+    pub gear: Vec<OpGear>,
+    pub gear_notes: Vec<String>,
+    pub expect: OpExpect,
+    pub mistakes: Vec<String>,
+    pub route: OpRoute,
+    pub patches: Vec<OpPatch>,
+    pub conflicts: Vec<String>,
+    /// Things to check in game.
+    pub checks: Vec<String>,
+    /// `sourced`, `conflicting`, `unverified` or `in-game`.
+    pub confidence: String,
+    pub sources: Vec<OpSource>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpStep {
+    pub name: String,
+    pub what: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpReward {
+    pub item_id: String,
+    /// `guaranteed`, `likely` or `possible`.
+    pub chance: String,
+    pub from: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpTeam {
+    pub min: u32,
+    pub best: u32,
+    pub note: String,
+}
+
+/// One line of kit: any of these items (weapon families expanded to every tier), or any
+/// weapon with at least this ARC armour penetration, `qty` of them.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpGear {
+    /// `weapon`, `shield`, `healing`, `utility` or `augment`.
+    pub slot: String,
+    /// `minimum` or `recommended`.
+    pub need: String,
+    pub item_ids: Vec<String>,
+    pub armor_pen: Option<String>,
+    pub qty: u32,
+    pub note: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpExpect {
+    pub pvp: String,
+    pub extraction: String,
+    pub other: Vec<String>,
+}
+
+/// What the route planner needs to know about it.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpRoute {
+    /// Marker types where it happens, as `events/harvester`.
+    pub markers: Vec<String>,
+    /// Always at the same spot (the Harvester), or at one of several (Assessor landings).
+    pub fixed: bool,
+    /// Raid minute it starts, when it doesn't start with the raid.
+    pub start_minute: Option<f64>,
+    /// About how long it holds you.
+    pub minutes: Option<f64>,
+    /// Minutes before the objective is lost (an Assessor pylon launches).
+    pub window_minutes: Option<f64>,
+    /// The whole lobby heads for it.
+    pub pulls_lobby: bool,
+    /// Raider Hatches don't work.
+    pub no_hatches: bool,
+    pub raid_minutes: Option<u32>,
+    pub notes: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpPatch {
+    pub patch: String,
+    pub date: String,
+    pub change: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default)]
+pub struct OpSource {
+    pub url: String,
+    pub retrieved: String,
+    pub revision: String,
+}

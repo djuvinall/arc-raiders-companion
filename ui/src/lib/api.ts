@@ -646,10 +646,13 @@ export interface TargetArea {
   depth: number;
   stops: RaidStop[];
   covers: { item_id: string; name: string; likely: number; possible: number; enough: boolean }[];
-  exits: { name: string; x: number; y: number; distance: number }[];
+  /** `hatch`: a Raider Hatch, which needs a Raider Hatch Key. */
+  exits: { name: string; x: number; y: number; distance: number; hatch: boolean }[];
   walk: number;
   /** With a primary objective: how far past the area's edge it is. */
   detour: number | null;
+  /** Rough minutes to walk the loop and open its stops (estimated speeds). */
+  minutes: number;
 }
 
 export interface MapPick {
@@ -676,7 +679,95 @@ export interface RaidAuto {
   quest_stops: RaidStop[];
   primary: RaidStop | null;
   conditions: ConditionNote[];
+  /** 30, or what a live or primary operation makes it. */
+  raid_minutes: number;
+  /** Operations live on the map now, or the plan's primary. */
+  operations: OpNote[];
+  /** Every operation spot on the map, to pick as the primary. */
+  op_spots: { op_id: string; op_name: string; stop: RaidStop }[];
 }
+
+export interface OpNote {
+  id: string;
+  name: string;
+  kind: string;
+  live: boolean;
+  primary: boolean;
+  ready: boolean;
+  short: string[];
+  team_min: number;
+  team_best: number;
+  start_minute: number | null;
+  minutes: number | null;
+  window_minutes: number | null;
+  pulls_lobby: boolean;
+  no_hatches: boolean;
+  notes: string[];
+}
+
+export interface Operation {
+  id: string;
+  name: string;
+  kind: "operation" | "boss" | "event";
+  condition: string;
+  introduced: string;
+  maps: string[];
+  summary: string;
+  starts: string;
+  map_effects: string[];
+  steps: { name: string; what: string }[];
+  enemies: string[];
+  enemy_notes: string[];
+  rewards: { item_id: string; chance: string; from: string }[];
+  reward_notes: string[];
+  team: { min: number; best: number; note: string };
+  gear_notes: string[];
+  expect: { pvp: string; extraction: string; other: string[] };
+  mistakes: string[];
+  route: {
+    markers: string[];
+    fixed: boolean;
+    start_minute: number | null;
+    minutes: number | null;
+    window_minutes: number | null;
+    pulls_lobby: boolean;
+    no_hatches: boolean;
+    raid_minutes: number | null;
+    notes: string[];
+  };
+  patches: { patch: string; date: string; change: string }[];
+  conflicts: string[];
+  checks: string[];
+  confidence: "sourced" | "conflicting" | "unverified" | "in-game";
+  sources: { url: string; retrieved: string; revision: string }[];
+}
+
+export interface GearCheck {
+  slot: string;
+  need: "minimum" | "recommended";
+  names: string[];
+  examples: Link[];
+  armor_pen: string | null;
+  qty: number;
+  note: string | null;
+  have: number;
+  met: boolean;
+}
+
+export interface OperationView {
+  op: Operation;
+  maps: { map_id: string; map_name: string; spots: number }[];
+  enemies: Link[];
+  rewards: { item: Link; chance: string; from: string }[];
+  gear: GearCheck[];
+  /** Every minimum gear line is in the stash. */
+  ready: boolean;
+}
+
+export const operationList = () => invoke<OperationView[]>("operation_list");
+/** Scheduled event name to the id of its operation guide, for linking live events. */
+export const operationGuides = async () =>
+  new Map((await operationList()).map((o) => [o.op.condition.toLowerCase(), o.op.id] as const));
 
 export const RAID_DEFAULTS: RaidSettings = { areas: 3, radius: 250, stops: 8, confidence: 2 };
 export const newRaidPlan = (mapId: string, name: string): RaidPlan => ({

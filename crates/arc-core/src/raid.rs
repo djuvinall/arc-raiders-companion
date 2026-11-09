@@ -345,6 +345,8 @@ pub struct Exit {
     pub x: f64,
     pub y: f64,
     pub distance: f64,
+    /// A Raider Hatch: needs a Raider Hatch Key, and some conditions turn hatches off.
+    pub hatch: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -369,6 +371,8 @@ pub struct TargetArea {
     pub walk: f64,
     /// With a primary objective: how far past the area's edge it is, in map units.
     pub detour: Option<f64>,
+    /// Rough minutes to walk the loop and open its stops, from estimated speeds.
+    pub minutes: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -392,6 +396,102 @@ pub struct RaidAuto {
     pub primary: Option<Stop>,
     /// Conditions live on this map now that the plan counted.
     pub conditions: Vec<ConditionNote>,
+    /// Raid length: 30 minutes, or what a live operation makes it.
+    pub raid_minutes: u32,
+    /// Operations that shape this raid: live on the map now, or the primary objective.
+    pub operations: Vec<OpNote>,
+    /// Every operation spot on this map, to pick one as the primary objective.
+    pub op_spots: Vec<OpSpot>,
+}
+
+/// An operation as it affects one plan.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct OpNote {
+    pub id: String,
+    pub name: String,
+    pub kind: String,
+    /// On the schedule for this map now.
+    pub live: bool,
+    /// The plan's primary objective.
+    pub primary: bool,
+    /// Every minimum gear line is in the stash.
+    pub ready: bool,
+    /// Minimum gear lines the stash is short of, by name.
+    pub short: Vec<String>,
+    pub team_min: u32,
+    pub team_best: u32,
+    pub start_minute: Option<f64>,
+    pub minutes: Option<f64>,
+    pub window_minutes: Option<f64>,
+    pub pulls_lobby: bool,
+    pub no_hatches: bool,
+    pub notes: Vec<String>,
+}
+
+/// One place an operation happens on this map.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct OpSpot {
+    pub op_id: String,
+    pub op_name: String,
+    pub stop: Stop,
+}
+
+/// Operations on this plan's map that are live now or are its primary objective.
+fn op_notes(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live: &[String]) -> Vec<OpNote> {
+    let primary_op = plan.primary.as_ref().filter(|p| p.kind == "operation").map(|p| p.id.split('@').next().unwrap_or(&p.id).to_string());
+    ds.files.operations.iter().filter(|o| o.maps.contains(&plan.map_id)).filter_map(|o| {
+        let is_live = live.iter().any(|l| l.trim().eq_ignore_ascii_case(&o.condition));
+        let is_primary = primary_op.as_deref() == Some(o.id.as_str());
+        if !is_live && !is_primary {
+            return None;
+        }
+        let view = crate::operations::view(ds, profile, o);
+        let short = view.gear.iter().filter(|g| g.need == "minimum" && !g.met)
+            .map(|g| {
+                let what = if g.names.is_empty() {
+                    format!("a weapon with {} ARC armour penetration", g.armor_pen.as_deref().unwrap_or("strong"))
+                } else {
+                    g.names.join(" or ")
+                };
+                if g.qty > 1 { format!("{what} x{} (have {})", g.qty, g.have) } else { what }
+            })
+            .collect();
+        Some(OpNote {
+            id: o.id.clone(), name: o.name.clone(), kind: o.kind.clone(), live: is_live, primary: is_primary,
+            ready: view.ready, short, team_min: o.team.min, team_best: o.team.best,
+            start_minute: o.route.start_minute, minutes: o.route.minutes, window_minutes: o.route.window_minutes,
+            pulls_lobby: o.route.pulls_lobby, no_hatches: o.route.no_hatches, notes: o.route.notes.clone(),
+        })
+    }).collect()
+}
+
+/// Operation spots to offer as a primary objective. Events with many spots (Redirection's
+/// payloads land wherever you call them) aren't places to aim for.
+fn op_spots(ds: &Dataset, map_id: &str) -> Vec<OpSpot> {
+    const MANY: usize = 20;
+    let markers = ds.files.markers.maps.get(map_id).map_or(&[][..], |m| &m[..]);
+    let mut out = Vec::new();
+    for o in ds.files.operations.iter().filter(|o| o.maps.iter().any(|m| m == map_id)) {
+        let here: Vec<(usize, &MapMarker)> = markers.iter().enumerate()
+            .filter(|(_, m)| ds.files.markers.categories.get(usize::from(m.0)).is_some_and(|c| o.route.markers.contains(&c.id)))
+            .collect();
+        if here.len() > MANY {
+            continue;
+        }
+        for (i, m) in here {
+            let category = &ds.files.markers.categories[usize::from(m.0)];
+            let place = place_name(ds, map_id, (m.1, m.2));
+            out.push(OpSpot {
+                op_id: o.id.clone(),
+                op_name: o.name.clone(),
+                stop: Stop {
+                    key: format!("{}#{i}", category.id), kind: "primary", name: format!("{}: {} near {place}", o.name, category.name),
+                    x: m.1, y: m.2, floors: m.3, items: vec![o.name.clone()],
+                },
+            });
+        }
+    }
+    out
 }
 
 /// One map's case for a raid: its best area and what else is there for you.
@@ -475,14 +575,24 @@ fn walk(points: &[(f64, f64)]) -> f64 {
     points.windows(2).map(|w| dist(w[0], w[1])).sum()
 }
 
-fn exits(ds: &Dataset, map_id: &str, at: (f64, f64)) -> Vec<Exit> {
+/// The two nearest exits that are open, and always at least one that isn't a Raider Hatch
+/// (those need a key).
+fn exits(ds: &Dataset, map_id: &str, at: (f64, f64), no_hatches: bool) -> Vec<Exit> {
     let mut all: Vec<Exit> = ds.files.pois.iter()
         .filter(|p| p.map_id == map_id && p.kind == PoiKind::Extract)
-        .map(|p| Exit { name: p.name.clone(), x: p.x, y: p.y, distance: dist(at, (p.x, p.y)).round() })
+        .map(|p| Exit {
+            name: p.name.clone(), x: p.x, y: p.y, distance: dist(at, (p.x, p.y)).round(),
+            hatch: p.name.to_lowercase().contains("hatch"),
+        })
+        .filter(|e| !(no_hatches && e.hatch))
         .collect();
     all.sort_by(|a, b| a.distance.total_cmp(&b.distance));
-    all.truncate(2);
-    all
+    let open = all.iter().position(|e| !e.hatch);
+    let mut out: Vec<Exit> = all.iter().take(2).cloned().collect();
+    if let Some(i) = open.filter(|i| *i >= 2) {
+        out[1] = all[i].clone();
+    }
+    out
 }
 
 /// A spot named after a key, keycard or floor ("Dam Staff Key Room" is fine; "Buried City JKV
@@ -521,6 +631,38 @@ fn place_name(ds: &Dataset, map_id: &str, at: (f64, f64)) -> String {
         .map_or_else(String::new, |(n, _)| n)
 }
 
+/// Estimated travel speed in map units per second, jogging with stops. Not measured: check in
+/// game by timing a run between two markers.
+pub const TRAVEL_SPEED: f64 = 4.5;
+/// Estimated seconds to search a container, and extra to breach one.
+pub const SEARCH_SECONDS: f64 = 4.0;
+pub const BREACH_SECONDS: f64 = 8.0;
+/// A raid without a condition that changes it.
+pub const RAID_MINUTES: u32 = 30;
+
+/// What shapes every area of one plan.
+#[derive(Default)]
+struct Ctx<'a> {
+    primary: Option<&'a Stop>,
+    /// A condition such as the ARC Frigate turns Raider Hatches off.
+    no_hatches: bool,
+}
+
+/// Rough minutes for a loop: the walk, plus searching (and breaching) its stops.
+fn loop_minutes(ds: &Dataset, walk: f64, stops: &[Stop]) -> f64 {
+    let open: f64 = stops.iter().map(|s| match s.kind {
+        "container" => SEARCH_SECONDS + if breached(ds, &s.name) { BREACH_SECONDS } else { 0.0 },
+        "plant" | "arc" => SEARCH_SECONDS,
+        _ => 0.0,
+    }).sum();
+    ((walk / TRAVEL_SPEED + open) / 60.0 * 10.0).round() / 10.0
+}
+
+/// A breachable container type takes longer. Stops are named after their container type.
+fn breached(ds: &Dataset, name: &str) -> bool {
+    ds.files.containers.iter().any(|c| c.breach && c.name == name)
+}
+
 /// How much an area's worth is kept at a distance from the primary objective: full beside
 /// it, half at `DETOUR` radii away.
 const DETOUR: f64 = 3.0;
@@ -536,8 +678,9 @@ fn detour_factor(primary: Option<&Stop>, at: (f64, f64), radius: f64) -> f64 {
 /// areas near it rank higher and each loop passes through it.
 fn search(
     ds: &Dataset, map_id: &str, wants: &[Wanted], spots: &[Spot], quest_stops: &[Stop], settings: &RaidSettings,
-    primary: Option<&Stop>,
+    ctx: &Ctx,
 ) -> Vec<TargetArea> {
+    let primary = ctx.primary;
     let radius = settings.radius.clamp(60.0, 1500.0);
     let confidence = f64::from(settings.confidence.clamp(1, 10));
     let targets: Vec<f64> = wants.iter().map(|w| f64::from(w.qty.max(1)) * confidence).collect();
@@ -579,7 +722,7 @@ fn search(
             continue;
         }
         taken.push(at);
-        areas.push(area(ds, map_id, &map_name, at, (value, depth), wants, spots, &grid, quest_stops, &quest_grid, &targets, settings, areas.len(), primary));
+        areas.push(area(ds, map_id, &map_name, at, (value, depth), wants, spots, &grid, quest_stops, &quest_grid, &targets, settings, areas.len(), ctx));
     }
     areas
 }
@@ -588,8 +731,9 @@ fn search(
 fn area(
     ds: &Dataset, map_id: &str, map_name: &str, at: (f64, f64), (value, depth): (f64, f64), wants: &[Wanted], spots: &[Spot],
     grid: &Grid, quest_stops: &[Stop], quest_grid: &Grid, targets: &[f64], settings: &RaidSettings, index: usize,
-    primary: Option<&Stop>,
+    ctx: &Ctx,
 ) -> TargetArea {
+    let primary = ctx.primary;
     let radius = settings.radius.clamp(60.0, 1500.0);
     let inside: Vec<usize> = grid.near(at.0, at.1).filter(|&n| dist(at, (spots[n].x, spots[n].y)) <= radius).collect();
     let covers: Vec<ItemCover> = wants.iter().enumerate().map(|(i, w)| {
@@ -627,7 +771,7 @@ fn area(
         let n = stops.len() as f64;
         (stops.iter().map(|s| s.x).sum::<f64>() / n, stops.iter().map(|s| s.y).sum::<f64>() / n)
     };
-    let out = exits(ds, map_id, centre);
+    let out = exits(ds, map_id, centre, ctx.no_hatches);
     // Start at the stop farthest from the nearest exit, so the loop ends close to it.
     let points: Vec<(f64, f64)> = stops.iter().map(|s| (s.x, s.y)).collect();
     let exit = out.first().map_or(centre, |e| (e.x, e.y));
@@ -635,6 +779,7 @@ fn area(
     let path = order(&points, start);
     let stops: Vec<Stop> = path.iter().map(|&i| stops[i].clone()).collect();
     let length = walk(&path.iter().map(|&i| points[i]).collect::<Vec<_>>());
+    let minutes = loop_minutes(ds, length, &stops);
     TargetArea {
         label: char::from(b'A' + (index as u8 % 26)).to_string(),
         name: place_name(ds, map_id, centre),
@@ -650,6 +795,7 @@ fn area(
         exits: out,
         walk: length.round(),
         detour,
+        minutes,
     }
 }
 
@@ -723,7 +869,7 @@ pub fn suggest_maps_live(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live:
         let now = live_on(ds, &m.id, live.get(&m.id).map_or(&[][..], Vec::as_slice));
         let spots_here = spots(ds, &m.id, &wants, &boxes_off, &now);
         let quests = quest_stops(ds, profile, &m.id, &off);
-        let best = search(ds, &m.id, &wants, &spots_here, &quests, &one, None).into_iter().next();
+        let best = search(ds, &m.id, &wants, &spots_here, &quests, &one, &Ctx::default()).into_iter().next();
         let mut sums = vec![0.0; wants.len()];
         for s in &spots_here {
             for (sum, v) in sums.iter_mut().zip(&s.scores) {
@@ -802,7 +948,12 @@ pub fn auto_plan_live(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live: &[
     }).collect();
     let quests = quest_stops(ds, profile, &plan.map_id, &off);
     let primary = primary_stop(plan);
-    let areas = search(ds, &plan.map_id, &wants, &spots_here, &quests, &plan.settings, primary.as_ref());
+    let ops = op_notes(ds, profile, plan, live);
+    let ctx = Ctx { primary: primary.as_ref(), no_hatches: ops.iter().any(|o| o.no_hatches) };
+    let areas = search(ds, &plan.map_id, &wants, &spots_here, &quests, &plan.settings, &ctx);
+    let raid_minutes = ops.iter()
+        .filter_map(|o| ds.files.operations.iter().find(|x| x.id == o.id).and_then(|x| x.route.raid_minutes))
+        .max().unwrap_or(RAID_MINUTES);
     RaidAuto {
         sources: all.into_iter().map(|(key, kind, name, items)| Source {
             on: source_on(&key, kind),
@@ -817,6 +968,9 @@ pub fn auto_plan_live(ds: &Dataset, profile: &Profile, plan: &RaidPlan, live: &[
         quest_stops: quests,
         primary,
         conditions: now.iter().map(|c| condition_note(c)).collect(),
+        raid_minutes,
+        operations: ops,
+        op_spots: op_spots(ds, &plan.map_id),
     }
 }
 
@@ -827,7 +981,7 @@ pub fn farm(ds: &Dataset, item_ids: &[String], settings: &RaidSettings) -> Vec<T
     let per_map = RaidSettings { areas: 2, ..settings.clone() };
     let mut all: Vec<TargetArea> = ds.files.maps.iter().flat_map(|m| {
         let spots_here = spots(ds, &m.id, &wants, &BTreeSet::new(), &[]);
-        search(ds, &m.id, &wants, &spots_here, &[], &per_map, None)
+        search(ds, &m.id, &wants, &spots_here, &[], &per_map, &Ctx::default())
     }).collect();
     all.sort_by(|a, b| b.value.total_cmp(&a.value).then(b.depth.total_cmp(&a.depth)));
     all.truncate(8);

@@ -14,6 +14,7 @@ pub const FILES: &[&str] = &[
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
     "loot_areas.json", "map_markers.json", "version.json", "changelog.json", "notes.json",
     "project_tasks.json", "containers.json", "conditions.json",
+    "operations.json",
 ];
 
 fn dataset_version(text: &str) -> Option<String> {

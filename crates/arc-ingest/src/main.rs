@@ -13,6 +13,7 @@ mod fetch;
 mod guns;
 mod http;
 mod normalize;
+mod operations;
 mod output;
 mod precedence;
 mod probe;
@@ -37,6 +38,7 @@ const NOTES_OVERLAY: &str = include_str!("../../../dataset/overlays/notes_overla
 const QUESTS_OVERLAY: &str = include_str!("../../../dataset/overlays/quests_overlay.json");
 const CONTAINERS_OVERLAY: &str = include_str!("../../../dataset/overlays/containers_overlay.json");
 const CONDITIONS_OVERLAY: &str = include_str!("../../../dataset/overlays/conditions_overlay.json");
+const OPERATIONS_OVERLAY: &str = include_str!("../../../dataset/overlays/operations_overlay.json");
 const ARC_LOOT: &str = include_str!("../../../dataset/overlays/arc_loot.json");
 const TIP_FIXES: &str = include_str!("../../../dataset/overlays/tip_fixes.json");
 const STENCILS_OVERLAY: &str = include_str!("../../../dataset/overlays/stencils_overlay.json");
@@ -523,6 +525,7 @@ fn write_schemas(dir: &Path) -> Result<()> {
         ("notes", schemars::schema_for!(m::Notes)),
         ("container", schemars::schema_for!(Vec<m::Container>)),
         ("condition", schemars::schema_for!(Vec<m::MapCondition>)),
+        ("operation", schemars::schema_for!(Vec<m::Operation>)),
     ];
     for (name, schema) in schemas {
         let text = serde_json::to_string_pretty(&schema)? + "\n";
@@ -561,6 +564,9 @@ fn rebuild(root: &Path, write: bool) -> Result<usize> {
     out.files.markers = build_markers(&marker_fixture, &out.files.arcs)?;
     out.files.containers = containers::build(CONTAINERS_OVERLAY, &arc_loot, &out.files.items, &mut out.files.markers)?;
     out.files.conditions = containers::conditions(CONDITIONS_OVERLAY, &out.files.maps, &out.files.markers)?;
+    out.files.operations = operations::build(
+        OPERATIONS_OVERLAY, &out.files.items, &out.files.arcs, &out.files.maps, &out.files.markers, &out.files.conditions,
+    )?;
     apply_notes(&mut out.files)?;
     apply_project_tasks(&mut out.files)?;
     let fixes = corrections::load(&root.join("dataset/overlays/corrections"))?;

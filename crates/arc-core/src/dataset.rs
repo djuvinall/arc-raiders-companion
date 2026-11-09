@@ -34,6 +34,7 @@ pub struct DatasetFiles {
     pub project_tasks: ProjectTasks,
     pub containers: Vec<Container>,
     pub conditions: Vec<MapCondition>,
+    pub operations: Vec<Operation>,
 }
 
 #[derive(Debug, Default)]
@@ -100,6 +101,10 @@ impl Dataset {
             },
             conditions: match read("conditions.json") {
                 Ok(_) => parse(read, "conditions.json")?,
+                Err(_) => Vec::new(),
+            },
+            operations: match read("operations.json") {
+                Ok(_) => parse(read, "operations.json")?,
                 Err(_) => Vec::new(),
             },
         };

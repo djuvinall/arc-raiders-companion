@@ -11,6 +11,7 @@
   import Craft from "./routes/Craft.svelte";
   import EntityRef from "./routes/EntityRef.svelte";
   import Arcs from "./routes/Arcs.svelte";
+  import Operations from "./routes/Operations.svelte";
   import Home from "./routes/Home.svelte";
   import ItemPage from "./routes/ItemPage.svelte";
   import Mini from "./routes/Mini.svelte";
@@ -61,7 +62,7 @@
       case "raid":
         return { title: "Raid", subtitle: "Plans and farming" };
       case "arcs":
-        return { title: "ARCs", subtitle: "Enemy guide" };
+        return parts[1] === "ops" ? { title: "ARCs", subtitle: "Operations" } : { title: "ARCs", subtitle: "Enemy guide" };
       case "skills":
         return { title: "Skills", subtitle: "Planner" };
       case "weapons":
@@ -113,7 +114,11 @@
           farmItem={parts[1] === "farm" ? (parts[2] ?? "") : undefined}
         />
       {:else if parts[0] === "arcs"}
-        <Arcs id={parts[1]} />
+        {#if parts[1] === "ops"}
+          <Operations id={parts[2]} />
+        {:else}
+          <Arcs id={parts[1]} />
+        {/if}
       {:else if parts[0] === "skills"}
         <Skills />
       {:else if parts[0] === "weapons"}

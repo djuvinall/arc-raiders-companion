@@ -6,6 +6,7 @@ pub mod calc;
 pub mod dataset;
 pub mod events;
 pub mod model;
+pub mod operations;
 pub mod patches;
 pub mod raid;
 pub mod routing;

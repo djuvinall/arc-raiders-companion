@@ -134,6 +134,9 @@
     } else if (kind === "place") {
       const p = pois.find((x) => x.id === id);
       if (p) next = { kind, id: p.id, name: p.name, x: p.x, y: p.y, floors: p.zlayers };
+    } else if (kind === "op") {
+      const o = auto?.op_spots[Number(id)];
+      if (o) next = { kind: "operation", id: `${o.op_id}@${o.stop.key}`, name: o.stop.name, x: o.stop.x, y: o.stop.y, floors: o.stop.floors };
     } else if (kind === "arc") {
       const a = arcSpots.find((x) => x.id === id);
       if (a) next = { kind, id: a.id, name: "Hunt " + a.name, x: a.x, y: a.y, floors: a.floors };
@@ -438,7 +441,7 @@
       {#if area}
         <h3 class="section-title">{area.map_name}: {area.name}</h3>
         {@render covers(area)}
-        <p class="small dim">Nearest exits: {area.exits.map((e) => e.name).join(", ") || "none mapped"}</p>
+        <p class="small dim">Nearest exits: {area.exits.map((e) => e.hatch ? `${e.name} (Raider Hatch: needs a key)` : e.name).join(", ") || "none mapped"}</p>
         <button class="button small primary" onclick={() => planFarm(area)}>Plan this</button>
         <h3 class="section-title">Stops</h3>
         {#each area.stops as s, i (s.key)}<p class="small"><b>{i + 1}.</b> {s.name}{s.items.length ? `: ${short(s.items)}` : ""}</p>{/each}
@@ -458,6 +461,29 @@
         </div>
       </div>
       {#if message}<p class="small message" role="status">{message}</p>{/if}
+      {#each auto?.operations ?? [] as o (o.id)}
+        <div class="op" class:short={!o.ready}>
+          <p class="small">
+            <strong>{o.live ? "Live now" : "Primary"}: <a href="#/arcs/ops/{o.id}">{o.name}</a></strong>
+            <span class="dim">· {o.team_min === o.team_best ? o.team_best : `${o.team_min} to ${o.team_best}`} players</span>
+          </p>
+          {#if o.ready}
+            <p class="small ok">Your stash covers its minimum gear.</p>
+          {:else}
+            <p class="small warn">Short of its minimum gear: {o.short.join("; ")}.</p>
+          {/if}
+          <p class="dim small">
+            {[
+              o.start_minute ? `starts about ${o.start_minute} min in` : "",
+              o.minutes ? `takes about ${o.minutes} min` : "",
+              o.window_minutes ? `lost after about ${o.window_minutes} min` : "",
+              o.pulls_lobby ? "the whole lobby heads for it" : "",
+              o.no_hatches ? "no Raider Hatches" : "",
+            ].filter(Boolean).join(" · ")}
+          </p>
+          {#each o.notes as n}<p class="dim small">{n}</p>{/each}
+        </div>
+      {/each}
       {#if auto?.conditions.length}
         <div class="live">
           {#each auto.conditions as c (c.name)}
@@ -479,6 +505,11 @@
         {#if auto?.quest_stops.length}
           <optgroup label="Quest steps">
             {#each auto.quest_stops as q (q.key)}<option value={"quest:" + q.key}>{q.items[0]}: {q.name}</option>{/each}
+          </optgroup>
+        {/if}
+        {#if auto?.op_spots.length}
+          <optgroup label="Operations and bosses">
+            {#each auto.op_spots as o, i (o.stop.key)}<option value={"op:" + i}>{o.stop.name}</option>{/each}
           </optgroup>
         {/if}
         {#if arcSpots.length}
@@ -518,15 +549,16 @@
       {/if}
 
       <h3 class="section-title">{plan.primary ? "Side areas" : "Target areas"}</h3>
+      {#if auto}<p class="dim small">The raid lasts {auto.raid_minutes} minutes. Times are rough: estimated walking speed in straight lines, plus a few seconds per container.</p>{/if}
       {#each auto?.areas ?? [] as a, i (a.label)}
         <div class="area" class:on={i === areaIndex && !plan.custom}>
           <button class="area-head" onclick={() => { areaIndex = i; if (plan) { plan.custom = false; plan.area = a.label; save(false); } }}>
             <strong>{a.label}. {a.name || "Open ground"}</strong>
-            <span class="dim small" title="Covered: how much of what you want has enough chances here. Chances: how many, against what the plan asks for. Loop length is a straight line in map units.">{pct(a.value)} covered · {a.depth}× chances · {a.stops.length} stops · loop {a.walk}{a.detour === null || a.detour === undefined ? "" : a.detour ? " · " + a.detour + " off the objective" : " · around the objective"}</span>
+            <span class="dim small" title="Covered: how much of what you want has enough chances here. Chances: how many, against what the plan asks for. Loop length is a straight line in map units.">{pct(a.value)} covered · {a.depth}× chances · {a.stops.length} stops · about {a.minutes} min{a.detour === null || a.detour === undefined ? "" : a.detour ? " · " + a.detour + " off the objective" : " · around the objective"}</span>
           </button>
           {#if i === areaIndex}
             {@render covers(a)}
-            <p class="small dim">Nearest exits: {a.exits.map((e) => e.name).join(", ") || "none mapped"}</p>
+            <p class="small dim">Nearest exits: {a.exits.map((e) => e.hatch ? `${e.name} (Raider Hatch: needs a key)` : e.name).join(", ") || "none mapped"}</p>
             {#if !plan.custom}
               {#each a.stops as s, k (s.key)}
                 <label class="small check">
@@ -598,6 +630,25 @@
 </div>
 
 <style>
+  .op {
+    margin: 6px 0;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-left: 3px solid #7fc97f;
+    border-radius: 6px;
+  }
+  .op.short {
+    border-left-color: #d9a441;
+  }
+  .op p {
+    margin: 1px 0;
+  }
+  .ok {
+    color: #7fc97f;
+  }
+  .warn {
+    color: #d9a441;
+  }
   .live {
     padding: 6px 8px;
     border: 1px solid var(--yellow);

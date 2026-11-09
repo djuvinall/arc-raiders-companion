@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    getProfile, homeView, linkHref, liveEvents, mapList, patchNotes, projectList,
+    getProfile, homeView, linkHref, liveEvents, mapList, operationGuides, patchNotes, projectList,
     type EventsView, type GameMap, type Goal, type Home, type Overview, type PatchNote, type Profile, type ProjectView,
   } from "../lib/api";
 
@@ -28,6 +28,8 @@
   getProfile().then((p) => (profile = p));
   mapList().then((m) => (maps = m));
   liveEvents(region).then((e) => (events = e), () => {});
+  let guides = $state(new Map<string, string>());
+  operationGuides().then((g) => (guides = g), () => {});
   patchNotes().then((n) => (patch = n.notes.find((x) => x.version) ?? n.notes[0] ?? null), () => {});
 
   const mapName = (id: string) => maps.find((m) => m.id === id)?.name ?? id;
@@ -39,6 +41,8 @@
   const plans = $derived(profile?.raid_plans ?? []);
   const inRaid = $derived(plans.find((p) => p.status === "in_raid") ?? null);
   const liveNow = $derived(events?.maps.filter((m) => m.current.length) ?? []);
+  const liveGuides = $derived([...new Set(liveNow.flatMap((m) => m.current.map((e) => e.name)))]
+    .filter((n) => guides.has(n.toLowerCase())));
   const projectRows = $derived(projects
     .filter((p) => !p.paused && p.stages.length && p.stage <= p.stages.length && (p.tracked || (p.ends && endsAt(p) >= now)))
     .filter((p) => p.tracked || !p.permanent)
@@ -106,6 +110,9 @@
               <span class="dim small">{m.map_name}{m.next ? ` · next: ${m.next.name}` : ""}</span>
             </a>
           {/each}
+          {#if liveGuides.length}
+            <p class="small guides">Guides: {#each liveGuides as n, i (n)}{i ? " · " : ""}<a href="#/arcs/ops/{guides.get(n.toLowerCase())}">{n}</a>{/each}</p>
+          {/if}
         </section>
       {/if}
 

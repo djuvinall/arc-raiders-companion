@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    getItem, getProfile, iconSrc, liveEvents, mapList, mapMarkers, mapPois, markerCounts, questList,
+    getItem, getProfile, iconSrc, liveEvents, mapList, mapMarkers, mapPois, markerCounts, operationGuides, questList,
     type ItemDetail,
     type EventsView, type GameMap, type MarkerSet, type Poi, type RaidPlan,
   } from "../lib/api";
@@ -12,6 +12,8 @@
   let finding = $state<ItemDetail | null>(null);
   // svelte-ignore state_referenced_locally
   if (find) getItem(find).then((d) => (finding = d));
+  let guides = $state(new Map<string, string>());
+  operationGuides().then((g) => (guides = g), () => {});
 
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
   const REGIONS = ["europe", "north-america", "oceania"];
@@ -279,7 +281,7 @@
         {#each live?.current ?? [] as event}
           <span class="event now">
             {#if event.icon}<img src={iconSrc(event.icon)} alt="" width="16" height="16" />{/if}
-            {event.name} · ends in {when(event.endTime)}
+            {#if guides.has(event.name.toLowerCase())}<a href="#/arcs/ops/{guides.get(event.name.toLowerCase())}" title="Open the guide">{event.name}</a>{:else}{event.name}{/if} · ends in {when(event.endTime)}
           </span>
         {/each}
         {#if live?.next}<span class="event">Next: {live.next.name} in {when(live.next.startTime)}</span>{/if}

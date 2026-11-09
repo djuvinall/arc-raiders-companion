@@ -35,6 +35,7 @@ pub fn render(files: &DatasetFiles, coverage: &Value) -> Result<BTreeMap<&'stati
         ("project_tasks.json", pretty(&files.project_tasks)?),
         ("containers.json", pretty(&files.containers)?),
         ("conditions.json", pretty(&files.conditions)?),
+        ("operations.json", pretty(&files.operations)?),
         ("coverage.json", pretty(coverage)?),
     ]))
 }

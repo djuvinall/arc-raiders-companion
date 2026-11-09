@@ -43,6 +43,7 @@ embedded!(
     "pois.json", "quests.json", "projects.json", "skills.json", "arcs.json", "traders.json",
     "loot_areas.json", "map_markers.json", "version.json", "changelog.json", "notes.json",
     "project_tasks.json", "containers.json", "conditions.json",
+    "operations.json",
 );
 
 // A pinned copy of the Steam feed, so patch notes read with a cold cache.
@@ -109,6 +110,12 @@ fn set_found(state: State<AppState>, add: Vec<String>, remove: Vec<String>) -> C
         p.blueprints_found.retain(|id| !remove.contains(id) && !add.contains(id));
         p.blueprints_found.extend(add);
     })
+}
+
+/// ARC Operations and boss events as guides, with the stash checked against their gear.
+#[tauri::command]
+fn operation_list(state: State<AppState>) -> Vec<arc_core::operations::OperationView> {
+    arc_core::operations::list(&state.dataset, &state.profile.lock().expect("profile lock"))
 }
 
 #[tauri::command]
@@ -679,7 +686,7 @@ fn main() {
             toggle_tracked_item, quest_list, set_quest_objective, set_quest_state, project_list,
             commit_resource, uncommit_resource, reopen_project_stage, set_project_objective, set_project_tracked, collection_list, toggle_found, patch_notes,
             dataset_changelog, export_profile, import_profile, app_version, check_data_update, send_report,
-            home_view, set_found, set_tracked_from, item_verdict, arc_list, workbench_list, set_workbench_level,
+            home_view, set_found, set_tracked_from, item_verdict, arc_list, operation_list, workbench_list, set_workbench_level,
             toggle_tracked_bench, complete_quest_chain, complete_quests_before, complete_implied_quests, open_mini,
             restart_app, quest_share_code, add_friend, remove_friend, set_friend_quest, party_plan, stencil_shots, save_stencil_shot, delete_stencil_shot,
             updates::check_app_update, updates::install_app_update

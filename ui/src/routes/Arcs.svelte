@@ -18,6 +18,10 @@
 
 <div class="page">
   <aside>
+    <nav class="switch" aria-label="Guide">
+      <a href="#/arcs" class="on" aria-current="page">ARCs</a>
+      <a href="#/arcs/ops">Operations</a>
+    </nav>
     {#each arcs as { arc } (arc.id)}
       <button class="row" class:on={arc.id === selectedId} onclick={() => (selectedId = arc.id)}>
         <Icon url={arc.icon} name={arc.name} size={36} />
@@ -105,6 +109,26 @@
   .detail {
     overflow: auto;
     min-height: 0;
+  }
+  .switch {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .switch a {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--font-head);
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .switch a.on {
+    background: var(--panel-2);
+    border-color: var(--yellow);
   }
   .row {
     display: grid;
