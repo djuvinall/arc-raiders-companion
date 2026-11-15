@@ -1,0 +1,266 @@
+{
+  "_note": "Read from in-game screenshots on 2026-11-14 (confidence: in-game). Amplification trees, level-up costs and per-level durability lines. Nothing in ingest reads this file yet.",
+  "amplifications": {
+    "anvil": {
+      "cost": "one amplification part (pictured, not named on the card)",
+      "nodes": [
+        {
+          "name": "X-Rounds",
+          "effects": [
+            "+5 Base Damage",
+            "33% Increased Damage vs ARC Armor",
+            "10% Reduced Headshot Damage Multiplier",
+            "30% Increased Vertical Recoil",
+            "30% Increased Horizontal Recoil",
+            "50% Reduced Bullet Velocity"
+          ],
+          "blocks": [
+            "Anvil Splitter"
+          ]
+        },
+        {
+          "name": "Anvil Splitter",
+          "effects": [
+            "+3 Projectiles Per Shot",
+            "30% Reduced Base Dispersion",
+            "90% Reduced Dispersion Recovery Time",
+            "40% Increased ADS Dispersion",
+            "70% Reduced Projectile Damage",
+            "40% Reduced Headshot Damage Multiplier"
+          ],
+          "blocks": [
+            "X-Rounds"
+          ],
+          "note": "Splits into four weaker projectiles. The wiki-only item 'Anvil Splitter' is this amplification."
+        }
+      ]
+    },
+    "bettina": {
+      "cost": [
+        {
+          "item_id": "pneumatic-actuator",
+          "qty": 3
+        }
+      ],
+      "amplified_adds": "+100 Max Durability (100 to 200); keeps the level IV modifiers (15% Increased Fire Rate, 33.3% Reduced Reload Time)",
+      "nodes": [
+        {
+          "name": "Bigger Mag",
+          "effects": [
+            "+15 Magazine Size"
+          ],
+          "blocks": [
+            "Semi-Auto",
+            "X-Rounds"
+          ]
+        },
+        {
+          "name": "Semi-Auto",
+          "effects": [
+            "+3 Base Damage",
+            "20% Reduced Max Shot Dispersion",
+            "20% Reduced Fire Rate"
+          ],
+          "blocks": [
+            "Bigger Mag"
+          ]
+        },
+        {
+          "name": "X-Rounds",
+          "effects": [
+            "+3 Base Damage",
+            "25% Increased Damage vs ARC Armor",
+            "20% Increased Vertical Recoil",
+            "20% Increased Horizontal Recoil",
+            "30% Reduced Bullet Velocity",
+            "-4 Magazine Size"
+          ],
+          "note": "Follows Semi-Auto in the tree."
+        }
+      ]
+    },
+    "renegade": {
+      "nodes": [
+        {
+          "name": "More Reload",
+          "effects": [
+            "+1 Bullets Loaded at a time"
+          ]
+        },
+        {
+          "name": "Scoped",
+          "effects": [
+            "Adds a scope; fire from a scoped view"
+          ]
+        }
+      ]
+    },
+    "il-toro": {
+      "nodes": [
+        {
+          "name": "More Reload",
+          "effects": [
+            "+1 Shells Loaded at a time"
+          ]
+        },
+        {
+          "name": "Slug Rounds",
+          "effects": [
+            "-8 Projectiles Per Shot",
+            "900% Increased Projectile Damage",
+            "200% Increased Damage vs ARC Armor",
+            "40% Reduced Base Dispersion",
+            "50% Reduced Bullet Velocity"
+          ]
+        }
+      ]
+    },
+    "kettle": {
+      "nodes": [
+        {
+          "name": "X-Rounds",
+          "effects": [
+            "+6.5 Base Damage",
+            "400% Increased Damage vs ARC Armor",
+            "15% Increased Vertical Recoil",
+            "15% Increased Horizontal Recoil",
+            "30% Reduced Bullet Velocity",
+            "20% Reduced Fire Rate",
+            "-4 Magazine Size"
+          ],
+          "blocks": [
+            "Anti-Shield",
+            "Full-Auto"
+          ]
+        },
+        {
+          "name": "Anti-Shield",
+          "effects": [
+            "100% Increased Damage vs Raider Shields",
+            "-2 Base Damage"
+          ],
+          "blocks": [
+            "X-Rounds"
+          ]
+        },
+        {
+          "name": "Full-Auto",
+          "effects": [
+            "15% Increased Fire Rate",
+            "20% Reduced Headshot Damage Multiplier",
+            "30% Increased Vertical Recoil",
+            "30% Increased Horizontal Recoil",
+            "30% Increased Max Shot Dispersion"
+          ],
+          "blocks": [
+            "X-Rounds"
+          ]
+        }
+      ]
+    },
+    "osprey": {
+      "nodes": [
+        {
+          "name": "Tracker Rounds",
+          "effects": [
+            "+5s Tracking Duration",
+            "60% Reduced Bullet Velocity"
+          ],
+          "blocks": [
+            "Anti-Weak Point"
+          ]
+        },
+        {
+          "name": "Anti-Weak Point",
+          "effects": [
+            "100% Increased Damage vs ARC Weak Points"
+          ],
+          "blocks": [
+            "Tracker Rounds"
+          ],
+          "note": "Less damage to ARC armor plating (no number given)."
+        },
+        {
+          "name": "Ergonomic Bolt",
+          "effects": [
+            "Bolt-action while scoped"
+          ]
+        }
+      ]
+    },
+    "burletta": {
+      "nodes": [
+        {
+          "name": "Burst Fire",
+          "effects": [
+            "+2 Projectiles in Burst"
+          ],
+          "blocks": [
+            "Full-Auto"
+          ]
+        },
+        {
+          "name": "Increased Burst",
+          "effects": [
+            "+2 Projectiles in Burst",
+            "+3 Magazine Size"
+          ],
+          "note": "Follows Burst Fire."
+        },
+        {
+          "name": "Full-Auto",
+          "effects": [
+            "60% Increased Fire Rate",
+            "-2 Base Damage",
+            "60% Reduced Headshot Damage Multiplier",
+            "50% Increased Vertical Recoil",
+            "50% Increased Horizontal Recoil",
+            "100% Increased Dispersion Recovery Time",
+            "50% Increased Base Dispersion",
+            "50% Increased ADS Dispersion"
+          ],
+          "blocks": [
+            "Burst Fire",
+            "Increased Burst"
+          ]
+        },
+        {
+          "name": "Sprint Shooting",
+          "effects": [
+            "Fire while sprinting"
+          ]
+        }
+      ]
+    }
+  },
+  "level_durability": "Every level I to II card seen adds +10 Max Durability (100 to 110) and +10 Durability (Repair). Hullcracker II to III: Max Durability 110 to 120, Repair 88 to 96.",
+  "upgrade_costs_confirmed": [
+    "bettina-ii-craft",
+    "hullcracker-iii-craft",
+    "renegade-ii-craft",
+    "torrente-ii-craft",
+    "arpeggio-ii-craft",
+    "il-toro-ii-craft",
+    "kettle-ii-craft",
+    "osprey-ii-craft",
+    "burletta-ii-craft"
+  ],
+  "matched_unchanged": [
+    "amplified-anvil",
+    "amplified-bettina-semi-auto",
+    "anvil-iv",
+    "dolabra",
+    "tempest-iv (stats)",
+    "il-toro-ii and torrente-ii magazine sizes",
+    "stencils: Dragon's Breath, Ochre, Garnet on Tempest",
+    "stencils: Fortuna, Garnet, Ochre, Slipstream, Tortoise, Cerulean on Anvil"
+  ],
+  "open_checks": [
+    "Bettina III, Renegade III, Osprey III and the other unseen levels: still carry level IV numbers.",
+    "Ferro I to III fire rate: data gives 6.6 on every level, but Ferro IV shows 16.6.",
+    "Reduced Durability Burn Rate on Renegade III/IV and Torrente III/IV: probably stale like level II.",
+    "Hullcracker card shows an underbarrel slot and a second filled icon; is there a stock slot?",
+    "Anvil amplification part: its name.",
+    "Kettle III: Range likely 42.9 (II) or higher."
+  ]
+}

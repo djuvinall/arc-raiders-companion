@@ -40,15 +40,25 @@ pub fn load(dir: &Path) -> Result<Vec<(String, Correction)>> {
         .filter(|p| p.extension().is_some_and(|x| x == "json"))
         .collect();
     names.sort();
-    names
-        .into_iter()
-        .map(|p| {
-            let name = p.file_name().unwrap().to_string_lossy().into_owned();
-            let text = fs::read_to_string(&p)?;
-            let c = serde_json::from_str(&text).with_context(|| format!("corrections/{name}"))?;
-            Ok((name, c))
-        })
-        .collect()
+    let mut out = Vec::new();
+    for p in names {
+        let name = p.file_name().unwrap().to_string_lossy().into_owned();
+        let text = fs::read_to_string(&p)?;
+        // A player report is one correction; an in-game check session is a list of them.
+        let list: OneOrMany = serde_json::from_str(&text).with_context(|| format!("corrections/{name}"))?;
+        match list {
+            OneOrMany::One(c) => out.push((name, c)),
+            OneOrMany::Many(cs) => out.extend(cs.into_iter().enumerate().map(|(i, c)| (format!("{name}[{i}]"), c))),
+        }
+    }
+    Ok(out)
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum OneOrMany {
+    One(Correction),
+    Many(Vec<Correction>),
 }
 
 /// Sets `field` on the row with `id`; returns the value it replaced.
@@ -137,6 +147,17 @@ mod tests {
         patch(&mut r, &c("/stats/charge", json!(90.0))).unwrap();
         assert_eq!(r[1].stats.as_ref().unwrap()["charge"], json!(90.0));
         assert_eq!(r[0].value, 1);
+    }
+
+    #[test]
+    fn a_file_holds_one_correction_or_a_list() {
+        let one: OneOrMany = serde_json::from_value(json!({"file": "items", "id": "b", "field": "/value", "value": 1})).unwrap();
+        assert!(matches!(one, OneOrMany::One(_)));
+        let many: OneOrMany = serde_json::from_value(json!([
+            {"file": "items", "id": "a", "field": "/value", "value": 1},
+            {"file": "items", "id": "b", "field": "/value", "value": 2}
+        ])).unwrap();
+        assert!(matches!(many, OneOrMany::Many(ref v) if v.len() == 2));
     }
 
     #[test]
